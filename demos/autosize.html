@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@0.8.4/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@0.8.4/dist/sm.css" rel="stylesheet">
+    <title>ui-helpers • demos • autosize</title>
+</head>
+<body>
+
+<div id="app">
+    <textarea v-model="value" v-autosize></textarea>
+    <textarea v-model="value" v-autosize class="max-h200 oa vt"></textarea>
+    <pre class="xm dashed">{{ value }}</pre>
+</div>
+
+<script src="https://unpkg.com/jquery@3.6.3/dist/jquery.js"></script>
+<script src="https://unpkg.com/vue@2.7.14/dist/vue.js"></script>
+<script src="../src/autosize.js"></script>
+<script>
+new Vue({
+    el: '#app',
+    data: {
+        value: 'hello\nwelcome\n',
+    },
+});
+</script>
+
+</body>
+</html>
