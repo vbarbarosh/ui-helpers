@@ -3,10 +3,21 @@
   "author": "Vladimir Barbarosh <vladimir.barbarosh@gmail.com>",
   "version": "0.1.0",
   "description": "A set of ready components for fast prototyping.",
+  "license": "MIT",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "license": "MIT",
+  "files": [
+      "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vbarbarosh/ui-helpers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vbarbarosh/ui-helpers/issues"
+  },
+  "homepage": "https://vue-pager.vbarbarosh.com",
   "devDependencies": {
     "mocha": "^10.2.0",
     "power-assert": "^1.6.1"
