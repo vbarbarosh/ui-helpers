@@ -1,7 +1,7 @@
 {
   "name": "@vbarbarosh/ui-helpers",
   "author": "Vladimir Barbarosh <vladimir.barbarosh@gmail.com>",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A set of ready components for fast prototyping.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
