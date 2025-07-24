@@ -17,7 +17,7 @@
   "bugs": {
     "url": "https://github.com/vbarbarosh/ui-helpers/issues"
   },
-  "homepage": "https://vue-pager.vbarbarosh.com",
+  "homepage": "https://ui-helpers.vbarbarosh.com",
   "devDependencies": {
     "mocha": "^10.2.0",
     "power-assert": "^1.6.1"
