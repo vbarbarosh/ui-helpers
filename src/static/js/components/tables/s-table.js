@@ -37,7 +37,6 @@ vue_component('s-table', {
     `,
     computed: {
         computed_columns: function () {
-            console.log(this.columns);
             if (typeof this.columns === 'string') {
                 return this.columns.split(',').map(function (label, i) {
                     return mapper({label, read: v => v[label]}, i);

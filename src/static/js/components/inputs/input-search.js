@@ -1,13 +1,13 @@
-vue_component('input-int', {
+vue_component('input-search', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     inject: {form_item_id: {default: null}},
     template: `
-        <input v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item_id" type="number" />
+        <input v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item_id" type="search" />
     `,
     methods: {
         input: function (event) {
-            this.$emit('update:modelValue', parseInt(event.target.value));
+            this.$emit('update:modelValue', event.target.value);
         },
     },
 });

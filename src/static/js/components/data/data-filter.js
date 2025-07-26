@@ -3,6 +3,7 @@ vue_component('data-filter', {
     render: function () {
         const _this = this;
         return this.$slots.default({
+            // 🧹 pattern -> search
             get pattern() { return _this.pattern; },
             set pattern(next) { _this.pattern = next; },
             get computed_items() { return _this.computed_items; },

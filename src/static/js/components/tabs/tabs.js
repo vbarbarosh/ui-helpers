@@ -1,7 +1,7 @@
 vue_component('tabs', {
-    props: ['items'],
+    props: ['items', 'class2'],
     template: `
-        <div class="tabs">
+        <div v-bind:class="(class2 ?? 'tabs')">
             <div class="tab-header">
                 <div v-for="item in local_items"
                         v-on:click="click_tab(item)"
@@ -71,12 +71,12 @@ css`
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-    .tab-header {
+    .tabs > .tab-header {
         display: flex;
         border-bottom: 1px solid #ddd;
     }
 
-    .tab-button {
+    .tabs > .tab-header > .tab-button {
         padding: 12px 20px;
         cursor: pointer;
         background: #f1f1f1;
@@ -86,16 +86,16 @@ css`
         transition: all 0.3s;
     }
 
-    .tab-button:hover {
+    .tabs > .tab-header > .tab-button:hover {
         background: #ddd;
     }
 
-    .tab-button.active {
+    .tabs > .tab-header > .tab-button.active {
         background: #4CAF50;
         color: white;
     }
 
-    .tab-content {
+    .tabs > .tab-content {
         padding: 20px;
     }
 `;

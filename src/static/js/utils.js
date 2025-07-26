@@ -363,6 +363,11 @@ function http_get_json(url, options)
     return axios.get(url, {responseType: 'json', ...options}).then(v => v.data);
 }
 
+function http_get_utf8(url, options)
+{
+    return axios.get(url, {responseType: 'text', ...options}).then(v => v.data);
+}
+
 function http_post_json(url, body, options)
 {
     return axios.post(url, body, {responseType: 'json', ...options}).then(v => v.data);
@@ -535,4 +540,17 @@ function array_pick_random(array, n)
         out.push(array[i]);
     }
     return out;
+}
+
+function thumbnailer(url, params)
+{
+    if (window.location.origin === 'http://127.0.0.1:3000') {
+        return urlmod('/thumbnailer', {u: url, ...params});
+    }
+    return url;
+}
+
+function random_html_id()
+{
+    return `id-${crypto.randomUUID()}`;
 }

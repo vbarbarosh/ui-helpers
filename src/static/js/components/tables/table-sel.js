@@ -1,7 +1,7 @@
 vue_component('table-sel', {
-    props: ['items', 'columns', 'selection'],
+    props: ['items', 'columns', 'selection', 'class'],
     template: `
-        <table>
+        <table v-bind:class="$props.class">
         <thead>
             <tr>
                 <th v-if="selection">
@@ -72,6 +72,13 @@ vue_component('table-sel', {
             return this.items ?? [];
         },
         computed_columns: function () {
+            if (typeof this.columns === 'string') {
+                const out = this.columns.split(',').map(function (label, i) {
+                    return {label, read: v => v[label]};
+                });
+                out.push({label: '', read: v => v, component: 'button-json'});
+                return out;
+            }
             if (!this.columns) {
                 if (!this.computed_items[0]) {
                     return [];
@@ -103,8 +110,6 @@ vue_component('table-sel', {
         },
     },
     watch: {
-        items: function () {
-        },
     },
     methods: {
         click_th_checkbox: function () {

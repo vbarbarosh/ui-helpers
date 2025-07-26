@@ -1,4 +1,4 @@
-vue_component('data-lipsum-dogs', {
+vue_component('data-lipsum-slider', {
     props: [],
     render: function () {
         const _this = this;
@@ -18,8 +18,7 @@ vue_component('data-lipsum-dogs', {
         refresh: async function () {
             this.loading_counter++;
             try {
-                const {message} = await http_get_json('https://dog.ceo/api/breed/labrador/images/random/15');
-                this.items = message;
+                this.items = await http_get_json('lipsum/codepen-vue-slider-MJqmLo.json');
             }
             finally {
                 this.loading_counter--;

@@ -32,19 +32,40 @@ function vue_directive(name, params)
         inject('components/buttons/button-json.js');
         inject('components/buttons/button-refresh.js');
         inject('components/buttons/button-selection.js');
+        inject('components/data/data-fetch.js');
         inject('components/data/data-filter.js');
         inject('components/data/data-lipsum-countries.js');
         inject('components/data/data-lipsum-dogs.js');
+        inject('components/data/data-lipsum-slider.js');
         inject('components/data/data-snapshots.js');
         inject('components/data/data-vars.js');
         inject('components/etc/copy-to-clipboard.js');
         inject('components/etc/highlight.js');
         inject('components/etc/lipsum.js');
         inject('components/etc/spinner.js');
-        inject('components/inputs/input-bool.js');
+        inject('components/forms/form-hor.js');
+        inject('components/forms/form-item.js');
+        inject('components/forms/form-label.js');
+        inject('components/forms/form-vert.js');
+        inject('components/inputs/input-checkbox.js');
+        inject('components/inputs/input-color.js');
+        inject('components/inputs/input-date.js');
+        inject('components/inputs/input-email.js');
+        inject('components/inputs/input-file.js');
+        inject('components/inputs/input-files.js');
         inject('components/inputs/input-int.js');
-        inject('components/inputs/input-str.js');
+        inject('components/inputs/input-month.js');
+        inject('components/inputs/input-password.js');
+        inject('components/inputs/input-radio.js');
+        inject('components/inputs/input-range.js');
+        inject('components/inputs/input-search.js');
+        inject('components/inputs/input-select.js');
+        inject('components/inputs/input-tel.js');
+        inject('components/inputs/input-text.js');
         inject('components/inputs/input-textarea.js');
+        inject('components/inputs/input-time.js');
+        inject('components/inputs/input-url.js');
+        inject('components/inputs/input-week.js');
         inject('components/modals/modal-blocking.js');
         inject('components/modals/modal-error.js');
         inject('components/modals/modal-hello.js');
@@ -82,8 +103,11 @@ function vue_directive(name, params)
         inject('components/tables/s-table.js');
         inject('components/tables/table-sel.js');
         inject('components/tabs/tabs-item.js');
+        inject('components/tabs/tabs-underline.js');
         inject('components/tabs/tabs.js');
         inject('components/vendor/fancybox.js');
+        inject('components/vendor/markdown-with-tabs.js');
+        inject('components/vendor/markdown.js');
         inject('components/vendor/prism-code-editor.js');
         inject('components/vendor/prism-html.js');
         inject('components/vendor/prism-js.js');
@@ -109,6 +133,7 @@ function vue_directive(name, params)
                 format_bytes,
                 format_date,
                 format_thousands,
+                thumbnailer,
             },
         });
         vue_components.forEach(function (item) {
