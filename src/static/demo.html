@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <style>
+        .gap10 { gap: 10px; }
+    </style>
+    <title>demo.html</title>
+</head>
+<body>
+
+<script src="js/bundle.js"></script>
+<script>
+vue_component('app', {
+    template: `
+        <tabs>
+            <tabs-item label="Inputs">
+                <div class="flex-row gap10">
+                    <div class="flex-col flex-align-start gap10">
+                        <input-bool v-model="inputs.bool" />
+                        <input-int v-model="inputs.int" />
+                        <input-str v-model="inputs.str" />
+                        <input-textarea v-autosize v-model="inputs.textarea" />
+                    </div>
+                    <div class="flex-col flex-align-start gap10">
+                        <input-bool v-model="inputs.bool" />
+                        <input-int v-model="inputs.int" />
+                        <input-str v-model="inputs.str" />
+                        <input-textarea v-autosize v-model="inputs.textarea" />
+                    </div>
+                </div>
+                <pre>{{ inputs }}</pre>
+            </tabs-item>
+            <tabs-item label="Fancybox">
+                <fancybox :value="items_fancybox" />
+            </tabs-item>
+            <tabs-item label="Buttons">
+                <div class="flex-row-center flex-justify-start gap10">
+                    <button-json :value="items" />
+                    <button-selection :value="items" />
+                    <button-refresh />
+                </div>
+            </tabs-item>
+            <tabs-item label="Tables">
+                <s-table :items="items" :columns="columns">
+                    <template v-slot:img="slot">
+                        <img v-bind:src="slot.item.img" alt="" class="max-w200 max-h200">
+                    </template>
+                </s-table>
+            </tabs-item>
+            <tabs-item label="Tabs in HTML">
+                <tabs>
+                    <tabs-item label="Foo"><lipsum /></tabs-item>
+                    <tabs-item label="Bar"><lipsum /></tabs-item>
+                    <tabs-item label="Baz"><lipsum /></tabs-item>
+                </tabs>
+            </tabs-item>
+            <tabs-item label="Tabs in PROPS">
+                <tabs :items="tab_items" />
+            </tabs-item>
+            <tabs-item label="Countries">
+                <data-vars v-slot="vars" :vars="{selection: []}">
+                    <data-lipsum-countries v-slot="countries">
+                        <data-filter v-slot="filter" :items="countries.items" prop="name">
+                            <input-str v-model="filter.pattern" />
+                            <button-selection :value="vars.selection" />
+                            <table-sel :selection="vars.selection" :items="filter.computed_items" />
+                        </data-filter>
+                    </data-lipsum-countries>
+                </data-vars>
+            </tabs-item>
+            <tabs-item label="Snapshots" active>
+                <data-snapshots v-slot="snapshots" :templ="{label: '', inputs: {bool: false, int: 0, str: '', textarea: ''}}">
+                    <div class="flex-row gap10">
+                        <div class="w200">
+                            <s-table :items="snapshots.items.slice().reverse()" :columns="[{label: 'label', slot_td: 'label'}]">
+                                <template v-slot:label="slot">
+                                    <td v-on:click="snapshots.activate(slot.item)">{{ slot.item.label }}</td>
+                                </template>
+                            </s-table>
+                            <button v-on:click="snapshots.capture">capture</button>
+                        </div>
+                        <div class="flex-col flex-align-start gap10">
+                            <input-bool v-model="snapshots.active.inputs.bool" />
+                            <input-int v-model="snapshots.active.inputs.int" />
+                            <input-str v-model="snapshots.active.inputs.str" />
+                            <input-textarea v-autosize v-model="snapshots.active.inputs.textarea" />
+                            <pre>{{ snapshots.items }}</pre>
+                        </div>
+                    </div>
+                </data-snapshots>
+            </tabs-item>
+        </tabs>
+    `,
+    data: function () {
+        return {
+            inputs: {
+                bool: false,
+                int: 0,
+                str: '',
+                textarea: '',
+            },
+            tab_items: [
+                {label: 'Foo', component: {is: 'lipsum', n: 10}},
+                {label: 'Bar', active: true, component: 'lipsum'},
+                {label: 'Baz', component: 'lipsum'},
+            ],
+            items: [],
+            columns: [
+                {label: 'title', read: v => v.title},
+                {label: 'img', slot: 'img'},
+                {label: 'content', read: v => v.content},
+            ],
+            countries: [],
+        };
+    },
+    computed: {
+        items_fancybox: function () {
+            return this.items.map(function (item) {
+                return {
+                    thumbnail_url: item.img,
+                    download_url: item.img,
+                    basename: item.img.split('/').pop(),
+                };
+            });
+        },
+    },
+    methods: {
+        click_json: async function () {
+            await modal_json(this.items).promise();
+        }
+    },
+    created: async function () {
+        this.items = await blocking(http_get_json('lipsum/codepen-vue-slider-MJqmLo.json'));
+    },
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+[
+    {
+        "title": "Article 1",
+        "img": "https://s3-us-west-2.amazonaws.com/s.cdpn.io/5689/rock.jpg",
+        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ex arcu, fringilla in urna quis, ultrices efficitur neque. Morbi lacinia arcu tellus, a imperdiet"
+    },
+    {
+        "title": "Article 2",
+        "img": "https://s3-us-west-2.amazonaws.com/s.cdpn.io/5689/grooves.jpg",
+        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ex arcu, fringilla in urna quis, ultrices efficitur neque. Morbi lacinia arcu tellus, a imperdiet"
+    },
+    {
+        "title": "Article 3",
+        "img": "https://s3-us-west-2.amazonaws.com/s.cdpn.io/5689/arch.jpg",
+        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ex arcu, fringilla in urna quis, ultrices efficitur neque. Morbi lacinia arcu tellus, a imperdiet"
+    },
+    {
+        "title": "Article 4",
+        "img": "https://s3-us-west-2.amazonaws.com/s.cdpn.io/5689/sunset.jpg",
+        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ex arcu, fringilla in urna quis, ultrices efficitur neque. Morbi lacinia arcu tellus, a imperdiet"
+    }
+]
