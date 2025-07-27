@@ -105,6 +105,7 @@ function vue_directive(name, params)
         inject('components/tabs/tabs-item.js');
         inject('components/tabs/tabs-underline.js');
         inject('components/tabs/tabs.js');
+        inject('components/vendor/element-plus/index.js');
         inject('components/vendor/fancybox.js');
         inject('components/vendor/markdown-with-tabs.js');
         inject('components/vendor/markdown.js');
@@ -126,6 +127,12 @@ function vue_directive(name, params)
         }
         console.log('🎉 All scripts loaded');
         window.app = Vue.createApp({template: '<app />'});
+        // Warning: a promise was created in a handler at [...] but was not returned from it, see http://goo.gl/rRqMUw
+        // http://bluebirdjs.com/docs/warning-explanations.html#warning-a-promise-was-created-in-a-handler-but-was-not-returned-from-it
+        Promise.config({
+            warnings: false,
+        });
+        app.use(ElementPlus);
         app.mixin({
             methods: {
                 px,

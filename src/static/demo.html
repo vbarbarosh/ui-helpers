@@ -79,6 +79,7 @@ vue_component('app', {
             'snippets/lipsum-countries.md',
             'snippets/tables.md',
             'snippets/tabs.md',
+            'snippets/vendor-element-plus.md',
         ];
         this.snippets = await blocking(Promise.all(ss.map(async function (url) {
             const markdown = await http_get_utf8(url);
