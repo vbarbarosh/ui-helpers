@@ -1,7 +1,7 @@
 {
   "name": "@vbarbarosh/ui-helpers",
   "author": "Vladimir Barbarosh <vladimir.barbarosh@gmail.com>",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "A set of ready components for fast prototyping.",
   "license": "MIT",
   "scripts": {
