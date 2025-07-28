@@ -134,6 +134,10 @@ function vue_directive(name, params)
         });
         app.use(ElementPlus);
         app.mixin({
+            computed: {
+                win: function () { return window; },
+                doc: function () { return document; },
+            },
             methods: {
                 px,
                 pc,

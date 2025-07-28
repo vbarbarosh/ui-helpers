@@ -15,7 +15,8 @@ vue_component('prism-js', {
             if (!this.ready) {
                 return '';
             }
-            return Prism.highlight(this.value, Prism.languages.javascript, 'javascript');
+            const text = (typeof this.value === 'string') ? this.value : JSON.stringify(this.value, null, 2);
+            return Prism.highlight(text, Prism.languages.javascript, 'javascript');
         },
     },
     watch: {},
