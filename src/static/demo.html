@@ -7,6 +7,7 @@
     <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
     <style>
         .gap10 { gap: 10px; }
+        .gap15 { gap: 15px; }
         .fit-down { object-fit: scale-down; }
         pre { margin: 0; }
     </style>
@@ -80,6 +81,7 @@ vue_component('app', {
             'snippets/tables.md',
             'snippets/tabs.md',
             'snippets/vendor-element-plus.md',
+            'snippets/vendor-observable-plot.md',
         ];
         this.snippets = await blocking(Promise.all(ss.map(async function (url) {
             const markdown = await http_get_utf8(url);

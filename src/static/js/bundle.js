@@ -36,6 +36,7 @@ function vue_directive(name, params)
         inject('components/data/data-filter.js');
         inject('components/data/data-lipsum-countries.js');
         inject('components/data/data-lipsum-dogs.js');
+        inject('components/data/data-lipsum-penguins.js');
         inject('components/data/data-lipsum-slider.js');
         inject('components/data/data-snapshots.js');
         inject('components/data/data-vars.js');
@@ -109,6 +110,7 @@ function vue_directive(name, params)
         inject('components/vendor/fancybox.js');
         inject('components/vendor/markdown-with-tabs.js');
         inject('components/vendor/markdown.js');
+        inject('components/vendor/observable/plot.js');
         inject('components/vendor/prism-code-editor.js');
         inject('components/vendor/prism-html.js');
         inject('components/vendor/prism-js.js');
@@ -137,6 +139,8 @@ function vue_directive(name, params)
             computed: {
                 win: function () { return window; },
                 doc: function () { return document; },
+                d3: function () { return window.d3; },
+                Plot: function () { return window.Plot; },
             },
             methods: {
                 px,
