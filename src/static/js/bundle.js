@@ -111,6 +111,7 @@ function vue_directive(name, params)
         inject('components/vendor/markdown-with-tabs.js');
         inject('components/vendor/markdown.js');
         inject('components/vendor/observable/plot.js');
+        inject('components/vendor/prism-bash.js');
         inject('components/vendor/prism-code-editor.js');
         inject('components/vendor/prism-html.js');
         inject('components/vendor/prism-js.js');
