@@ -1,7 +1,11 @@
 # download-zip
 
 ```vue
-<download-zip :files="[{name: 'file1.txt', body: 'file1'}, {name: 'file2.txt', body: 'file2'}]" />
+<download-zip :files="[
+    {name: 'file1.txt', body: 'file1'},
+    {name: 'file2.txt', body: 'file2'},
+    {name: 'Fury_01.jpg', url: 'https://images.dog.ceo/breeds/labrador/Fury_01.jpg'},
+]" />
 ```
 
 Download .zip with dogs

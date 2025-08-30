@@ -1,7 +1,11 @@
 # download-zip
 
 ```vue
-<files-browser :files="[{name: 'file1.txt', body: 'file1'}, {name: 'file2.txt', body: 'file2'}]" />
+<files-browser :files="[
+    {name: 'file1.txt', body: 'file1'},
+    {name: 'file2.txt', body: 'file2'},
+    {name: 'Fury_01.jpg', url: 'https://images.dog.ceo/breeds/labrador/Fury_01.jpg'},
+]" />
 ```
 
 Browse dogs
