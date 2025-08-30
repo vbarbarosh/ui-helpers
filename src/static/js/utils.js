@@ -358,6 +358,11 @@ function urlmod(url, params)
     return tmp_url.toString().replace(/^xxx:\/\/___base___\//, '');
 }
 
+function http_get_blob(url, options)
+{
+    return axios.get(url, {responseType: 'blob', ...options}).then(v => v.data);
+}
+
 function http_get_json(url, options)
 {
     return axios.get(url, {responseType: 'json', ...options}).then(v => v.data);
