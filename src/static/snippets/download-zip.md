@@ -1,11 +1,7 @@
 # download-zip
 
 ```vue
-<data-vars v-slot="vars" :vars="{files: [{name: 'file1.txt', body: 'file1'}, {name: 'file2.txt', body: 'file2'}]}">
-    <div class="iflex-col gap5">
-        <download-zip :files="vars.files" />
-    </div>
-</data-vars>
+<download-zip :files="[{name: 'file1.txt', body: 'file1'}, {name: 'file2.txt', body: 'file2'}]" />
 ```
 
 Download .zip with dogs
