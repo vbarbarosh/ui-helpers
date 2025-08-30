@@ -151,6 +151,7 @@ function vue_directive(name, params)
                 format_date,
                 format_thousands,
                 thumbnailer,
+                plural,
             },
         });
         vue_components.forEach(function (item) {
