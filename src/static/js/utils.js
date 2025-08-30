@@ -547,14 +547,6 @@ function array_pick_random(array, n)
     return out;
 }
 
-function thumbnailer(url, params)
-{
-    if (window.location.origin === 'http://127.0.0.1:3000') {
-        return urlmod('/thumbnailer', {u: url, ...params});
-    }
-    return url;
-}
-
 function random_html_id()
 {
     return `id-${crypto.randomUUID()}`;
