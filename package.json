@@ -19,6 +19,8 @@
   },
   "homepage": "https://ui-helpers.vbarbarosh.com",
   "devDependencies": {
+    "@vbarbarosh/node-helpers": "^3.70.0",
+    "bluebird": "^3.7.2",
     "mocha": "^10.2.0",
     "power-assert": "^1.6.1"
   }
