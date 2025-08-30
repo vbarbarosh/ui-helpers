@@ -42,6 +42,7 @@ function vue_directive(name, params)
         inject('components/data/data-vars.js');
         inject('components/etc/copy-to-clipboard.js');
         inject('components/etc/download-zip.js');
+        inject('components/etc/files-browser.js');
         inject('components/etc/highlight.js');
         inject('components/etc/lipsum.js');
         inject('components/etc/spinner.js');
