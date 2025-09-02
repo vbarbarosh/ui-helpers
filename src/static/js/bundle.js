@@ -103,7 +103,7 @@ function vue_directive(name, params)
         inject('components/svg/svg-icon-search.js');
         inject('components/svg/svg-icon-svgrepo-259551-hard-disk.js');
         inject('components/svg/svg-icon-warn.js');
-        inject('components/tables/s-table.js');
+        // inject('components/tables/s-table.js');
         inject('components/tables/table-sel.js');
         inject('components/tabs/tabs-item.js');
         inject('components/tabs/tabs-underline.js');
