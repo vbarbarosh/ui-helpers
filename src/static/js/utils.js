@@ -551,3 +551,8 @@ function random_html_id()
 {
     return `id-${crypto.randomUUID()}`;
 }
+
+function escape_regexp(s)
+{
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

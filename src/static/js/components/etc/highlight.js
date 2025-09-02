@@ -1,7 +1,7 @@
 vue_component('highlight', {
     props: ['text', 'substring'],
     template: `
-        <span v-for="(s, i) in computed_items" v-bind:class="{yellow: (i % 2 === 1)}">{{ s }}</span>
+        <span v-for="(s, i) in computed_items" v-bind:class="{red: (i % 2 === 1)}">{{ s }}</span>
     `,
     data: function () {
         return {};
