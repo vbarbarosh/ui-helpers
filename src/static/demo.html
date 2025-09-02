@@ -24,9 +24,9 @@ vue_component('app', {
                 <data-snapshots v-slot="snapshots" :templ="{label: '', inputs: {}}">
                     <div class="flex-row gap10">
                         <div class="w200">
-                            <table-sel :items="snapshots.items.slice().reverse()" :columns="[{label: 'label', slot_td: 'label'}]">
+                            <table-sel :items="snapshots.items.slice().reverse()" :columns="[{label: 'label', slot: 'label'}]">
                                 <template v-slot:label="slot">
-                                    <td v-on:click="snapshots.activate(slot.item)">{{ slot.item.label }}</td>
+                                    <button v-on:click="snapshots.activate(slot.item)">{{ slot.item.label }}</button>
                                 </template>
                             </table-sel>
                             <button v-on:click="snapshots.capture">capture</button>
