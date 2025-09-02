@@ -19,7 +19,7 @@
 <script>
 vue_component('app', {
     template: `
-        <tabs>
+        <tabs v-if="ready">
             <tabs-item label="Snapshots">
                 <data-snapshots v-slot="snapshots" :templ="{label: '', inputs: {}}">
                     <div class="flex-row gap10">
@@ -43,23 +43,28 @@ vue_component('app', {
             </tabs-item>
             <tabs-item label="Snippets" active>
                 <data-vars v-slot="vars" :vars="{selection: []}">
-                    <data-filter v-slot="filter" :items="snippets" prop="name">
-                        <div class="hsplit gap10">
-                            <div class="w200">
-                                <input-search v-autofocus v-model="filter.pattern" />
-                                <table-sel :selection="vars.selection" :items="filter.computed_items" columns="name" />
-                            </div>
-                            <div class="fluid">
-                                <markdown-with-tabs v-for="item in vars.selection" v-bind:key="item.name" v-bind:value="item.markdown" />
-                            </div>
+                <data-filter v-slot="filter" :items="snippets" prop="name">
+                <data-local-storage v-model="filter.pattern" store="main">
+                <data-local-storage-selection :selection="vars.selection" :items="snippets" prop="name" store="main_sel">
+                    <div class="hsplit gap10">
+                        <div class="w200">
+                            <input-search v-autofocus v-model="filter.pattern" />
+                            <table-sel :selection="vars.selection" :items="filter.computed_items" columns="name" />
                         </div>
-                    </data-filter>
+                        <div class="fluid">
+                            <markdown-with-tabs v-for="item in vars.selection" v-bind:key="item.name" v-bind:value="item.markdown" />
+                        </div>
+                    </div>
+                </data-local-storage-selection>
+                </data-local-storage>
+                </data-filter>
                 </data-vars>
             </tabs-item>
         </tabs>
     `,
     data: function () {
         return {
+            ready: false,
             snippets: [],
             inputs: {
                 bool: false,
@@ -91,6 +96,7 @@ vue_component('app', {
             const markdown = await http_get_utf8(url);
             return {name: url.split('/').pop(), markdown: markdown};
         })));
+        this.ready = true;
     },
 });
 </script>
