@@ -122,5 +122,3 @@ vue_component('virtual-grid', {
         this._observer.unobserve(this.$el);
     },
 });
-
-
