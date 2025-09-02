@@ -1,3 +1,5 @@
+// https://www.jacklmoore.com/autosize/
+
 vue_directive('autosize', {
     mounted: async function (el) {
         autosize(el);
