@@ -81,6 +81,10 @@ function vue_directive(name, params)
         inject('components/inputs/input-time.js');
         inject('components/inputs/input-url.js');
         inject('components/inputs/input-week.js');
+        inject('components/live/live-icons-inner.js');
+        inject('components/live/live-icons.js');
+        inject('components/live/live-vue-inner.js');
+        inject('components/live/live-vue.js');
         inject('components/modals/modal-blocking.js');
         inject('components/modals/modal-error.js');
         inject('components/modals/modal-hello.js');
