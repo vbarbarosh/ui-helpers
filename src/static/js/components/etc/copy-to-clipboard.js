@@ -3,8 +3,8 @@ vue_component('copy-to-clipboard', {
     props: ['value'],
     template: `
         <Transition>
-            <svg-icon-check v-if="check" v-on:click="click_copy_to_clipboard" class="abs-tr w15 h15 p8 cur-pointer z1" />
-            <svg-icon-copy v-else v-on:click="click_copy_to_clipboard" class="abs-tr w15 h15 p8 cur-pointer z1" />
+            <svg-icon-check v-if="check" v-on:click="click" class="abs-tr w15 h15 p8 cur-pointer z1" />
+            <svg-icon-copy v-else v-on:click="click" class="abs-tr w15 h15 p8 cur-pointer z1" />
         </Transition>
     `,
     data: function () {
@@ -17,7 +17,7 @@ vue_component('copy-to-clipboard', {
     watch: {
     },
     methods: {
-        click_copy_to_clipboard: async function () {
+        click: async function () {
             window.navigator.clipboard.writeText(this.value);
             const uid = crypto.randomUUID();
             this.check = uid;
