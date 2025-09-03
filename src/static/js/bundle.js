@@ -46,8 +46,9 @@ function vue_directive(name, params)
         inject('components/data/data-lipsum-dogs.js');
         inject('components/data/data-lipsum-penguins.js');
         inject('components/data/data-lipsum-slider.js');
-        inject('components/data/data-local-storage.js');
         inject('components/data/data-local-storage-selection.js');
+        inject('components/data/data-local-storage.js');
+        inject('components/data/data-selection.js');
         inject('components/data/data-snapshots.js');
         inject('components/data/data-vars.js');
         inject('components/etc/copy-to-clipboard.js');
