@@ -29,6 +29,8 @@ function vue_directive(name, params)
         if (i !== -1) {
             bundle_pending.splice(i, 1);
         }
+        inject('components/breadcrumbs/breadcrumbs-item.js');
+        inject('components/breadcrumbs/breadcrumbs.js');
         inject('components/buttons/button-json.js');
         inject('components/buttons/button-refresh.js');
         inject('components/buttons/button-selection.js');
@@ -47,6 +49,7 @@ function vue_directive(name, params)
         inject('components/etc/files-browser.js');
         inject('components/etc/highlight.js');
         inject('components/etc/lipsum.js');
+        inject('components/etc/reset-on-change.js');
         inject('components/etc/spinner.js');
         inject('components/forms/form-hor.js');
         inject('components/forms/form-item.js');
