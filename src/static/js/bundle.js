@@ -29,11 +29,17 @@ function vue_directive(name, params)
         if (i !== -1) {
             bundle_pending.splice(i, 1);
         }
+        inject_link('../css/default.css');
         inject('components/breadcrumbs/breadcrumbs-item.js');
         inject('components/breadcrumbs/breadcrumbs.js');
+        inject('components/buttons/button-blue.js');
+        inject('components/buttons/button-green.js');
         inject('components/buttons/button-json.js');
+        inject('components/buttons/button-red.js');
         inject('components/buttons/button-refresh.js');
         inject('components/buttons/button-selection.js');
+        inject('components/buttons/button-transparent.js');
+        inject('components/buttons/button-void.js');
         inject('components/data/data-fetch.js');
         inject('components/data/data-filter.js');
         inject('components/data/data-lipsum-countries.js');
@@ -192,6 +198,21 @@ function vue_directive(name, params)
         bundle_pending.push(elem);
         insert_after.insertAdjacentElement('afterend', elem);
         insert_after = elem;
+    }
+
+    // <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    function inject_link(href, onload) {
+        const elem = document.createElement('LINK');
+        elem.rel = 'stylesheet';
+        elem.href = href.match(/^https?:/) ? href : `${current_script_src}/${href}`;
+        elem.onload = function () {
+            ready(elem);
+            if (typeof onload === 'function') {
+                onload(elem);
+            }
+        };
+        bundle_pending.push(elem);
+        document.head.insertAdjacentElement('beforeend', elem);
     }
 
     async function error_handler(error)
