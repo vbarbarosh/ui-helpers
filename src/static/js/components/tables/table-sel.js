@@ -5,7 +5,7 @@ vue_component('table-sel', {
         <thead>
             <tr>
                 <th v-if="selection">
-                    <input v-on:click="click_th_checkbox" v-bind:checked="(selection.length === items.length)" type="checkbox">
+                    <input v-on:click="click_th_checkbox" v-bind:checked="(selection.length === items?.length)" type="checkbox">
                 </th>
                 <th v-for="col in computed_columns">
                     {{ col.label }}
