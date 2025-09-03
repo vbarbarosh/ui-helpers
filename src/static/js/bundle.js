@@ -159,6 +159,15 @@ function vue_directive(name, params)
                 plural,
             },
         });
+        // Prevent Vue from spamming the console with "helpful" tips
+        app.config.productionTip = false;
+        app.config.errorHandler = async function (error) {
+            console.log('errorHandler', error);
+            await error_handler(error);
+        };
+        app.config.warnHandler = async function (error) {
+            console.log('warnHandler', error);
+        };
         vue_components.forEach(function (item) {
             app.component(item.name, item.params);
         });
@@ -180,6 +189,16 @@ function vue_directive(name, params)
         bundle_pending.push(elem);
         insert_after.insertAdjacentElement('afterend', elem);
         insert_after = elem;
+    }
+
+    async function error_handler(error)
+    {
+        try {
+            await modal_error({error}).promise();
+        }
+        catch (error) {
+            console.log(error);
+        }
     }
 
 })();
