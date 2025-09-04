@@ -10,3 +10,7 @@ vue_component('app', {
 });
 </script>
 ```
+
+## Related
+
+- https://blog.jonudell.net/2025/07/18/introducing-xmlui/
