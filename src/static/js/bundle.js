@@ -58,10 +58,17 @@ function vue_directive(name, params)
         inject('components/etc/lipsum.js');
         inject('components/etc/reset-on-change.js');
         inject('components/etc/spinner.js');
+        inject('components/forms/form-enum.js');
+        inject('components/forms/form-file-drop-zone.js');
+        inject('components/forms/form-files-drop-zone.js');
         inject('components/forms/form-hor.js');
+        inject('components/forms/form-int.js');
         inject('components/forms/form-item.js');
         inject('components/forms/form-label.js');
+        inject('components/forms/form-string.js');
+        inject('components/forms/form-textarea.js');
         inject('components/forms/form-vert.js');
+        inject('components/forms/form.js');
         inject('components/inputs/input-checkbox.js');
         inject('components/inputs/input-color.js');
         inject('components/inputs/input-date.js');
