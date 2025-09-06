@@ -10,6 +10,7 @@
 <body>
 
 <script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.0/src/static/js/bundle.js"></script>
+<script src="/modals/modal-comment-create.js"></script>
 <script src="/modals/modal-comment-update.js"></script>
 <script src="/modals/modal-form-auto.js"></script>
 <script src="/services/comments.js"></script>
@@ -64,12 +65,18 @@
     vue_component('app', {
         template: `
             <data-fetch v-slot="fetch" :fn="() => win.comments_list()" auto>
-                <p><button-refresh @click="win.blocking(fetch.refresh())" /></p>
+                <p class="flex-row-center-left gap5">
+                    <button-refresh v-on:click="win.blocking(fetch.refresh())" />
+                    <button v-on:click="do_create(fetch.refresh)">new</button>
+                </p>
                 <div class="hsplit gap15">
                     <div class="fluid">
                         <table-sel :items="fetch.response">
                             <template v-slot:actions="slot">
-                                <button v-on:click="do_update(slot.item.uid, fetch.refresh)">update</button>
+                                <span class="flex-row-center gap5">
+                                    <button v-on:click="do_update(slot.item.uid, fetch.refresh)">update</button>
+                                    <button v-on:click="do_remove(slot.item.uid, fetch.refresh)">remove</button>
+                                </span>
                             </template>
                         </table-sel>
                     </div>
@@ -82,6 +89,15 @@
             </data-fetch>
         `,
         methods: {
+            do_create: async function (refresh) {
+                if (await modal_comment_create().promise()) {
+                    await blocking(refresh());
+                }
+            },
+            do_remove: async function (comment_uid, refresh) {
+                await blocking(comments_remove(comment_uid));
+                await blocking(refresh());
+            },
             do_update: async function (comment_uid, refresh) {
                 if (await modal_comment_update({comment_uid}).promise()) {
                     await blocking(refresh());
