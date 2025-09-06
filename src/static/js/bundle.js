@@ -68,7 +68,6 @@ function vue_directive(name, params)
         inject('components/forms/form-string.js');
         inject('components/forms/form-textarea.js');
         inject('components/forms/form-vert.js');
-        inject('components/forms/form.js');
         inject('components/inputs/input-checkbox.js');
         inject('components/inputs/input-color.js');
         inject('components/inputs/input-date.js');
