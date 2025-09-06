@@ -22,12 +22,12 @@
             <div class="dashed mg5">
                 <template v-for="(value, key) in modelValue">
                     <div class="hsplit gap10">
-                        <label for="xx" class="w100">{{key}}</label>
+                        <label class="w100">{{key}}</label>
                         <template v-if="(key === 'body')">
-                            <input-textarea v-model="modelValue[key]" v-autosize id="" class="fluid" />
+                            <input-textarea v-model="modelValue[key]" v-autosize class="fluid" />
                         </template>
                         <template v-else>
-                            <input-text v-model="modelValue[key]" id="" class="fluid" />
+                            <input-text v-model="modelValue[key]" class="fluid" />
                         </template>
                     </div>
                 </template>
