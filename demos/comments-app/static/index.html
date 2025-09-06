@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <title>comments-app</title>
+</head>
+<body>
+
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.0/src/static/js/bundle.js"></script>
+<script src="/modals/modal-comment-update.js"></script>
+<script src="/modals/modal-form-auto.js"></script>
+<script src="/services/comments.js"></script>
+<script src="/helpers/utils.js"></script>
+<script>
+    vue_component('form-auto', {
+        emits: ['submit', 'cancel'],
+        props: ['modelValue'],
+        template: `
+            <div class="dashed mg5">
+                <template v-for="(value, key) in modelValue">
+                    <div class="hsplit gap10">
+                        <label for="xx" class="w100">{{key}}</label>
+                        <template v-if="(key === 'body')">
+                            <input-textarea v-model="modelValue[key]" v-autosize id="" class="fluid" />
+                        </template>
+                        <template v-else>
+                            <input-text v-model="modelValue[key]" id="" class="fluid" />
+                        </template>
+                    </div>
+                </template>
+                <div class="hsplit gap10">
+                    <div class="w100"></div>
+                    <div>
+                        <button-transparent v-on:click="click_cancel">Cancel</button-transparent>
+                        <button-green v-on:click="click_save">Save</button-green>
+                    </div>
+                </div>
+            </div>
+        `,
+        methods: {
+            click_cancel: function () {
+                this.$emit('cancel');
+            },
+            click_save: function () {
+                this.$emit('submit');
+            },
+        },
+    });
+    vue_component('comment-card', {
+        props: ['item'],
+        template: `
+            <div>
+                {{ item }}
+                ----
+                save
+            </div>
+        `,
+    });
+</script>
+<script>
+    vue_component('app', {
+        template: `
+            <data-fetch v-slot="fetch" :fn="() => win.comments_list()" auto>
+                <p><button-refresh @click="win.blocking(fetch.refresh())" /></p>
+                <div class="hsplit gap15">
+                    <div class="fluid">
+                        <table-sel :items="fetch.response">
+                            <template v-slot:actions="slot">
+                                <button v-on:click="do_update(slot.item.uid, fetch.refresh)">update</button>
+                            </template>
+                        </table-sel>
+                    </div>
+                    <div class="w600 mg15">
+                        <template v-for="item in fetch.response" :key="item.uid">
+                            <form-auto v-model="item" />
+                        </template>
+                    </div>
+                </div>
+            </data-fetch>
+        `,
+        methods: {
+            do_update: async function (comment_uid, refresh) {
+                if (await modal_comment_update({comment_uid}).promise()) {
+                    await blocking(refresh());
+                }
+                // // 1. fetch entire model from backend
+                // // 2. show modal
+                // // 3. submit changes
+                // // 4. refresh current page
+                // const item = await blocking(comments_fetch(item_uid));
+                // if (await modal_form_auto(item).promise()) {
+                //     await blocking(comments_update(item));
+                //     await blocking(refresh());
+                // }
+            },
+        }
+    });
+</script>
+
+</body>
+</html>
