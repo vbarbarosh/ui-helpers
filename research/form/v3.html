@@ -11,7 +11,7 @@
 
 <script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.0/src/static/js/bundle.js"></script>
 <script>
-vue_component('v4-form-style1', {
+vue_component('v3-form-style1', {
     props: ['modelValue', 'fields', 'items'],
     template: `
         <div class="hsplit gap10">
@@ -30,7 +30,7 @@ vue_component('v4-form-style1', {
         </div>
     `,
 });
-vue_component('v4-form-style2', {
+vue_component('v3-form-style2', {
     props: ['modelValue', 'fields', 'items'],
     template: `
         <div class="hsplit gap10">
@@ -47,7 +47,7 @@ vue_component('v4-form-style2', {
         </div>
     `,
 });
-vue_component('v4-form-style3', {
+vue_component('v3-form-style3', {
     props: ['modelValue', 'fields', 'items'],
     template: `
         <div class="hsplit gap10">
@@ -74,16 +74,16 @@ vue_component('v4-form-style3', {
     `,
 });
 
-vue_component('v4-input-checkbox', {
+vue_component('v3-input-checkbox', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'label'],
     template: `
-        <v4-form-item v-slot="slot" :label>
+        <v3-form-item v-slot="slot" :label>
             <input v-on:input="input" v-bind:id="slot.id" v-bind:checked="modelValue" type="checkbox" />
             <label v-if="slot.placeholder" v-bind:for="slot.id">
                 {{ slot.placeholder }}
             </label>
-        </v4-form-item>
+        </v3-form-item>
     `,
     methods: {
         input: function (event) {
@@ -92,17 +92,17 @@ vue_component('v4-input-checkbox', {
     }
 });
 
-vue_component('v4-input-text', {
+vue_component('v3-input-text', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'label'],
     template: `
-        <v4-form-item v-slot="slot" :label>
+        <v3-form-item v-slot="slot" :label>
             <input v-on:input="input"
                    v-bind:id="slot.id"
                    v-bind:placeholder="slot.placeholder"
                    v-bind:value="modelValue"
                    type="text" />
-        </v4-form-item>
+        </v3-form-item>
     `,
     methods: {
         input: function (event) {
@@ -111,11 +111,11 @@ vue_component('v4-input-text', {
     }
 });
 
-vue_component('v4-input-enum-radios', {
+vue_component('v3-input-enum-radios', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'label', 'options'],
     template: `
-        <v4-form-item :label>
+        <v3-form-item :label>
             <template v-for="option in options">
                 <label>
                     <input v-on:input="input"
@@ -125,7 +125,7 @@ vue_component('v4-input-enum-radios', {
                     {{ option.label }}
                 </label>
             </template>
-        </v4-form-item>`,
+        </v3-form-item>`,
     data: function () {
         return {
             name: `name-${crypto.randomUUID()}`,
@@ -138,10 +138,10 @@ vue_component('v4-input-enum-radios', {
     }
 });
 
-vue_component('v4-form-group', {
-    inject: {v4_form: {default: null}},
+vue_component('v3-form-group', {
+    inject: {v3_form: {default: null}},
     provide: function () {
-        return {v4_form: this};
+        return {v3_form: this};
     },
     template: `
         <div class="border">
@@ -181,21 +181,21 @@ console.log('form_item_add',  inst);
         },
     },
     created: function () {
-        if (this.v4_form) {
-            this.local_item = this.v4_form.form_item_add(this);
+        if (this.v3_form) {
+            this.local_item = this.v3_form.form_item_add(this);
         }
     },
     unmounted: function () {
-        if (this.v4_form) {
-            this.v4_form.form_item_remove(this);
+        if (this.v3_form) {
+            this.v3_form.form_item_remove(this);
             this.local_item = null;
         }
     },
 });
 
-vue_component('v4-form-table', {
+vue_component('v3-form-table', {
     provide: function () {
-        return {v4_form: this};
+        return {v3_form: this};
     },
     template: `
         <table>
@@ -231,9 +231,9 @@ vue_component('v4-form-table', {
     }
 });
 
-vue_component('v4-form-classic', {
+vue_component('v3-form-classic', {
     provide: function () {
-        return {v4_form: this};
+        return {v3_form: this};
     },
     template: `
         <div class="mg5">
@@ -266,9 +266,9 @@ vue_component('v4-form-classic', {
     }
 });
 
-vue_component('v4-form-placeholders', {
+vue_component('v3-form-placeholders', {
     provide: function () {
-        return {v4_form: this};
+        return {v3_form: this};
     },
     template: `
         <div class="mg5">
@@ -300,10 +300,10 @@ vue_component('v4-form-placeholders', {
     }
 });
 
-vue_component('v4-form-item', {
+vue_component('v3-form-item', {
     props: ['label'],
-    inject: {v4_form: {default: null}},
-    template: `<slot v-if="!v4_form" />`,
+    inject: {v3_form: {default: null}},
+    template: `<slot v-if="!v3_form" />`,
     data: function () {
         return {
             id: `id-${crypto.randomUUID()}`,
@@ -319,13 +319,13 @@ vue_component('v4-form-item', {
         },
     },
     created: function () {
-        if (this.v4_form) {
-            this.local_item = this.v4_form.form_item_add(this);
+        if (this.v3_form) {
+            this.local_item = this.v3_form.form_item_add(this);
         }
     },
     unmounted: function () {
-        if (this.v4_form) {
-            this.v4_form.form_item_remove(this);
+        if (this.v3_form) {
+            this.v3_form.form_item_remove(this);
             this.local_item = null;
         }
     },
@@ -342,47 +342,47 @@ vue_component('app', {
     template: `
         <div class="fix-f hsplit gap15 m10">
             <div class="fluid mg15 rainbow oa">
-                <v4-form-style1 v-model="form1" :items :fields />
-                <v4-form-style2 v-model="form1" :items :fields />
-                <v4-form-style3 v-model="form1" :items :fields />
+                <v3-form-style1 v-model="form1" :items :fields />
+                <v3-form-style2 v-model="form1" :items :fields />
+                <v3-form-style3 v-model="form1" :items :fields />
             </div>
             <div class="flex-col gap10 oa">
                 <h3>form-classic</h3>
 
-                <v4-form-classic>
-                    <v4-form-group label="Personal information">
-                        <v4-input-text v-model="form1.first_name" label="First name" />
-                        <v4-input-text v-model="form1.last_name" label="Last name" />
-                    </v4-form-group>
-                    <v4-form-group label="Account information">
-                        <v4-input-text v-model="form1.email" label="Email" />
-                        <v4-input-text v-model="form1.password" label="Password" />
-                        <v4-input-text v-model="form1.password2" label="Password Confirm" />
-                    </v4-form-group>
-                    <v4-input-checkbox v-model="form1.remember_me" label="Remember me" />
-                    <v4-input-enum-radios v-model="form1.sex" :options="[{label: 'Male', value: 'male'}, {label: 'Female', value: 'female'}]" label="Sex" />
-                </v4-form-classic>
+                <v3-form-classic>
+                    <v3-form-group label="Personal information">
+                        <v3-input-text v-model="form1.first_name" label="First name" />
+                        <v3-input-text v-model="form1.last_name" label="Last name" />
+                    </v3-form-group>
+                    <v3-form-group label="Account information">
+                        <v3-input-text v-model="form1.email" label="Email" />
+                        <v3-input-text v-model="form1.password" label="Password" />
+                        <v3-input-text v-model="form1.password2" label="Password Confirm" />
+                    </v3-form-group>
+                    <v3-input-checkbox v-model="form1.remember_me" label="Remember me" />
+                    <v3-input-enum-radios v-model="form1.sex" :options="[{label: 'Male', value: 'male'}, {label: 'Female', value: 'female'}]" label="Sex" />
+                </v3-form-classic>
 
                 <h3>form-table</h3>
-                <v4-form-table>
-                    <v4-input-text v-model="form1.first_name" label="First name" />
-                    <v4-input-text v-model="form1.last_name" label="Last name" />
-                    <v4-input-text v-model="form1.email" label="Email" />
-                    <v4-input-text v-model="form1.password" label="Password" />
-                    <v4-input-text v-model="form1.password2" label="Password Confirm" />
-                    <v4-input-checkbox v-model="form1.remember_me" label="Remember me" />
-                    <v4-input-enum-radios v-model="form1.sex" :options="[{label: 'Male', value: 'male'}, {label: 'Female', value: 'female'}]" label="Sex" />
-                </v4-form-table>
+                <v3-form-table>
+                    <v3-input-text v-model="form1.first_name" label="First name" />
+                    <v3-input-text v-model="form1.last_name" label="Last name" />
+                    <v3-input-text v-model="form1.email" label="Email" />
+                    <v3-input-text v-model="form1.password" label="Password" />
+                    <v3-input-text v-model="form1.password2" label="Password Confirm" />
+                    <v3-input-checkbox v-model="form1.remember_me" label="Remember me" />
+                    <v3-input-enum-radios v-model="form1.sex" :options="[{label: 'Male', value: 'male'}, {label: 'Female', value: 'female'}]" label="Sex" />
+                </v3-form-table>
                 <h3>form-placeholders</h3>
-                <v4-form-placeholders>
-                    <v4-input-text v-model="form1.first_name" label="First name" />
-                    <v4-input-text v-model="form1.last_name" label="Last name" />
-                    <v4-input-text v-model="form1.email" label="Email" />
-                    <v4-input-text v-model="form1.password" label="Password" />
-                    <v4-input-text v-model="form1.password2" label="Password Confirm" />
-                    <v4-input-checkbox v-model="form1.remember_me" label="Remember me" />
-                    <v4-input-enum-radios v-model="form1.sex" :options="[{label: 'Male', value: 'male'}, {label: 'Female', value: 'female'}]" label="Sex" />
-                </v4-form-placeholders>
+                <v3-form-placeholders>
+                    <v3-input-text v-model="form1.first_name" label="First name" />
+                    <v3-input-text v-model="form1.last_name" label="Last name" />
+                    <v3-input-text v-model="form1.email" label="Email" />
+                    <v3-input-text v-model="form1.password" label="Password" />
+                    <v3-input-text v-model="form1.password2" label="Password Confirm" />
+                    <v3-input-checkbox v-model="form1.remember_me" label="Remember me" />
+                    <v3-input-enum-radios v-model="form1.sex" :options="[{label: 'Male', value: 'male'}, {label: 'Female', value: 'female'}]" label="Sex" />
+                </v3-form-placeholders>
             </div>
             <div class="w200">
                 <prism-js :value="form1_json" />
