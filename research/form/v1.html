@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <title>form | research | ui-helpers</title>
+</head>
+<body>
+
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.0/src/static/js/bundle.js"></script>
+<script>
+vue_component('form-style1-static', {
+    props: ['modelValue', 'types', 'items'],
+    template: `
+        <div class="mg5">
+            <h3 class="xm">Personal information</h3>
+            <div class="flex-row gap10">
+                <input placeholder="First name" />
+                <input placeholder="Last name" />
+            </div>
+            <h3 class="xm">Account information</h3>
+            <div><input placeholder="Email address" /></div>
+            <div><input placeholder="Password" /></div>
+            <div><input placeholder="Password again" /></div>
+            <div><input type="checkbox"> Remember me</div>
+            <button type="button">Register</button>
+        </div>
+    `,
+});
+vue_component('form-style2-static', {
+    props: ['modelValue', 'fields', 'items'],
+    template: `
+        <div>
+            <fieldset>
+                <legend>Personal information</legend>
+                <div>First name: <input /></div>
+                <div>Last name: <input /></div>
+            </fieldset>
+            <fieldset>
+                <legend>Account information</legend>
+                <div>Email address: <input /></div>
+                <div>Password: <input /></div>
+                <div>Password again: <input /></div>
+            </fieldset>
+            <div>
+                <input type="checkbox"> Remember me
+            </div>
+            <button type="button">Register</button>
+        </div>
+    `,
+});
+vue_component('form-style1', {
+    props: ['modelValue', 'fields', 'items'],
+    template: `
+        <div class="hsplit gap10">
+            <div>
+                <div><input placeholder="First name" /></div>
+                <div><input placeholder="Last name" /></div>
+                <div><input placeholder="Email address" /></div>
+                <div><input placeholder="Password" /></div>
+                <div><input placeholder="Password again" /></div>
+                <div><input type="checkbox"> Remember me</div>
+                <button type="button">Register</button>
+            </div>
+            <div>
+                dynamic
+            </div>
+        </div>
+    `,
+});
+vue_component('form-style2', {
+    props: ['modelValue', 'fields', 'items'],
+    template: `
+        <div class="hsplit gap10">
+            <div class="mg5">
+                <div class="flex-row-center-left gap10"><span class="w100">First name</span><input placeholder="First name" /></div>
+                <div class="flex-row-center-left gap10"><span class="w100">Last name</span><input placeholder="Last name" /></div>
+                <div class="flex-row-center-left gap10"><span class="w100">Email address</span><input placeholder="Email address" /></div>
+                <div class="flex-row-center-left gap10"><span class="w100">Password</span><input placeholder="Password" /></div>
+                <div class="flex-row-center-left gap10"><span class="w100">Password again</span><input placeholder="Password again" /></div>
+                <div class="flex-row-center-left gap10"><span class="w100">Remember me</span><div><input type="checkbox"></div></div>
+                <div class="flex-row-center-left gap10"><span class="w100"></span><button type="button">Register</button></div>
+            </div>
+            <div>dynamic</div>
+        </div>
+    `,
+});
+vue_component('form-style3', {
+    props: ['modelValue', 'fields', 'items'],
+    template: `
+        <div class="hsplit gap10">
+            <div>
+                <table>
+                <thead></thead>
+                <tbody>
+                    <tr><th>First name</th><td><input placeholder="First name" /></td></tr>
+                    <tr><th>Last name</th><td><input placeholder="Last name" /></td></tr>
+                    <tr><th>Email address</th><td><input placeholder="Email address" /></td></tr>
+                    <tr><th>Password</th><td><input placeholder="Password" /></td></tr>
+                    <tr><th>Password again</th><td><input placeholder="Password again" /></td></tr>
+                    <tr><th>Remember me</th><td><div><input type="checkbox"></div></td></tr>
+                    <tr><th></th><td><div><input type="checkbox"> Remember me 2</div></td></tr>
+                    <tr><th></th><td><button type="button">Register</button></td></tr>
+                </tbody>
+                </table>
+            </div>
+            <div>
+                dynamic
+                <form-string1 v-slot="slot" label="whatever">
+                    <div>{{ slot }}</div>
+                    <div><render-function :fn="slot.label" /></div>
+                    <div><render-function :fn="slot.input" /></div>
+                </form-string1>
+            </div>
+        </div>
+
+    `,
+});
+vue_component('render-function', {
+    props: ['fn'],
+    render: function () {
+        return this.fn();
+    },
+});
+vue_component('form-string1', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'label'],
+    render: function () {
+        if (this.$slots.default) {
+            return this.$slots.default({
+                label: () => Vue.h('label', {for: this.id}, [this.label]),
+                input: () => Vue.h('input', {type: 'string', id: this.id})
+            });
+        }
+        return Vue.h('input', {type: 'string'});
+    },
+    data: function () {
+        return {
+            id: window.crypto.randomUUID(),
+        };
+    },
+});
+vue_component('form-checkbox', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'label'],
+    template: `
+        <div><input @input="v => $emit('update:modelValue', v.target.checked)" :modelValue type="checkbox"> Remember me</div>
+    `,
+});
+vue_component('app', {
+    template: `
+        <div class="fix-f hsplit gap15 m10">
+            <div class="fluid mg15 rainbow oa">
+                <form-style1 v-model="form1" :items :fields />
+                <form-style2 v-model="form1" :items :fields />
+                <form-style3 v-model="form1" :items :fields />
+            </div>
+            <div class="w200">
+                <prism-js :value="form1_json" />
+            </div>
+            <div class="w400 flex-col gap10 oa">
+<!--
+                <img src="images/img1.png" alt="" class="max-ww">
+                <img src="images/img2.png" alt="" class="max-ww">
+-->
+                <img src="images/img3.png" alt="" class="max-ww">
+            </div>
+        </div>
+    `,
+    data: function () {
+        return {
+            form1: {
+                first_name: '',
+                last_name: '',
+                email: '',
+                password: '',
+                password2: '',
+                remember_me: true,
+            },
+            fields: [
+                {name: 'first_name', type: 'str'},
+                {name: 'last_name', type: 'str'},
+                {name: 'email', type: 'email'},
+                {name: 'password', type: 'str'},
+                {name: 'password2', type: 'str'},
+                {name: 'remember_me', type: 'bool'},
+            ],
+            items: [
+                // {label: 'Personal information', ui: 'group', items: [
+                    {label: 'First name', field: 'first_name', component: 'form-string'},
+                    {label: 'Last name', field: 'last_name', component: 'form-string'},
+                // ]},
+                // {label: 'Account information', ui: 'group', items: [
+                    {label: 'Email address', field: 'email', component: 'form-string'},
+                    {label: 'Password', field: 'password', component: 'form-string'},
+                    {label: 'Password2', field: 'password2', component: 'form-string'},
+                // ]},
+                {label: 'Remember me', field: 'remember_me', component: 'form-checkbox'},
+                {label: 'Register', component: 'form-button'},
+                // {label: 'Personal information', children: [
+                //     {label: 'First name'},
+                //     {label: 'Last name'},
+                // ]},
+                // {label: 'Account information', children: [
+                //     {label: 'Email address'},
+                //     {label: 'Password'},
+                //     {label: 'Password2'},
+                // ]},
+                // {label: 'Remember me'},
+                // {label: 'Register'},
+            ],
+        };
+    },
+    computed: {
+        form1_json: function () {
+            return JSON.stringify(this.form1, null, 4);
+        },
+    },
+});
+</script>
+
+</body>
+</html>
