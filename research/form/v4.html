@@ -139,38 +139,34 @@ vue_component('v4-input-enum-radios', {
 });
 
 vue_component('v4-form-group', {
+    props: ['label'],
     inject: {v4_form: {default: null}},
     provide: function () {
         return {v4_form: this};
     },
-    template: `
-        <div class="border">
-            <div>form-group | {{ plural(form_items.length, '# item', '# items', 'No items') }}</div>
-            <div style="display:none;"><slot /></div>
-        </div>
-    `,
+    template: `<slot />`,
     data: function () {
         return {
+            group: true,
             form_items: [],
             local_item: null,
         };
     },
     methods: {
-        render_label: function () {
-            return Vue.h('label', {for: this.id}, [this.label]);
-        },
-        render_body: function (props) {
-            return Vue.h('div', {class: 'border'}, [
-                Vue.h('div', {}, [`form-group | ${plural(this.form_items.length, '# item', '# items', 'No items')}`]),
-                ...this.form_items.map(v => v.inst.render_body(props)),
-            ]);
-            //return this.$options.render(this);
-            return null; // return this.$slots.default({id: this.id, ...props});
-        },
+        // render_label: function () {
+        //     return Vue.h('label', {for: this.id}, [this.label]);
+        // },
+        // render_body: function (props) {
+        //     return Vue.h('div', {class: 'border'}, [
+        //         Vue.h('div', {}, [`form-group | ${plural(this.form_items.length, '# item', '# items', 'No items')}`]),
+        //         ...this.form_items.map(v => v.inst.render_body(props)),
+        //     ]);
+        //     //return this.$options.render(this);
+        //     return null; // return this.$slots.default({id: this.id, ...props});
+        // },
         form_item_add: function (inst) {
-console.log('form_item_add',  inst);
             const uid = `uid-${crypto.randomUUID()}`;
-            this.form_items.push({uid, inst});
+            this.form_items.push({uid, inst, type: 'group'});
             return uid;
         },
         form_item_remove: function (inst) {
@@ -237,10 +233,19 @@ vue_component('v4-form-classic', {
     },
     template: `
         <div class="mg5">
-            <div v-for="item in form_items" class="flex-row-center-left gap10">
-                <div class="w100"><render-function :fn="item.inst.render_label" /></div>
-                <div><render-function :fn="item.inst.render_body" /></div>
-            </div>
+            <template v-for="item in form_items">
+                <fieldset v-if="item.inst.group" class="mg5">
+                    <legend>{{ item.inst.label }}</legend>
+                    <div v-for="child in item.inst.form_items" class="flex-row-center-left gap10">
+                        <div class="w100"><render-function :fn="child.inst.render_label" /></div>
+                        <div><render-function :fn="child.inst.render_body" /></div>
+                    </div>
+                </fieldset>
+                <div v-else class="flex-row-center-left gap10">
+                    <div class="w100"><render-function :fn="item.inst.render_label" /></div>
+                    <div><render-function :fn="item.inst.render_body" /></div>
+                </div>
+            </template>
         </div>
         <div style="display:none;">
             <slot />
