@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <title>markup-as-data-providers | research | ui-helpers</title>
+</head>
+<body>
+
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.0/src/static/js/bundle.js"></script>
+<script>
+vue_component('foo-container', {
+    props: ['modelValue'],
+    provide: function () {
+        return {foo: this};
+    },
+    template: `
+        <div class="border">
+            <h2>Foo Container</h2>
+            <p>{{ items.length }}</p>
+            <button v-on:click="counter++">Increase [{{counter}}]</button>
+            <div class="p5">
+                Items here:
+                <div v-for="item in items">
+                    {{ item.key }} | <render-function :fn="item.inst.render_label" />
+                </div>
+            </div>
+            <div class="red">
+                <slot />
+            </div>
+        </div>
+    `,
+    data: function () {
+        return {
+            counter: 0,
+            items: [],
+        };
+    },
+    methods: {
+        items_add: function (inst) {
+            const key = crypto.randomUUID();
+            const item = {key, inst};
+            this.items.push(item);
+            return item;
+        },
+        items_remove: function (inst) {
+            const i = this.items.findIndex(v => v.inst === inst);
+            if (i !== -1) {
+                this.items.splice(i, 1);
+            }
+        },
+    },
+});
+
+vue_component('foo-item', {
+    inject: ['foo'],
+    provide: function () {
+        return {foo_item: this};
+    },
+    template: `<slot />`,
+    data: function () {
+        return {
+            local_item: null,
+            label_inst: null,
+        };
+    },
+    methods: {
+        render_label: function () {
+            //console.log('slots', this.label_inst);
+            if (this.label_inst) {
+                console.log('slots', this.label_inst.$slots.default());
+                return this.label_inst.$slots.default({counter: this.foo.counter});
+            }
+            return [];
+        },
+        add_label: function (inst) {
+            this.label_inst = inst;
+        },
+        remove_label: function (inst) {
+            this.label_inst = null;
+        },
+    },
+    created: function () {
+        console.log('foo_item.created');
+        this.local_item = this.foo.items_add(this);
+    },
+    unmounted: function () {
+        console.log('foo_item.unmounted');
+        this.foo.items_remove(this);
+        this.local_item = null;
+    },
+});
+
+vue_component('foo-label', {
+    inject: ['foo_item'],
+    // template: `<slot />`,
+    render: function () {
+        return [];
+    },
+    data: function () {
+        return {
+            local_item: null,
+        };
+    },
+    methods: {
+    },
+    created: function () {
+        console.log('foo_label.created');
+        this.local_item = this.foo_item.add_label(this);
+    },
+    unmounted: function () {
+        console.log('foo_label.unmounted');
+        this.foo_item.remove_label(this);
+        this.local_item = null;
+    },
+});
+
+vue_component('render-function', {
+    props: ['fn'],
+    render: function () {
+        return this.fn(this.$attrs);
+    },
+});
+
+vue_component('app', {
+    template: `
+        <div class="fix-f hsplit gap15 m10">
+            <div class="fluid oa">
+                <foo-container>
+                    <foo-item>
+                        <foo-label v-slot="slot">
+                            <span class="flex-row-center-left gap10">
+                                <svg-icon-ai class="w20 h20" /> Some label here | {{ slot }}
+                            </span>
+                        </foo-label>
+                    </foo-item>
+                    <foo-item />
+                    <foo-item />
+                </foo-container>
+            </div>
+            <div class="w400 flex-col gap10 oa">
+            </div>
+        </div>
+    `,
+    data: function () {
+        return {};
+    },
+});
+</script>
+
+</body>
+</html>
