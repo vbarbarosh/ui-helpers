@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <title>form | research | ui-helpers</title>
+</head>
+<body>
+
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.0/src/static/js/bundle.js"></script>
+<script>
+vue_component('v5-form', {
+    props: ['modelValue'],
+    provide: function () {
+        return {
+            form: {
+                items_add: this.items_add,
+            },
+        };
+    },
+    template: `
+        <div>
+            <table class="nowrap w0">
+            <tbody>
+                <tr v-for="item in items" v-bind:key="item.key">
+                    <th><render-function v-bind:fn="item.inst.render_label" /></th>
+                    <td><render-function v-bind:fn="item.inst.render_control" /></td>
+                </tr>
+            </tbody>
+            </table>
+            <slot />
+        </div>
+    `,
+    data: function () {
+        return {
+            items: [],
+        };
+    },
+    methods: {
+        items_add: function (inst) {
+            const key = crypto.randomUUID();
+            const item = {key, inst};
+            this.items.push(item);
+            return item;
+        },
+        items_remove: function (item) {
+            const i = this.items.indexOf(item);
+            if (i !== -1) {
+                this.items.splice(i, 1);
+            }
+        },
+    },
+});
+
+vue_component('stub', {
+    template: `<div>STUB</div>`,
+});
+
+vue_component('v5-form-item', {
+    props: ['label'],
+    inject: {form: {default: null}},
+    provide: function () {
+        console.log('form-item provide');
+        return {
+            form_item: {
+                add_label: this.add_label,
+                remove_label: this.remove_label,
+            },
+        };
+    },
+    template: `<slot />`,
+    data: function () {
+        return {
+            id: `id-${crypto.randomUUID()}`,
+            local_item: null,
+            label_inst: null,
+        };
+    },
+    methods: {
+        add_label: function (inst) {
+            this.label_inst = inst;
+        },
+        remove_label: function (inst) {
+            if (this.label_inst === inst) {
+                this.label_inst = null;
+            }
+        },
+        render_label: function (props) {
+            if (this.label_inst) {
+                return this.label_inst.render_label(props);
+            }
+            if (this.$slots.label) {
+                return this.$slots.label({for: this.id, ...props});
+            }
+            return Vue.h('label', {for: this.id}, [this.label]);
+        },
+        render_control: function (props) {
+            return this.$slots.default({id: this.id, ...props});
+        },
+    },
+    created: function () {
+        if (this.form) {
+            this.local_item = this.form.items_add(this);
+        }
+    },
+    unmounted: function () {
+        if (this.form) {
+            this.form.items_remove(this.local_item);
+            this.local_item = null;
+        }
+    },
+});
+
+vue_component('v5-form-label', {
+    inject: ['form_item'],
+    template: `<stub />`,
+    methods: {
+        render_label: function (props) {
+            return this.$slots.default(props);
+        },
+    },
+    created: function () {
+console.log('form-label.created', this.form_item);
+        if (this.form_item) {
+            this.form_item.add_label(this);
+        }
+    },
+    unmounted: function () {
+console.log('form-label.unmounted', this.form_item);
+        if (this.form_item) {
+            this.form_item.remove_label(this);
+        }
+    },
+});
+
+vue_component('render-function', {
+    props: ['fn'],
+    render: function () {
+        return this.fn(this.$attrs);
+    },
+});
+
+vue_component('app', {
+    template: `
+        <div class="fix-f hsplit gap15 m10">
+            <div class="fluid mg15 rainbow oa">
+                <v5-form v-model="form">
+<!--
+                    <v5-form-item label="First name">
+                        <input-text v-model="form1.first_name" />
+                    </v5-form-item>
+-->
+                    <v5-form-item>
+<!--
+                        <template #label="{id}">
+                            <label :for="id" class="flex-row-center-left gap10">
+                                <svg-icon-ai class="w20 h20" /> Horse name
+                            </label>
+                        </template>
+                        <template #default="">
+                            <input-text v-model="form1.horse_name" />
+                        </template>
+-->
+                        <v5-form-label class="flex-row-center-left gap10">
+                            <svg-icon-ai class="w20 h20" /> Horse name
+                        </v5-form-label>
+                        <!-- <input-text v-if="false" v-model="form1.horse_name" /> -->
+                    </v5-form-item>
+<!--
+                    <v5-form-item v-slot="slot">
+                        <v5-form-label>🐴 Horse name</v5-form-label>
+                        <el-cascader v-model="form1.fofofo" :label-id="slot.id" />
+                    </v5-form-item>
+                    <input-text v-model="form1.last_name" label="Last name" />
+                    <input-text v-model="form1.email" label="Email" />
+                    <input-text v-model="form1.password" label="Password" />
+                    <input-text v-model="form1.password2" label="Password Confirm" />
+                    <input-checkbox v-model="form1.remember_me" label="Remember me" />
+                    <input-enum-radios v-model="form1.sex" :options="[{label: 'Male', value: 'male'}, {label: 'Female', value: 'female'}]" label="Sex" />
+-->
+                </v5-form>
+            </div>
+            <div class="w400 flex-col gap10 oa">
+                <img src="images/auto-placed-form.png" alt="">
+            </div>
+        </div>
+    `,
+    data: function () {
+        return {
+            form1: {
+                first_name: '',
+                last_name: '',
+                email: '',
+                password: '',
+                password2: '',
+                remember_me: true,
+            },
+            fields: [
+                {name: 'first_name', type: 'str'},
+                {name: 'last_name', type: 'str'},
+                {name: 'email', type: 'email'},
+                {name: 'password', type: 'str'},
+                {name: 'password2', type: 'str'},
+                {name: 'remember_me', type: 'bool'},
+            ],
+            items: [
+                // {label: 'Personal information', ui: 'group', items: [
+                    {label: 'First name', field: 'first_name', component: 'form-string'},
+                    {label: 'Last name', field: 'last_name', component: 'form-string'},
+                // ]},
+                // {label: 'Account information', ui: 'group', items: [
+                    {label: 'Email address', field: 'email', component: 'form-string'},
+                    {label: 'Password', field: 'password', component: 'form-string'},
+                    {label: 'Password2', field: 'password2', component: 'form-string'},
+                // ]},
+                {label: 'Remember me', field: 'remember_me', component: 'form-checkbox'},
+                {label: 'Register', component: 'form-button'},
+                // {label: 'Personal information', children: [
+                //     {label: 'First name'},
+                //     {label: 'Last name'},
+                // ]},
+                // {label: 'Account information', children: [
+                //     {label: 'Email address'},
+                //     {label: 'Password'},
+                //     {label: 'Password2'},
+                // ]},
+                // {label: 'Remember me'},
+                // {label: 'Register'},
+            ],
+        };
+    },
+    computed: {
+        form1_json: function () {
+            return JSON.stringify(this.form1, null, 4);
+        },
+    },
+});
+</script>
+
+</body>
+</html>
