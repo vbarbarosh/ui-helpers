@@ -1,5 +1,11 @@
+const vue_ready_callbacks = [];
 const vue_components = [];
 const vue_directives = [];
+
+function vue_ready(callback)
+{
+    vue_ready_callbacks.push(callback);
+}
 
 function vue_component(name, params)
 {
@@ -22,7 +28,11 @@ function vue_directive(name, params)
     inject('https://unpkg.com/axios@1.11.0/dist/axios.min.js');
     inject('https://unpkg.com/jquery@3.7.1/dist/jquery.js');
     inject('https://unpkg.com/bluebird@3.7.2/js/browser/bluebird.js');
-    inject('https://unpkg.com/vue@3.5.18/dist/vue.global.js');
+    inject('https://unpkg.com/vue@3.5.18/dist/vue.global.js', function () {
+        vue_ready_callbacks.forEach(function (callback) {
+            try { callback(); } catch (error) { console.warn(error); }
+        });
+    });
     inject('https://unpkg.com/@vbarbarosh/dd@1.9.0/dist/dd.js');
     inject('utils.js', function () {
         const i = bundle_pending.indexOf('utils');
