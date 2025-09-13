@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <title>markup-as-data-providers | research | ui-helpers</title>
+</head>
+<body>
+
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
+<script>
+vue_ready(function () {
+    const _compile = Vue.compile;
+    Vue.compile = function (...args) {
+        console.log('compile', args);
+        return _compile.apply(Vue, args);
+    };
+    const _createApp = Vue.createApp;
+    Vue.createApp = function (...args) {
+        console.log('createApp', args);
+        const out = _createApp.apply(Vue, args);
+        const _component = out.component;
+        out.component = function (name, def) {
+            console.log('component', name, def.template);
+            return _component.apply(out, [name, def]);
+        };
+        return out;
+        function rewrite_template(src) {
+            // naive rewrite: wrap foo-labels
+            return src.replace(/<foo-label/g, '<template v-slot:label><foo-label')
+                .replace(/<\/foo-label>/g, '</foo-label></template>');
+        }
+    };
+    console.log(Vue.compile);
+});
+
+
+// Vue.compile = function(template, options) {
+//     // do your own preprocessing
+//     const transformed = template.replace(
+//         /<foo-label(.*?)>/g,
+//         '<template v-slot:meta><foo-label$1>'
+//     );
+//
+//     return _compile(transformed, options);
+// };
+</script>
+<script>
+vue_component('foo-table', {
+    props: ['items'],
+    provide: function () {
+        return {foo: this};
+    },
+    template: `
+        <div class="border">
+            <h2>Foo Table</h2>
+            <p>{{ columns.length }}</p>
+            <button v-on:click="counter++">Increase [{{counter}}]</button>
+            <table>
+                <thead>
+                    <tr>
+                        <template v-for="column in columns">
+                            <th><render-function :fn="column.inst.render_label" :column /></th>
+                        </template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in items">
+                        <template v-for="column in columns">
+                            <td><render-function :fn="column.inst.render_cell" :item /></td>
+                        </template>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="red">
+                <slot />
+            </div>
+        </div>
+    `,
+    data: function () {
+        return {
+            counter: 0,
+            columns: [],
+        };
+    },
+    methods: {
+        columns_add: function (inst) {
+            const key = crypto.randomUUID();
+            const item = {key, inst};
+            this.columns.push(item);
+            return item;
+        },
+        columns_remove: function (inst) {
+            const i = this.columns.findIndex(v => v.inst === inst);
+            if (i !== -1) {
+                this.columns.splice(i, 1);
+            }
+        },
+    },
+});
+
+vue_component('foo-column', {
+    props: ['prop', 'label'],
+    inject: ['foo'],
+    provide: function () {
+        return {foo_column: this};
+    },
+    template: `<slot />`,
+    data: function () {
+        return {
+            local_item: null,
+            label_inst: null,
+            cell_inst: null,
+        };
+    },
+    methods: {
+        render_label: function (props) {
+            console.log('render_label');
+            if (this.label_inst) {
+                return this.label_inst.$slots.default(props);
+            }
+            if (this.$slots.label) {
+                return this.$slots.label(props);
+            }
+            if (typeof this.label === 'string') {
+                return this.label;
+            }
+            return null;
+        },
+        render_cell: function (props) {
+            // console.log('render_cell', this.cell_inst);
+            if (this.cell_inst) {
+                return this.cell_inst.$slots.default(props);
+            }
+            if (this.$slots.cell) {
+                return this.$slots.cell(props);
+            }
+            // if (this.$slots.default) {
+            //     // return this.$slots.default(props);
+            // }
+            return props.item[this.prop];
+        },
+        add_label: function (inst) {
+            this.label_inst = inst;
+        },
+        remove_label: function (inst) {
+            this.label_inst = null;
+        },
+        add_cell: function (inst) {
+            this.cell_inst = inst;
+        },
+        remove_cell: function (inst) {
+            this.cell_inst = null;
+        },
+    },
+    created: function () {
+        console.log('foo_column.created');
+        this.local_item = this.foo.columns_add(this);
+    },
+    unmounted: function () {
+        console.log('foo_column.unmounted');
+        this.foo.columns_remove(this);
+        this.local_item = null;
+    },
+});
+
+vue_component('foo-label', {
+    inject: ['foo_column'],
+    render: function () {
+        return [];
+    },
+    created: function () {
+        this.foo_column.add_label(this);
+    },
+    unmounted: function () {
+        this.foo_column.remove_label(this);
+    },
+});
+
+vue_component('foo-cell', {
+    inject: ['foo_column'],
+    render: function () {
+        return [];
+    },
+    created: function () {
+        this.foo_column.add_cell(this);
+    },
+    unmounted: function () {
+        this.foo_column.remove_cell(this);
+    },
+});
+
+vue_component('render-function', {
+    props: ['fn'],
+    render: function () {
+        return this.fn(this.$attrs);
+    },
+});
+
+vue_component('app', {
+    template: `
+        <div class="fix-f hsplit gap15 m10">
+            <div class="fluid oa">
+                <foo-table v-bind:items="posts">
+                    <foo-column>
+                        <template #th-body>
+                            whatever
+                        </template>
+                        <template #cell="slot">
+                            --{{slot.item.id}}--<strong>{{slot.item.userId}}</strong>
+                        </template>
+                    </foo-column>
+                    <foo-column prop="body">
+                        <foo-label>Body11</foo-label>
+                        <foo-cell v-slot="slot">
+                            {{ slot.item.title.slice(0, 50) + '...' }}
+                        </foo-cell>
+                    </foo-column>
+                    <foo-column v-slot:cell="slot" prop="idid" label="IDIDID">
+                        --{{slot.item.id}}--<strong>{{slot.item.userId}}</strong>
+                    </foo-column>
+                    <foo-column prop="userId" label="UserID" />
+                    <foo-column prop="title">
+                        <foo-label>Title</foo-label>
+                    </foo-column>
+                </foo-table>
+            </div>
+            <div class="w400 flex-col gap10 oa">
+            </div>
+        </div>
+    `,
+    data: function () {
+        return {
+            posts: [],
+        };
+    },
+    created: async function () {
+        this.posts = await blocking(http_get_json('https://jsonplaceholder.typicode.com/posts'));
+    },
+});
+</script>
+
+</body>
+</html>
