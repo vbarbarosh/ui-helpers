@@ -14,24 +14,20 @@
 vue_component('v5-form', {
     props: ['modelValue'],
     provide: function () {
-        return {
-            form: {
-                items_add: this.items_add,
-            },
-        };
+        return {form: this};
     },
     template: `
-        <div>
-            <table class="nowrap w0">
-            <tbody>
-                <tr v-for="item in items" v-bind:key="item.key">
-                    <th><render-function v-bind:fn="item.inst.render_label" /></th>
-                    <td><render-function v-bind:fn="item.inst.render_control" /></td>
-                </tr>
-            </tbody>
-            </table>
+        <div class="red">
             <slot />
         </div>
+        <table class="nowrap w0">
+            <tbody>
+                <tr v-for="item in items" :key="item.key">
+                    <th><render-function :fn="item.inst.render_label" :item /></th>
+                    <td><render-function :fn="item.inst.render_control" :item /></td>
+                </tr>
+            </tbody>
+        </table>
     `,
     data: function () {
         return {
@@ -54,28 +50,19 @@ vue_component('v5-form', {
     },
 });
 
-vue_component('stub', {
-    template: `<div>STUB</div>`,
-});
-
 vue_component('v5-form-item', {
+    inheritAttrs: false,
     props: ['label'],
-    inject: {form: {default: null}},
+    inject: ['form'],
     provide: function () {
-        console.log('form-item provide');
-        return {
-            form_item: {
-                add_label: this.add_label,
-                remove_label: this.remove_label,
-            },
-        };
+        return {form_item: this};
     },
     template: `<slot />`,
     data: function () {
         return {
             id: `id-${crypto.randomUUID()}`,
-            local_item: null,
             label_inst: null,
+            control_inst: null,
         };
     },
     methods: {
@@ -87,87 +74,136 @@ vue_component('v5-form-item', {
                 this.label_inst = null;
             }
         },
+        add_control: function (inst) {
+            this.control_inst = inst;
+        },
+        remove_control: function (inst) {
+            if (this.control_inst === inst) {
+                this.control_inst = null;
+            }
+        },
         render_label: function (props) {
             if (this.label_inst) {
-                return this.label_inst.render_label(props);
+                return this.label_inst.render_label({id: this.id, ...props});
             }
             if (this.$slots.label) {
-                return this.$slots.label({for: this.id, ...props});
+                return this.$slots.label({id: this.id, ...props});
             }
-            return Vue.h('label', {for: this.id}, [this.label]);
+            return Vue.h('label', {for: this.id}, this.label);
         },
         render_control: function (props) {
-            return this.$slots.default({id: this.id, ...props});
+            if (this.control_inst) {
+                const out = this.control_inst.render_control({id: this.id, ...props});
+                if (out.length) {
+                    out.splice(0, 1, Vue.cloneVNode(out[0], this.$attrs));
+                }
+                return out;
+            }
+            if (this.$slots.control) {
+                const out = this.$slots.control({id: this.id, ...props});
+                if (out.length) {
+                    out.splice(0, 1, Vue.cloneVNode(out[0], this.$attrs));
+                }
+                return out;
+            }
+            return this.id;
         },
     },
     created: function () {
-        if (this.form) {
-            this.local_item = this.form.items_add(this);
-        }
+        this.form.items_add(this);
     },
     unmounted: function () {
-        if (this.form) {
-            this.form.items_remove(this.local_item);
-            this.local_item = null;
-        }
+        this.form.items_remove(this.local_item);
     },
 });
 
 vue_component('v5-form-label', {
+    inheritAttrs: false,
     inject: ['form_item'],
-    template: `<stub />`,
+    render: function () {
+        return [];
+    },
     methods: {
         render_label: function (props) {
+            return Vue.h('label', {for: props.id, ...this.$attrs}, this.$slots.default(props));
+        },
+    },
+    created: function () {
+        this.form_item.add_label(this);
+    },
+    unmounted: function () {
+        this.form_item.remove_label(this);
+    },
+});
+
+vue_component('v5-form-control', {
+    inheritAttrs: false,
+    inject: ['form_item'],
+    render: function () {
+        return [];
+    },
+    methods: {
+        render_control: function (props) {
             return this.$slots.default(props);
         },
     },
     created: function () {
-console.log('form-label.created', this.form_item);
-        if (this.form_item) {
-            this.form_item.add_label(this);
-        }
+        this.form_item.add_control(this);
     },
     unmounted: function () {
-console.log('form-label.unmounted', this.form_item);
-        if (this.form_item) {
-            this.form_item.remove_label(this);
-        }
+        this.form_item.remove_control(this);
     },
 });
 
 vue_component('render-function', {
-    props: ['fn'],
+    props: ['fn', 'item'],
     render: function () {
-        return this.fn(this.$attrs);
+        return this.fn({item: this.item});
     },
+});
+
+vue_component('v5-input-text', {
+    emits: ['update:modelValue'],
+    props: ['modelValue'],
+    template: `
+        <v5-form-item #control="slot">
+            <input v-on:input="input" v-bind:value="modelValue" v-bind:id="slot.id" type="text" />
+        </v5-form-item>
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    }
 });
 
 vue_component('app', {
     template: `
         <div class="fix-f hsplit gap15 m10">
             <div class="fluid mg15 rainbow oa">
-                <v5-form v-model="form">
-<!--
-                    <v5-form-item label="First name">
-                        <input-text v-model="form1.first_name" />
-                    </v5-form-item>
--->
+                <v5-form v-model="form1">
+                    <v5-form-item label="Name" />
+
                     <v5-form-item>
-<!--
-                        <template #label="{id}">
-                            <label :for="id" class="flex-row-center-left gap10">
-                                <svg-icon-ai class="w20 h20" /> Horse name
-                            </label>
+                        <template #label="slot">
+                            <label :for="slot.id">Brand</label>
                         </template>
-                        <template #default="">
-                            <input-text v-model="form1.horse_name" />
+                        <template #control="slot">
+                            <input :id="slot.id" type="text" />
                         </template>
--->
-                        <v5-form-label class="flex-row-center-left gap10">
+                    </v5-form-item>
+
+                    <v5-form-item>
+                        <v5-form-label v-slot="slot" v-on:click="click" class="flex-row-center-left gap10" data-ggg>
                             <svg-icon-ai class="w20 h20" /> Horse name
                         </v5-form-label>
-                        <!-- <input-text v-if="false" v-model="form1.horse_name" /> -->
+                        <v5-form-control v-slot="slot">
+                            <input v-model="form1.first_name" :id="slot.id" />
+                        </v5-form-control>
                     </v5-form-item>
+
+                    <v5-input-text v-model="form1.first_name" label="First Name" />
+
 <!--
                     <v5-form-item v-slot="slot">
                         <v5-form-label>🐴 Horse name</v5-form-label>
@@ -181,6 +217,9 @@ vue_component('app', {
                     <input-enum-radios v-model="form1.sex" :options="[{label: 'Male', value: 'male'}, {label: 'Female', value: 'female'}]" label="Sex" />
 -->
                 </v5-form>
+            </div>
+            <div class="w400">
+                <prism-js :value="form1_json" />
             </div>
             <div class="w400 flex-col gap10 oa">
                 <img src="images/auto-placed-form.png" alt="">
@@ -230,6 +269,11 @@ vue_component('app', {
                 // {label: 'Register'},
             ],
         };
+    },
+    methods: {
+        click: function () {
+            console.log('click');
+        },
     },
     computed: {
         form1_json: function () {
