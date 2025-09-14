@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <title>markup-as-data-providers | research | ui-helpers</title>
+</head>
+<body>
+
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
+<script>
+vue_component('table-v2', {
+    props: ['items'],
+    provide: function () {
+        return {table: this};
+    },
+    template: `
+        <slot />    <!-- Без этого слота у мета-компонентов не будет возможности создаться -->
+        <table>
+            <thead>
+                <tr>
+                    <th v-for="column in columns" v-bind:key="column.key">
+                        <render-function v-bind:fn="column.inst.render_label" />
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in items">
+                    <td v-for="column in columns" v-bind:key="column.key">
+                        <render-function v-bind:fn="column.inst.render_cell" v-bind:item="item" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+`,
+    data: function () {
+        return {
+            columns: [],
+        };
+    },
+    methods: {
+        add_column: function (inst) {
+            const key = crypto.randomUUID();
+            const item = {key, inst};
+            this.columns.push(item);
+            return item;
+        },
+        remove_column: function (inst) {
+            const i = this.columns.findIndex(v => v.inst === inst);
+            if (i !== -1) {
+                this.columns.splice(i, 1);
+            }
+        },
+    },
+});
+
+vue_component('column', {
+    props: ['prop', 'label'],
+    inject: ['table'],
+    render: function () {
+        return [];
+    },
+    methods: {
+        render_label: function (props) {
+            if (this.$slots.label) {
+                return this.$slots.label(props);
+            }
+            if (typeof this.label === 'string') {
+                return this.label;
+            }
+            return null;
+        },
+        render_cell: function (props) {
+            if (this.$slots.default) {
+                return this.$slots.default(props);
+            }
+            return props.item[this.prop];
+        },
+    },
+    created: function () {
+        this.table.add_column(this);
+    },
+    unmounted: function () {
+        this.table.remove_column(this);
+    },
+});
+
+vue_component('render-function', {
+    props: ['fn'],
+    render: function () {
+        return this.fn(this.$attrs);
+    },
+});
+
+vue_component('app', {
+    template: `
+        <div class="fix-f p10 oa">
+            <table-v2 :items>
+                <column label="ID" prop="id" />
+                <column label="Author" prop="author" />
+                <column v-slot="slot" label="Size">
+                    {{ slot.item.width }}x{{ slot.item.height }}
+                </column>
+                <column label="Url" prop="url" />
+                <column v-slot="slot" label="Thumbnail">
+                    <img :src="slot.item.download_url" alt="" class="max-w50 max-h50" />
+                </column>
+            </table-v2>
+        </div>
+    `,
+    data: function () {
+        return {
+            items: [],
+        };
+    },
+    created: async function () {
+        this.items = await blocking(http_get_json('https://picsum.photos/v2/list?page=1&limit=10'));
+    },
+});
+</script>
+
+</body>
+</html>

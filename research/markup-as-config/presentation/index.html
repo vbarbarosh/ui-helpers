@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js@5.2.1/dist/reveal.css" />
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js@5.2.1/dist/theme/serif.css" />
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js@5.2.1/plugin/highlight/monokai.css" />
+
+    <title>templ-html/smcss-vue3.html</title>
+</head>
+<body>
+
+<div class="reveal">
+    <div class="slides">
+
+<section data-markdown>
+<textarea data-template>
+# Как создавать мета-компоненты
+
+---
+
+## Как можно использовать элементы для передачи мета-информации
+
+---
+
+## Как сделать такое
+
+```html
+<table-v2 :items>
+    <column label="ID" prop="id" />
+    <column label="Author" prop="author" />
+    <column v-slot="slot" label="Size">
+        {{ slot.item.width }}x{{ slot.item.height }}
+    </column>
+    <column label="Url" prop="url" />
+    <column v-slot="slot" label="Thumbnail">
+        <img :src="slot.item.download_url"
+             class="max-w100 max-h100" />
+    </column>
+</table-v2>
+```
+
+---
+
+Обычно элементы используются для рендеринга
+
+```html
+const Card = {
+    props: ['title', 'footer'],
+    template: `
+        <div class="card">
+            <div class="card-header">{{ title }}</div>
+            <div class="card-body"><slot /></div>
+            <div class="card-footer">{{ footer }}</div>
+        </div>
+    `,
+};
+```
+
+---
+
+Но иногда удобно использовать элементы для настройки компонента:
+
+```html
+<table-sel :items>
+    <column label="ID" prop="id" />
+    <column label="First Name" prop="first_name" />
+    <column label="Last Name" prop="last_name" />
+    <column label="Role" prop="role" />
+</table-sel>
+```
+
+---
+
+Обычный способ передать параметры:
+
+```html
+<table-sel :items :columns="[
+    {label: 'ID', read: v => v.id},
+    {label: 'First Name', read: v => v.first_name},
+    {label: 'Last Name', read: v => v.last_name},
+    {label: 'Role', read: v => v.role},
+]">
+```
+
+---
+
+И вариант когда настройки передаются через мета-компоненты:
+
+```html
+<table-sel :items>
+    <column :read="v => v.id" label="ID" />
+    <column :read="v => v.first_name" label="First Name" />
+    <column :read="v => v.last_name" label="Last Name" />
+    <column :read="v => v.role" label="Role" />
+</table-sel>
+```
+
+---
+
+Или еще проще:
+
+```html
+<table-sel :items>
+    <column label="ID" prop="id" />
+    <column label="First Name" prop="first_name" />
+    <column label="Last Name" prop="last_name" />
+    <column label="Role" prop="role" />
+</table-sel>
+
+---
+
+Или даже так:
+
+```html
+<table-sel :items>
+    <column label="ID" prop="id"></column>
+    <column label="First Name" prop="first_name" />
+    <column label="Last Name" prop="last_name" />
+    <column label="Role" prop="role" />
+    <column v-slot="slot" label="Avatar">
+        <img :src="slot.item.avatar_url" />
+    </column>
+</table-sel>
+```
+
+---
+
+Через параметры это может выглядеть так:
+
+```html
+<table-sel :items :columns="[
+    {label: 'ID', prop: 'id'},
+    {label: 'First Name', prop: 'first_name'},
+    {label: 'Last Name', prop: 'last_name'},
+    {label: 'Role', prop: 'role'},
+    {label: 'Avatar', slot: 'avatar'},
+]">
+    <template #avatar="slot">
+        <img :src="slot.item.avatar_url" />
+    </template>
+</table-sel>
+```
+
+---
+
+## Реализация
+
+---
+
+Реализация имеет очень шаблонный подход:
+
+```javascript [3-5|31-36|37-42]
+vue_component('table-sel', {
+    props: ['items'],
+    provide: function () {
+        return {table: this};
+    },
+    template: `
+        <slot />    <!-- Без этого слота у мета-компонентов не будет возможности создаться -->
+        <table>
+            <thead>
+                <tr>
+                    <th v-for="column in columns" v-bind:key="column.key">
+                        <render-function v-bind:fn="column.inst.render_label" />
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in items">
+                    <td v-for="column in columns" v-bind:key="column.key">
+                        <render-function v-bind:fn="column.inst.render_cell" v-bind:item="item" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    `,
+    data: function () {
+        return {
+            columns: [],
+        };
+    },
+    methods: {
+        add_column: function (inst) {
+            const key = crypto.randomUUID();
+            const item = {key, inst};
+            this.columns.push(item);
+            return item;
+        },
+        remove_column: function (inst) {
+            const i = this.columns.findIndex(v => v.inst === inst);
+            if (i !== -1) {
+                this.columns.splice(i, 1);
+            }
+        },
+    },
+});
+```
+
+---
+
+Мета компоненты:
+
+```javascript [3-6|24-29]
+vue_component('column', {
+    props: ['prop', 'label'],
+    inject: ['table'],
+    render: function () {
+        return [];
+    },
+    methods: {
+        render_label: function (props) {
+            if (this.$slots.label) {
+                return this.$slots.label(props);
+            }
+            if (typeof this.label === 'string') {
+                return this.label;
+            }
+            return null;
+        },
+        render_cell: function (props) {
+            if (this.$slots.default) {
+                return this.$slots.default(props);
+            }
+            return props.item[this.prop];
+        },
+    },
+    created: function () {
+        this.table.add_column(this);
+    },
+    unmounted: function () {
+        this.table.remove_column(this);
+    },
+});
+```
+
+---
+
+## Использование
+
+```javascript [7-10|14-16|21-23|56-64|65-70|80-85]
+vue_component('table-sel', {
+    props: ['items'],
+    provide: function () {
+        return {table: this};
+    },
+    template: `
+        <slot />    <!-- Без этого слота у
+                         мета-компонентов не
+                         будет возможности
+                         создаться -->
+        <table>
+            <thead>
+                <tr>
+<th v-for="column in columns" v-bind:key="column.key">
+    <render-function :fn="column.inst.render_label" />
+</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in items">
+<td v-for="column in columns" v-bind:key="column.key">
+    <render-function :fn="column.inst.render_cell" :item />
+</td>
+                </tr>
+            </tbody>
+        </table>
+    `,
+    data: function () {
+        return {
+            columns: [],
+        };
+    },
+    methods: {
+        add_column: function (inst) {
+            const key = crypto.randomUUID();
+            const item = {key, inst};
+            this.columns.push(item);
+            return item;
+        },
+        remove_column: function (inst) {
+            const i = this.columns.findIndex(v => v.inst === inst);
+            if (i !== -1) {
+                this.columns.splice(i, 1);
+            }
+        },
+    },
+});
+
+vue_component('column', {
+    props: ['prop', 'label'],
+    inject: ['table'],
+    render: function () {
+        return [];
+    },
+    methods: {
+render_label: function (props) {
+    if (this.$slots.label) {
+        return this.$slots.label(props);
+    }
+    if (typeof this.label === 'string') {
+        return this.label;
+    }
+    return null;
+},
+render_cell: function (props) {
+    if (this.$slots.default) {
+        return this.$slots.default(props);
+    }
+    return props.item[this.prop];
+},
+    },
+    created: function () {
+        this.table.add_column(this);
+    },
+    unmounted: function () {
+        this.table.remove_column(this);
+    },
+});
+
+vue_component('render-function', {
+    props: ['fn'],
+    render: function () {
+        return this.fn(this.$attrs);
+    },
+});
+
+```
+
+---
+
+## Конец 🙏
+</textarea>
+</section>
+
+    </div>
+</div>
+
+<script src="https://unpkg.com/reveal.js@5.2.1/dist/reveal.js"></script>
+<script src="https://unpkg.com/reveal.js@5.2.1/plugin/markdown/markdown.js"></script>
+<script src="https://unpkg.com/reveal.js@5.2.1/plugin/highlight/highlight.js"></script>
+<script>
+    Reveal.initialize({
+        plugins: [RevealMarkdown, RevealHighlight],
+    });
+</script>
+
+</body>
+</html>
