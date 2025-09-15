@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <title>understanding-provide-inject | research | ui-helpers</title>
+</head>
+<body>
+
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
+<script>
+vue_component('render-function', {
+    inheritAttrs: false,
+    props: ['fn'],
+    render: function () {
+        return this.fn(this.$attrs);
+    },
+});
+
+vue_component('some-provider', {
+    provide: function () {
+        return {some_provider: this};
+    },
+    template: `
+        <div class="red">
+            <slot />
+        </div>
+        <div class="green">
+            <template v-for="item in items">
+                <render-function :fn="item.$slots.default" />
+            </template>
+        </div>
+
+    `,
+    data: function () {
+        return {
+            meta: null,
+            message: 'Hello from some-provider',
+            items: [],
+        };
+    },
+});
+
+vue_component('some-consumer', {
+    inject: ['some_provider', 'meta_component'],
+    template: `<h2>consumer: {{ some_provider.message }} {{ typeof meta_component }}</h2>`,
+});
+
+vue_component('meta-component', {
+    inject: ['some_provider'],
+    provide: function () {
+        return {
+            meta_component: this,
+        };
+    },
+    render: function () {
+        return [];
+    },
+    created: function () {
+        this.some_provider.items.push(this);
+    },
+});
+
+vue_component('app', {
+    template: `
+        <div class="fix-f hsplit gap15 m10">
+            <div class="fluid oa">
+                <some-provider>
+                    <meta-component>
+                        <some-consumer />
+                    </meta-component>
+                </some-provider>
+            </div>
+            <div class="w400 flex-col gap10 oa">
+            </div>
+        </div>
+    `,
+    data: function () {
+        return {
+            posts: [],
+        };
+    },
+    created: async function () {
+        this.posts = await blocking(http_get_json('https://jsonplaceholder.typicode.com/posts'));
+    },
+});
+</script>
+
+</body>
+</html>
