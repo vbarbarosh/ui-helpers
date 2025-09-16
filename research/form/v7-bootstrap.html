@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <title>form | research | ui-helpers</title>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
+<script>
+const v6_form_types = {
+    string: 'v6-input-text',
+};
+
+vue_component('v7-form-table', {
+    props: ['modelValue'],
+    provide: function () {
+        return {form: this};
+    },
+    template: `
+        <div class="red">
+            <slot />
+        </div>
+        <table class="nowrap w0">
+            <tbody>
+                <tr v-for="item in items" :key="item.key">
+                    <th><render-function :fn="item.inst.render_label" :item /></th>
+                    <td><render-function :fn="item.inst.render_control" :item /></td>
+                </tr>
+            </tbody>
+        </table>
+    `,
+    data: function () {
+        return {
+            items: [],
+        };
+    },
+    methods: {
+        items_add: function (inst) {
+            const key = crypto.randomUUID();
+            const item = {key, inst};
+            this.items.push(item);
+            return item;
+        },
+        items_remove: function (item) {
+            const i = this.items.indexOf(item);
+            if (i !== -1) {
+                this.items.splice(i, 1);
+            }
+        },
+    },
+});
+
+vue_component('bs-component', {
+    props: ['value', 'item'],
+    inject: ['bs_component'],
+    template: `
+        <component v-if="bs_component[item.type]" :is="bs_component[item.type]" :value :item />
+    `,
+});
+
+vue_component('bs-floating-labels-input', {
+    props: ['value', 'item'],
+    template: `
+        <div class="form-floating mb-3">
+            <input v-model="value[item.prop]" :id :placeholder="item.placeholder ?? ''" class="form-control" type="text" />
+            <label :for="id">{{ item.label }}</label>
+        </div>
+    `,
+    data: function () {
+        return {
+            id: crypto.randomUUID(),
+        };
+    },
+});
+
+vue_component('bs-floating-labels-layout-row', {
+    props: ['value', 'item'],
+    template: `
+        <div class="row g-3">
+            <template v-for="item2 in item.items">
+                <div class="col">
+                    <bs-component :value :item="item2" />
+                </div>
+            </template>
+        </div>
+    `
+});
+
+vue_component('bs-classic-input', {
+    props: ['value', 'item'],
+    template: `
+        <div :class="col_md">
+            <label :for="id" class="form-label">{{ item.label }}</label>
+            <input :id class="form-control" type="text">
+        </div>
+    `,
+    data: function () {
+        return {
+            id: crypto.randomUUID(),
+        };
+    },
+    computed: {
+        col_md: function () {
+            return `col-md-${this.item.span ?? 12}`;
+        },
+    },
+});
+
+vue_component('bs-classic-layout-collapse', {
+    props: ['value', 'item'],
+    template: `
+        <div class="col-md-12">
+            <p>
+                <button :data-bs-target="href" class="btn btn-primary" type="button" data-bs-toggle="collapse" aria-expanded="false">
+                    {{ item.label ?? 'Button with data-bs-target' }}
+                </button>
+            </p>
+            <div :id class="collapse">
+                <div class="card card-body">
+                    <template v-for="item2 in item.items">
+                        <bs-component :value :item="item2" />
+                    </template>
+                </div>
+            </div>
+        </div>
+    `,
+    data: function () {
+        const id = crypto.randomUUID();
+        return {
+            id,
+            href: `#${id}`,
+        };
+    },
+});
+
+vue_component('v7-form-bs-floating-labels', {
+    props: ['modelValue', 'items'],
+    provide: function () {
+        return {
+            bs_component: {
+                string: 'bs-floating-labels-input',
+                'layout-row': 'bs-floating-labels-layout-row',
+            },
+        };
+    },
+    template: `
+        <div class="red">
+            <slot />
+        </div>
+        <template v-for="item in items">
+            <bs-component :value="modelValue" :item="item" />
+        </template>
+    `,
+});
+
+vue_component('v7-form-bs-classic', {
+    props: ['modelValue', 'items'],
+    provide: function () {
+        return {
+            bs_component: {
+                string: 'bs-classic-input',
+                'layout-collapse': 'bs-classic-layout-collapse',
+            },
+        };
+    },
+    template: `
+        <div class="red">
+            <slot />
+        </div>
+        <div class="row g-3">
+            <template v-for="item in items">
+                <bs-component :value="modelValue" :item="item" />
+            </template>
+        </div>
+    `,
+});
+
+vue_component('v7-form-classic', {
+    props: ['modelValue'],
+    provide: function () {
+        return {form: this};
+    },
+    template: `
+        <div class="red">
+            <slot />
+        </div>
+        <div class="mg15">
+            <div v-for="item in items" :key="item.key" class="flex-col flex-align-stretch">
+                <render-function :fn="item.inst.render_label" :item />
+                <render-function :fn="item.inst.render_control" :item />
+            </div>
+        </div>
+    `,
+    data: function () {
+        return {
+            items: [],
+        };
+    },
+    methods: {
+        items_add: function (inst) {
+            const key = crypto.randomUUID();
+            const item = {key, inst};
+            this.items.push(item);
+            return item;
+        },
+        items_remove: function (item) {
+            const i = this.items.indexOf(item);
+            if (i !== -1) {
+                this.items.splice(i, 1);
+            }
+        },
+    },
+});
+
+vue_component('v7-form-item', {
+    inheritAttrs: false,
+    props: ['label', 'prop', 'type'],
+    inject: ['form'],
+    provide: function () {
+        return {form_item: this};
+    },
+    template: `<slot />`,
+    data: function () {
+        return {
+            id: `id-${crypto.randomUUID()}`,
+            label_inst: null,
+            control_inst: null,
+        };
+    },
+    methods: {
+        add_label: function (inst) {
+            this.label_inst = inst;
+        },
+        remove_label: function (inst) {
+            if (this.label_inst === inst) {
+                this.label_inst = null;
+            }
+        },
+        add_control: function (inst) {
+            this.control_inst = inst;
+        },
+        remove_control: function (inst) {
+            if (this.control_inst === inst) {
+                this.control_inst = null;
+            }
+        },
+        render_label: function (props) {
+            if (this.label_inst) {
+                return this.label_inst.render_label({id: this.id, ...props});
+            }
+            if (this.$slots.label) {
+                return this.$slots.label({id: this.id, ...props});
+            }
+            return Vue.h('label', {for: this.id}, this.label);
+        },
+        render_control: function (props) {
+            if (this.control_inst) {
+                const out = this.control_inst.render_control({id: this.id, ...props});
+                if (out.length) {
+                    out.splice(0, 1, Vue.cloneVNode(out[0], this.$attrs));
+                }
+                return out;
+            }
+            if (this.$slots.control) {
+                return Vue.h(Vue.resolveComponent('proxy-provide'), {name: 'form_item', value: this}, {
+                    default: () => this.$slots.control({form_item: this, ...props}),
+                });
+                // if (out.length) {
+                //     out.splice(0, 1, Vue.cloneVNode(out[0], this.$attrs));
+                // }
+                // return out;
+            }
+            if (v6_form_types[this.type]) {
+                return Vue.h(Vue.resolveComponent('proxy-provide'), {name: 'form_item', value: this}, {
+                    default: () => Vue.h(Vue.resolveComponent(v6_form_types[this.type]), {
+                        modelValue: this.form.modelValue[this.prop],
+                        'onUpdate:modelValue': v => this.form.modelValue[this.prop] = v,
+                    })
+                });
+                // return Vue.h(Vue.resolveComponent(v6_form_types[this.type]), {
+                //     modelValue: this.form.modelValue[this.prop],
+                //     'onUpdate:modelValue': v => this.form.modelValue[this.prop] = v,
+                //     form_item: this,
+                // });
+            }
+            return this.id;
+        },
+    },
+    created: function () {
+        this.form.items_add(this);
+    },
+    unmounted: function () {
+        this.form.items_remove(this.local_item);
+    },
+});
+
+vue_component('v7-form-label', {
+    inheritAttrs: false,
+    inject: ['form_item'],
+    render: function () {
+        return [];
+    },
+    methods: {
+        render_label: function (props) {
+            return Vue.h('label', {for: props.id, ...this.$attrs}, this.$slots.default(props));
+        },
+    },
+    created: function () {
+        this.form_item.add_label(this);
+    },
+    unmounted: function () {
+        this.form_item.remove_label(this);
+    },
+});
+
+vue_component('proxy-provide', {
+    props: ['name', 'value'],
+    provide: function () {
+        return {
+            [this.name]: this.value,
+        };
+    },
+    template: `<slot />`,
+});
+
+vue_component('v7-form-control', {
+    inheritAttrs: false,
+    inject: ['form_item'],
+    render: function () {
+        return [];
+    },
+    methods: {
+        render_control: function (props) {
+            return Vue.h(Vue.resolveComponent('proxy-provide'), {name: 'form_item', value: this.form_item}, {
+                default: () => this.$slots.default(props),
+            });
+        },
+    },
+    created: function () {
+        this.form_item.add_control(this);
+    },
+    unmounted: function () {
+        this.form_item.remove_control(this);
+    },
+});
+
+vue_component('render-function', {
+    inheritAttrs: false,
+    props: ['fn', 'item'],
+    render: function () {
+        return this.fn({item: this.item});
+    },
+});
+
+vue_component('v6-input-text', {
+    emits: ['update:modelValue'],
+    props: ['modelValue'],
+    inject: {form_item: {default: {}}},
+    template: `
+        <input v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item.id" type="text" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
+
+vue_component('v6-input-text2', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'label'],
+    inject: {form_item: {default: null}},
+    template: `
+        <v7-form-item v-slot:control="slot" v-if="!form_item" :label>
+            <input v-on:input="input" v-bind:value="modelValue" v-bind:id="slot.form_item.id" type="text" />
+        </v7-form-item>
+        <input v-else v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item?.id" type="text" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
+
+vue_component('app', {
+    template: `
+        <div class="fix-f hsplit gap15 m10">
+            <div class="w500 border oa">
+                <div class="p10">
+                    <v7-form-bs-floating-labels v-model="form" :items />
+                </div>
+            </div>
+            <div class="w500 border oa">
+                <div class="p10">
+                    <v7-form-bs-classic v-model="form" :items="items2" />
+                </div>
+            </div>
+            <div class="fluid oa">
+                <ul>
+                    <li><a href="https://getbootstrap.com/docs/5.3/examples/checkout/" target="_blank">https://getbootstrap.com/docs/5.3/examples/checkout/</a></li>
+                    <li><a href="https://getbootstrap.com/docs/5.3/examples/sign-in/" target="_blank">https://getbootstrap.com/docs/5.3/examples/sign-in/</a></li>
+                    <li><a href="https://getbootstrap.com/docs/5.3/forms/validation/" target="_blank">https://getbootstrap.com/docs/5.3/forms/validation/</a></li>
+                </ul>
+            </div>
+        </div>
+    `,
+    data: function () {
+        return {
+            form: {
+                first_name: '',
+                last_name: '',
+                address: '',
+                address2: '',
+                city: '',
+                state: '',
+                zip: '',
+            },
+            items: [
+                {type: 'layout-row', items: [
+                    {type: 'string', prop: 'first_name', label: 'First Name'},
+                    {type: 'string', prop: 'last_name', label: 'Last Name'},
+                ]},
+                {type: 'string', prop: 'address', label: 'Address'},
+                {type: 'string', prop: 'address2', label: 'Address2'},
+                {type: 'string', prop: 'city', label: 'City'},
+                {type: 'string', prop: 'state', label: 'State'},
+                {type: 'string', prop: 'zip', label: 'ZIP'},
+            ],
+            items2: [
+                {type: 'string', prop: 'first_name', label: 'First Name', span: 6},
+                {type: 'string', prop: 'last_name', label: 'Last Name', span: 6},
+                {type: 'string', prop: 'address', label: 'Address'},
+                {type: 'string', prop: 'address2', label: 'Address2'},
+                {type: 'string', prop: 'city', label: 'City', span: 6},
+                {type: 'string', prop: 'state', label: 'State', span: 4},
+                {type: 'string', prop: 'zip', label: 'ZIP', span: 2},
+                {type: 'layout-collapse', label: 'Some extra', items: [
+                    {type: 'string', prop: 'extra', label: 'Extra'},
+                ]}
+            ],
+        };
+    },
+    computed: {
+        form_json: function () {
+            return JSON.stringify(this.form, null, 4);
+        },
+    },
+});
+</script>
+
+</body>
+</html>
