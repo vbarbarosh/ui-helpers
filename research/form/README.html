@@ -10,7 +10,225 @@
 <body>
 
 <script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.0/src/static/js/bundle.js"></script>
-<script id="json-demo1" type="text/plain">
+
+<script data-img="images/img_1.png" data-source="https://www.justinmind.com/blog/form-examples-web-mobile/" type="text/plain">
+const items = [
+    {type: 'date', label: 'Due Date'},
+    {type: 'select', label: 'Assign', options: [
+        {value: 'joe', label: 'Joe'},
+        {value: 'ann', label: 'Ann'},
+    ]},
+    {type: 'rich-text', label: 'Description'},
+];
+</script>
+
+<script data-img="images/img.png" data-source="https://www.justinmind.com/blog/form-examples-web-mobile/" type="text/plain">
+const items = [
+    {type: 'text', label: 'Company name'},
+    {type: 'text', label: 'Type'},
+    {type: 'text', label: 'Company size'},
+    {type: 'text', label: 'Address'},
+    {type: 'text', label: 'Country'},
+    {type: 'text', label: 'City'},
+];
+</script>
+
+<script data-img="images/img_2.png" data-source type="text/plain">
+const items = [
+    {type: 'section', label: 'Contact information', items: [
+        {type: 'text', label: 'Email'},
+        {type: 'checkbox', label: 'EMail me with news and offers'},
+    ]},
+    {type: 'section', label: 'Shipping', items: [
+        {type: 'text', label: 'Country / Region'},
+        {type: 'text', label: 'First name (optional)'},
+        {type: 'text', label: 'Last name'},
+        {type: 'text', label: 'Address'},
+        {type: 'text', label: 'Apartment, suite, etc (optional)'},
+    ]},
+    {type: 'columns', items: [
+        {type: 'text', label: 'Postal Code'},
+        {type: 'text', label: 'City'},
+    ]},
+    {type: 'checkbox', label: 'Save for next purchase'},
+];
+</script>
+
+<script data-img="images/img_3.png" data-source="https://getbootstrap.com/docs/5.3/examples/checkout/" type="text/plain">
+const items = [
+    {type: 'header', label: 'Billing address'},
+    {type: 'columns', items: [
+        {type: 'text', label: 'First name'},
+        {type: 'text', label: 'Last name'},
+    ]},
+    {type: 'text', label: 'Username'},
+    {type: 'text', label: 'Email'},
+    {type: 'text', label: 'Address'},
+    {type: 'text', label: 'Address 2 (Optional)'},
+    {type: 'columns', items: [
+        {type: 'text', label: 'Country'},
+        {type: 'text', label: 'State'},
+        {type: 'text', label: 'Zip'},
+    ]},
+    {type: 'hr'},
+    {type: 'checkbox', label: 'Shipping address is the same as my billing address'},
+    {type: 'checkbox', label: 'Save this information for next time'},
+    {type: 'hr'},
+    {type: 'section', label: 'Payment', items: [
+        {type: 'radio', options: [
+            {value: 'credit_card', label: 'Credit card',},
+            {value: 'debit_card', label: 'Debit card',},
+            {value: 'paypal', label: 'PayPal'},
+        ]},
+        {type: 'columns', span: '6,6,3,3', items: [
+            {type: 'text', label: 'Name on card', hint: 'Full name as displayed on card'},
+            {type: 'text', label: 'Credit card number'},
+            {type: 'text', label: 'Expiration'},
+            {type: 'text', label: 'CVV'},
+        ]},
+    ]},
+];
+</script>
+
+<script data-img="images/img_4.png" data-source="https://getbootstrap.com/docs/5.3/examples/sign-in/" type="text/plain">
+const items = [
+    {type: 'text', label: 'Email address'},
+    {type: 'text', label: 'Password'},
+    {type: 'checkbox', label: 'Remember me'},
+];
+</script>
+
+<script data-img="images/img_5.png" data-source="https://getbootstrap.com/docs/5.3/forms/validation/" type="text/plain">
+const items = [
+    {type: 'columns', span: '4,4,4,6,3,3', items: [
+        {type: 'text', label: 'First name'},
+        {type: 'text', label: 'Last name'},
+        {type: 'text', label: 'Username'},
+        {type: 'text', label: 'City'},
+        {type: 'text', label: 'State'},
+        {type: 'text', label: 'Zip'},
+    ]},
+    {type: 'checkbox', label: 'Agree to terms and conditions'},
+];
+</script>
+
+<script data-img="images/img_6.png" data-source="https://knowledge.square-9.com/gf10/custom-field-validation" type="text/plain">
+...
+</script>
+
+<script data-img="images/img_7.png" data-source="https://crayons.freshworks.com/components/core/form/#demo-dynamic-form" type="text/plain">
+const items = [
+    {type: 'text', label: 'First Name'},
+    {type: 'text', label: 'Last Name'},
+    {type: 'text', label: 'Email'},
+    {type: 'text', label: 'Phone Number'},
+    {type: 'text', label: 'Order Status'},
+    {type: 'radio', label: 'Gender', options: [
+        {value: 'female', label: 'Female'},
+        {value: 'male', label: 'Male'},
+     ]},
+    {type: 'textarea', label: 'Landmark'},
+    {type: 'checkbox', label: 'Indian Citizen'},
+    {type: 'text', label: 'Pincode'},
+    {type: 'text', label: 'Amount Paid'},
+    {type: 'date', label: 'Date of Birth'},
+    {type: 'files', label: 'Attach Files'},
+    {type: 'select-multi', label: 'Language Known', options: [
+        {value: 'en', label: 'English'},
+        {value: 'sp', label: 'Spanish'},
+    ]},
+];
+</script>
+
+<script data-img="images/img_8.png" data-source="https://crayons.freshworks.com/components/core/form/#text-and-value-indicators-for-select-dropdown-multi-select-component-choices" type="text/plain">
+const items = [
+    {type: 'text', label: 'First Name'},
+    {type: 'text', label: 'Last Name'},
+    {type: 'text', label: 'Email'},
+    {type: 'text', label: 'Phone Number'},
+    {type: 'select-multi', label: 'Language Known', options: [
+        {value: 'en', label: 'English'},
+        {value: 'sp', label: 'Spanish'},
+    ]},
+];
+</script>
+
+<script data-img="images/img_9.png" data-source="https://crayons.freshworks.com/components/core/form/#demo-form-inside-an-accordion" type="text/plain">
+const items = [
+    {type: 'text', label: 'First Name'},
+    {type: 'text', label: 'Last Name'},
+    {type: 'text', label: 'Email'},
+    {type: 'text', label: 'Phone Number'},
+    {type: 'select-multi', label: 'Language Known', options: [
+        {value: 'en', label: 'English'},
+        {value: 'sp', label: 'Spanish'},
+    ]},
+];
+</script>
+
+<script data-img="images/img_10.png" data-source="https://formkit.com/" type="text/plain">
+const items = [
+    {type: 'header', label: 'Airlines', help: 'Which airline do you prefer to fly on?'},
+    {type: 'radio', label: 'Last Name', options: [
+        {value: 'american_airlines', image_url: 'https://example.com/img/american_airlines.png'},
+        {value: 'delta', image_url: 'https://example.com/img/delta.png'},
+        {value: 'easy_jet', image_url: 'https://example.com/img/easy_jet.png'},
+        {value: 'jet_blue', image_url: 'https://example.com/img/jet_blue.png'},
+        {value: 'klm', image_url: 'https://example.com/img/klm.png'},
+        {value: 'lufthansa', image_url: 'https://example.com/img/lufthansa.png'},
+    ]},
+];
+</script>
+
+<script data-img="images/img_11.png" data-source="https://qform.io/" type="text/plain">
+const items = [
+    {type: 'header', label: 'Arrange a car rental'},
+    {type: 'int', label: 'Rental period days'},
+    {type: 'columns', span: '4,4,4,6,6,6,6', items: [
+        {type: 'radio', label: 'Car class', options: []},
+        {type: 'radio', label: 'Transmission', options: []},
+        {type: 'radio', label: 'Driving experience', options: []},
+        {type: 'radio', label: 'Name'},
+        {type: 'radio', label: 'Surname'},
+        {type: 'radio', label: 'Email'},
+        {type: 'radio', label: 'Telephone'},
+    ]},
+];
+</script>
+
+<script data-img="images/img_12.png" data-source="https://element-plus.org/en-US/component/form.html/" type="text/plain">
+const items = [
+    {type: 'text', label: 'Activity name'},
+    {type: 'text', label: 'Activity zone'},
+    {type: 'time-range', label: 'Activity time'},
+    {type: 'checkbox', label: 'Instant delivery'},
+    {type: 'checkboxes', label: 'Activity type', options: [
+        {value: 'online', label: 'Online activities'},
+        {value: 'promo', label: 'Promotion activities'},
+        {value: 'offline', label: 'Offline activities'},
+        {value: 'brand', label: 'Simple brand exposure'},
+    ]},
+    {type: 'radio', label: 'Resources', options: [
+        {value: 'sponsor', label: 'Sponsor'},
+        {value: 'venue', label: 'Venue'},
+    ]},
+    {type: 'textarea', label: 'Activity form'},
+];
+</script>
+
+<script data-img="images/img_13.png" data-source="https://uiverse.io/forms?page=3" type="text/plain">
+const items = [
+    {type: '', label: ''},
+];
+</script>
+
+<script data-img="images/img_14.png" data-source="https://uiverse.io/forms?page=5" type="text/plain">
+const items = [
+    {type: '', label: ''},
+];
+</script>
+
+<script data-img="images/img4.png" type="text/plain">
 <template>
     <form-classic v-model="form" :items />
 </template>
@@ -44,7 +262,8 @@
         },
     };
 </script>
-<script id="json-demo2" type="text/plain">
+
+<script data-img="images/img5.png" type="text/plain">
 <template>
     <form-classic v-model="form" :items />
 </template>
@@ -82,12 +301,13 @@
         },
     };
 </script>
-<script id="json-demo3" type="text/plain">
-// https://drafts.csswg.org/css-grid/#example-deb30762
+
+<script data-img="images/auto-placed-form.png" data-source="https://drafts.csswg.org/css-grid/#example-deb30762" type="text/plain">
 <form-table v-model="form">
     ...
 </form-table>
 </script>
+
 <script id="html-form-std" type="text/plain">
 ## Step элементы
 
@@ -265,13 +485,13 @@ vue_component('json-demos', {
     template: `
         <h2>Примеры разметки</h2>
 
-        <template v-for="id in ids" :key="id">
+        <template v-for="item in items" :key="item.key">
             <div class="rel p10 border xborder-ht">
-                <h3 class="abs-tr xm border">{{ id }}</h3>
+                <!--<h3 class="abs-tr xm border">{{ id }}</h3>-->
                 <div class="hsplit gap10">
-                    <prism-js :value="doc.getElementById(id).innerText.trim()" class="fluid" />
-                    <div v-if="id_to_image[id]">
-                        <img :src="id_to_image[id]" class="max-w400 sticky-t" alt="">
+                    <prism-js :value="item.body" class="fluid" />
+                    <div v-if="item.image_url">
+                        <img :src="item.image_url" class="max-w400 sticky-t" alt="">
                     </div>
                 </div>
 
@@ -280,19 +500,26 @@ vue_component('json-demos', {
     `,
     data: function () {
         return {
-            ids: [
-                'json-demo1',
-                'json-demo2',
-                'json-demo3',
-            ],
-            id_to_image: {
-                'json-demo1': 'images/img4.png',
-                'json-demo2': 'images/img5.png',
-                'json-demo3': 'images/auto-placed-form.png',
-            },
+            items: [],
         };
     },
+    methods: {
+        refresh: function () {
+            this.items = Array.from(document.querySelectorAll('script[data-img]')).map(function (elem) {
+                return {
+                    key: crypto.randomUUID(),
+                    image_url: elem.dataset.img,
+                    source_url: elem.dataset.source,
+                    body: elem.innerText.trim(),
+                };
+            });
+        },
+    },
+    created: function () {
+        this.refresh();
+    },
 });
+
 vue_component('html-markup-demos', {
     template: `
         <h2>Примеры разметки</h2>
@@ -334,26 +561,3 @@ vue_component('app', {
 
 </body>
 </html>
-
-<!--
-
-
-## Step элементы
-
-- https://formkit.com/playground?fkv=latest&fileTab=index.vue&css-framework=genesis&imports=jc%28%27name%21%27ImportMap%27%7Elang%21%27json%27%7Eeditor%21%27%28*+1vue%5C%211https%3A%2F%2Fcdn.jsdelivr.net%2Fnpm%2Fvue%403%2Fdist%2Fvue.esm-browser.min.js0*%29*%27%29*%5Cn0%5C%271+0%0110*_&files=jc%5B%28%27Z%21%27index.vue%27%7EQ%21%27%3CscripUsetup%3E1imporUSYOneD.%2FsYOne.vue%3BSYTwoD.%2FsYTwo.vue%3BSYThreeD.%2FsYThree.vue%2211consUdata+%3D+%2810Z8John+FormKit%22%2C10email8hello%40%7F.com%22%2C10phone8%7B555%7D+555-5555%22%2C1%291%3C%2Fscript%3E1%3CQ%3E17form3+%3AactionsBfalse3%3E1%25target%250L1%3C%2FQ%3E1_07multi-sY3%3EA7sY3+ZBpersonalInfo3+%3AvalueBdata%60One%26L1A7sY3+ZBreferences%60Two%26L1A7sY3+ZBSupplemental%60Three%260%3CQ+%23sYNext%3EA007submit3%260%3C%2FQ%3EA0LAL1%27%7Esyntax%21%27%5E%2C%28%27Z%21%27%7F.config.js_%2F*+In+this+file%2C+exporUyour+final+config.1IUwill+automatically+be+injected+into+the+playground+for+you.1Imports+from+other+playground+files+are+supported.+*%2F11imporU%28+genesisIcons+%29D%40%7F%2Ficons%3B%28+rootClasses+%29D.%2F%7F.theme.js%3B%28+createM%24+%29D%40%7F%2Faddons%2211consUm%24+%3D+createM%24%7B%2810tabStyle8progress%22%2C10allowIncomplete%3A+false%2C1%29%7D11exporUdefaulU%2810plugins%3A+%5Bm%24%5D%2C10icons%3A+%28A...genesisIcons%2C10%29%2C10config%3A+%28ArootClasses%2C10%29%2C1%291%5E%2C%28%27Z%21%27sYOne.vue_%3CQ4textzName3AZBZ%2BavatarMan6310%2F4emailzEmail3AZBemail%2Bemail6%7Cemail310%2F4mask3AZBphone3AmaskB%7B%23%23%23%7D+%23%23%23-%23%23%23%23zPhone%2Btelephone69%2C%28%27Z%21%27sYTwo.vue_%3CQ4textarea3Avalidation-labelBReferenceszPlease+supply+contacUinformation+for+2+references69%2C%28%27Z%21%27sYThree.vue_%3CQ4textareazWhy+do+you+wanUto+work+here%3F6310%2F4radiozHow+did+you+hear+abouUus63A%3AoptionsB%5BA0%28+label8GoogleVgoogleXFacebookVfacebookXTwitterVtwitterXFriendVfriend%22+%29%2CA%5D9%5D0++1%5Cn3%5C%274%3E10%3CFormKitAtypeB63AvalidationBrequired70%3CFormKiUtypeB8%3A+%229310%2F%3E1%3C%2FQ%3E1%5EA100B%3D3D+from+%22L%3C%2FFormKit%3EQtemplateUt+V%22%2C+value8X%22+%29%2CA0%28+label8YtepZname_%27%7Eeditor%21%27z3AlabelB%24ultiSYPlugin%26+%2F%3EA0%2B3Aprefix-iconB%3B%221imporU%5E%27%7Eadded%21true%29%603%3EA00%3CSY%7Fformkit%01%7F%60%5E%3B%2B%26%24z_ZYXVUQLDBA98764310_
-- https://formkit.com/plugins/multi-step
-
-```html
-```
-
-## Примеры разметки
-
-```html
-
-
-
-
-
-
-```
--->

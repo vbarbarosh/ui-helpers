@@ -134,3 +134,21 @@
 - https://vueform.com/
 - https://primevue.org/treeselect/
 - https://element-plus.org/en-US/component/overview.html
+
+- https://www.justinmind.com/blog/form-examples-web-mobile/
+- https://getbootstrap.com/docs/5.3/examples/checkout/
+- https://getbootstrap.com/docs/5.3/examples/sign-in/
+- https://getbootstrap.com/docs/5.3/forms/validation/
+- https://knowledge.square-9.com/gf10/custom-field-validation
+- https://crayons.freshworks.com/components/core/form/
+- https://f36.contentful.com/components/form
+- https://www.gravityforms.com/
+- https://kickstart.formkit.com/
+- https://formkit.com/
+- https://vueformulate.com/guide/#inputs
+- https://knowledge.square-9.com/gf10/custom-field-validation
+- https://qform.io/
+- https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/working-with-forms
+- https://www.wufoo.com/gallery/templates/
+- https://component.gallery/components/form/
+- https://uiverse.io/forms
