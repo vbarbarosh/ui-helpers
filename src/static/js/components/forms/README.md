@@ -11,6 +11,10 @@
     - form-input-resolver
     - form-type-component
 
+form-types
+    - form-controls
+    - form-inputs
+
 form:
     - value (where to store values)
     - an array of form_items

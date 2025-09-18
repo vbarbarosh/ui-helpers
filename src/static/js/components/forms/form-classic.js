@@ -11,6 +11,12 @@ vue_component('form-classic', {
         <div class="red">
             <slot />
         </div>
+        <div class="mg15">
+            <div v-for="item in items" :key="item.key" class="flex-col flex-align-stretch">
+                <render-function :fn="item.inst.render_label" :item />
+                <render-function :fn="item.inst.render_control" :item />
+            </div>
+        </div>
         <template v-for="item in items">
             <form-type-component :value="modelValue" :item="item" />
         </template>
