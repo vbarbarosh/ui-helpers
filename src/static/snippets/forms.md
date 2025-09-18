@@ -9,9 +9,9 @@
             <form-string v-model="vars.form.first_name" label="First Name" />
             <form-string v-model="vars.form.last_name" label="Last Name" />
             <form-int v-model="vars.form.age" label="Age" />
-            <form-enum v-model="vars.form.gender" label="Gender" :options="[
-                {label: 'Male', value: 'male'},
-                {label: 'Female', value: 'female'},
+            <form-select v-model="vars.form.gender" label="Gender" :options="[
+                {value: 'male', label: 'Male'},
+                {value: 'female', label: 'Female'},
             ]" />
         </div>
         <div class="flex-fluid">
