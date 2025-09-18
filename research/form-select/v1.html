@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <title>form-select | research | ui-helpers</title>
+</head>
+<body>
+
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
+<script>
+vue_component('form-select-good', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'options'],
+    template: `
+        <select @input="input" :value="computed_index">
+            <option v-for="option, index in options" :value="index">
+                {{ option.label }}
+            </option>
+        </select>
+    `,
+    computed: {
+        computed_index: function () {
+            return this.options.findIndex(v => v.value === this.modelValue);
+        },
+    },
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', this.options[event.target.value]?.value ?? null);
+        },
+    }
+});
+
+vue_component('form-select-good-ul', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'options'],
+    template: `
+        <ul class="max-h400 oa border">
+            <li v-for="option, index in options" @click="click_option(option)" :value="index" :class="{green: (modelValue === option.value)}">
+                {{ option.label }}
+            </li>
+        </ul>
+    `,
+    methods: {
+        click_option: function (option) {
+            this.$emit('update:modelValue', option.value);
+        },
+    }
+});
+
+vue_component('form-select-bad', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'items'],
+    template: `
+        <select @input="input" :value="computed_index">
+            <option v-for="item, index in items" :value="index" :disabled="(item.name === 'Liberia')">
+                <slot :item="item" />
+            </option>
+        </select>
+    `,
+    computed: {
+        computed_index: function () {
+            return (this.items ?? []).indexOf(this.modelValue);
+        },
+    },
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', this.items[event.target.value] ?? null);
+        },
+    }
+});
+
+vue_component('app', {
+    template: `
+        <div class="fix-f hsplit gap15 m10">
+            <div class="fluid flex-row-center-left gap5 oa">
+                <form-select-good v-model="value" :options="options_for_countries" />
+                <form-select-good-ul v-model="value" :options="options_for_countries" />
+                <form-select-bad v-slot="slot" v-model="value" :items="countries">
+                    {{ slot.item.name }}
+                </form-select-bad>
+            </div>
+            <div class="w400 flex-col gap10 oa">
+                {{ value }}
+            </div>
+        </div>
+    `,
+    data: function () {
+        return {
+            value: null,
+            options: [
+                {value: 1, label: 'First', disabled: true},
+                {value: 2, label: 'Second'},
+                {value: 3, label: 'Third'},
+            ],
+            countries: [],
+        };
+    },
+    computed: {
+        options_for_countries: function () {
+            return this.countries.map(function (item) {
+                return {value: item.alpha3, label: item.name};
+            });
+        },
+    },
+    created: async function () {
+        this.countries = await blocking(http_get_json('https://cdn.jsdelivr.net/npm/world_countries_lists@latest/data/countries/en/countries.json'));
+    },
+});
+</script>
+
+</body>
+</html>
