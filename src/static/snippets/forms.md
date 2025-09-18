@@ -9,7 +9,7 @@
             <form-string v-model="vars.form.first_name" label="First Name" />
             <form-string v-model="vars.form.last_name" label="Last Name" />
             <form-int v-model="vars.form.age" label="Age" />
-            <form-select v-model="vars.form.gender" label="Gender" :options="[
+            <input-select v-model="vars.form.gender" label="Gender" :options="[
                 {value: 'male', label: 'Male'},
                 {value: 'female', label: 'Female'},
             ]" />
@@ -48,7 +48,10 @@
                     </form-item>
                 </div>
                 <form-item label="Gender">
-                    <input-select v-model="vars.gender" options="Male,Female" />
+                    <input-select v-model="vars.gender" :options="[
+                        {value: 'Male', label: 'Male'},
+                        {value: 'Female', label: 'Femail'},
+                    ]" />
                 </form-item>
                 <button>Submit</button>
             </form-vert>

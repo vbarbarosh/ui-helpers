@@ -1,6 +1,6 @@
 vue_component('form-item', {
     emits: [],
-    props: ['label'],
+    props: ['type', 'label'],
     template: `
         <div class="form-item">
             <form-label v-if="label" v-bind:for="id">{{ label }}</form-label>

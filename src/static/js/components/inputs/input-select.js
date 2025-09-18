@@ -1,27 +1,21 @@
 vue_component('input-select', {
     emits: ['update:modelValue'],
-    props: ['modelValue', 'disabled', 'readonly', 'options'],
-    inject: {form_item_id: {default: null}},
+    props: ['modelValue', 'options', 'label', 'disabled', 'readonly'],
     template: `
-        <select v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item_id">
-            <option v-for="option in computed_options" v-bind:value="option.value" v-bind:disabled="option.disabled">
+        <select @input="input" :value="computed_index">
+            <option v-for="option, index in options" :value="index">
                 {{ option.label }}
             </option>
         </select>
     `,
     computed: {
-        computed_options: function () {
-            if (typeof this.options === 'string') {
-                return this.options.split(',').map(function (label) {
-                    return {label: label, value: label};
-                });
-            }
-            return this.options;
+        computed_index: function () {
+            return (this.options ?? []).findIndex(v => v.value === this.modelValue);
         },
     },
     methods: {
         input: function (event) {
-            this.$emit('update:modelValue', event.target.value);
+            this.$emit('update:modelValue', this.options[event.target.value]?.value ?? null);
         },
-    },
+    }
 });

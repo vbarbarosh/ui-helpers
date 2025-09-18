@@ -10,7 +10,7 @@
                     <button-json :value="fetch.response" />
                     <button-refresh @click="fetch.refresh" />
                 </div>
-                <form-select v-if="fetch.response" v-model="vars.conn" :options="fetch.response.items.map(v => ({label: v, value: v}))" label="Select MongoDB connection" />
+                <input-select v-if="fetch.response" v-model="vars.conn" :options="fetch.response.items.map(v => ({label: v, value: v}))" label="Select MongoDB connection" />
             </data-fetch>
             <pre>{{vars}}</pre>
         </breadcrumbs-item>
@@ -21,7 +21,7 @@
                     <button-refresh @click="fetch.refresh" />
                     <button>Create Database</button>
                 </div>
-                <form-select v-if="fetch.response" v-model="vars.db" :options="fetch.response.items.map(v => ({label: v.name, value: v.name}))" label="Select MongoDB database" />
+                <input-select v-if="fetch.response" v-model="vars.db" :options="fetch.response.items.map(v => ({label: v.name, value: v.name}))" label="Select MongoDB database" />
             </data-fetch>
             <pre>{{vars}}</pre>
         </breadcrumbs-item>
@@ -33,7 +33,7 @@
                     <button v-on:click="() => win.modal_mongo_collections_create(vars).promise().then(v => v && (vars.col = v.name))">Create Collection</button>
                     <button v-on:click="() => win.modal_mongo_collections_remove(vars).promise().then(v => v && (vars.col = null, fetch.refresh()))">Drop Collection</button>
                 </div>
-                <form-select v-if="fetch.response" v-model="vars.col" :options="fetch.response.items.map(v => ({label: v.name, value: v.name}))" label="Select MongoDB collection" />
+                <input-select v-if="fetch.response" v-model="vars.col" :options="fetch.response.items.map(v => ({label: v.name, value: v.name}))" label="Select MongoDB collection" />
                 <vb-table v-if="fetch.response" :items="fetch.response.items">
                     <template v-slot:actions="{item}">
                         <button v-on:click="() => win.modal_mongo_analyze({conn: vars.conn, db: vars.db, col: item.name}).promise()">analyze</button>

@@ -10,7 +10,7 @@
                     <button-json :value="fetch.response" />
                     <button-refresh @click="fetch.refresh" />
                 </div>
-                <form-select v-if="fetch.response" v-model="vars.conn" :options="fetch.response.items.map(v => ({label: v, value: v}))" label="Select S3 Connect" />
+                <input-select v-if="fetch.response" v-model="vars.conn" :options="fetch.response.items.map(v => ({label: v, value: v}))" label="Select S3 Connect" />
             </data-fetch>
             <pre>{{vars}}</pre>
         </breadcrumbs-item>

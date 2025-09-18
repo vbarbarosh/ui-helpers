@@ -74,7 +74,6 @@ function vue_directive(name, params)
         inject('components/forms/form-int.js');
         inject('components/forms/form-item.js');
         inject('components/forms/form-label.js');
-        inject('components/forms/form-select.js');
         inject('components/forms/form-string.js');
         inject('components/forms/form-textarea.js');
         inject('components/forms/form-vert.js');
