@@ -68,6 +68,7 @@ function vue_directive(name, params)
         inject('components/etc/lipsum.js');
         inject('components/etc/reset-on-change.js');
         inject('components/etc/spinner.js');
+        inject('components/forms/form-classic.js');
         inject('components/forms/form-file-drop-zone.js');
         inject('components/forms/form-files-drop-zone.js');
         inject('components/forms/form-hor.js');
@@ -76,6 +77,7 @@ function vue_directive(name, params)
         inject('components/forms/form-label.js');
         inject('components/forms/form-string.js');
         inject('components/forms/form-textarea.js');
+        inject('components/forms/form-type-component.js');
         inject('components/forms/form-vert.js');
         inject('components/inputs/input-checkbox.js');
         inject('components/inputs/input-color.js');
@@ -90,6 +92,7 @@ function vue_directive(name, params)
         inject('components/inputs/input-range.js');
         inject('components/inputs/input-search.js');
         inject('components/inputs/input-select.js');
+        inject('components/inputs/input-string.js');
         inject('components/inputs/input-tel.js');
         inject('components/inputs/input-text.js');
         inject('components/inputs/input-textarea.js');

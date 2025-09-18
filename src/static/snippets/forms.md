@@ -1,5 +1,16 @@
 # Forms
 
+## Experiments
+
+```vue
+<data-vars v-slot="vars" :vars="{form: {}}">
+    <form-classic v-model="vars.form" :items="[
+        {type: 'string', label: 'First Name'},
+        {type: 'string', label: 'Last Name'},
+    ]" />
+</data-vars>
+```
+
 ## Basic (input + label in a single element)
 
 ```vue
