@@ -75,11 +75,14 @@ function vue_directive(name, params)
         inject('components/forms/form-int.js');
         inject('components/forms/form-item.js');
         inject('components/forms/form-label.js');
+        inject('components/forms/form-render-control.js');
+        inject('components/forms/form-render-label.js');
         inject('components/forms/form-string.js');
         inject('components/forms/form-textarea.js');
         inject('components/forms/form-type-component.js');
         inject('components/forms/form-vert.js');
         inject('components/inputs/input-checkbox.js');
+        inject('components/inputs/input-checkboxes.js');
         inject('components/inputs/input-color.js');
         inject('components/inputs/input-date.js');
         inject('components/inputs/input-email.js');
@@ -89,6 +92,7 @@ function vue_directive(name, params)
         inject('components/inputs/input-month.js');
         inject('components/inputs/input-password.js');
         inject('components/inputs/input-radio.js');
+        inject('components/inputs/input-radios.js');
         inject('components/inputs/input-range.js');
         inject('components/inputs/input-search.js');
         inject('components/inputs/input-select.js');
