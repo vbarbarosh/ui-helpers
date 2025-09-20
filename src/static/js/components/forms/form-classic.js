@@ -1,16 +1,23 @@
 vue_component('form-classic', {
     props: ['modelValue', 'items'],
+    provide: function () {
+        return {
+            form_items: this.form_items,
+        };
+    },
     template: `
         <div class="red">
             <slot />
         </div>
         <div class="mg10">
             <form-classic-item v-for="item in local_items" v-bind:key="item.key" v-bind:item="item" />
+            <form-classic-item v-for="item in form_items" v-bind:key="item.key" v-bind:item="item" />
         </div>
     `,
     data: function () {
         return {
             local_items: [],
+            form_items: [],
         };
     },
     watch: {
@@ -19,7 +26,7 @@ vue_component('form-classic', {
             handler: function () {
                 const _this = this;
                 const item_to_id = new Map(this.local_items.map(v => [v.orig, v.id]));
-                this.local_items = this.items.map(function (item) {
+                this.local_items = (this.items ?? []).map(function (item) {
                     const id = item_to_id.get(item) ?? random_html_id();
                     return {
                         id,
