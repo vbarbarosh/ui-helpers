@@ -35,7 +35,6 @@ vue_component('input-select-many', {
         input: function (event) {
             const key_to_value = new Map(this.local_items.map(v => [v.key, v.value]));
             const values = [...event.target.selectedOptions].map(elem => key_to_value.get(elem.value)).filter(v => v);
-            console.log('input', values);
             if (Array.isArray(this.modelValue)) {
                 this.modelValue.splice(0, this.modelValue.length, ...values);
             }
