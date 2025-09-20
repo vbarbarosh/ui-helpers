@@ -1,12 +1,5 @@
 vue_component('form-classic', {
-    props: ['modelValue', 'items', 'types'],
-    provide: function () {
-        return {
-            form_types: {
-                string: 'input-string',
-            },
-        };
-    },
+    props: ['modelValue', 'items'],
     template: `
         <div class="red">
             <slot />
