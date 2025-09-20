@@ -6,7 +6,7 @@
 <data-vars v-slot="vars" :vars="{form: {}, whatever: false}">
     <div class="hsplit gap10">
         <div>
-            {{ win.Date.now() }}
+            <span class="p2 border">{{ tick() }}</span>
             <span v-if="vars.whatever">HELLO</span>
             <form-classic v-model="vars.form" :items="vars.items ??= [
                 {type: 'string', path: 'first_name', label: 'First Name'},
