@@ -5,13 +5,37 @@
 ```vue
 <data-vars v-slot="vars" :vars="{form: {}, whatever: false}">
     <div class="hsplit gap10">
-        <div>
+        <div class="w300">
             <span class="p2 border">{{ tick() }}</span>
             <span v-if="vars.whatever">HELLO</span>
             <form-classic v-model="vars.form" :items="vars.items ??= [
                 {type: 'string', path: 'first_name', label: 'First Name'},
                 {type: 'string', path: 'last_name', label: 'Last Name'},
                 {type: 'color', path: 'favorite_color', label: 'Favorite Color'},
+                {type: 'radios', path: 'favorite_fruit', label: 'Favorite Fruit', options: [
+                    {value: 'apple', label: 'Apple'},
+                    {value: 'banana', label: 'Banana'},
+                    {value: 'orange', label: 'Orange'},
+                    {value: 'mango', label: 'Mango'},
+                    {value: 'strawberry', label: 'Strawberry'},
+                    {value: 'grapes', label: 'Grapes'},
+                    {value: 'watermelon', label: 'Watermelon'},
+                    {value: 'pineapple', label: 'Pineapple'},
+                    {value: 'avocado', label: 'Avocado'},
+                    {value: 'blueberry', label: 'Blueberry'},
+                ]},
+                {type: 'select-many', path: 'favorite_fruits', label: 'Favorite Fruits', options: [
+                    {value: 'apple', label: 'Apple'},
+                    {value: 'banana', label: 'Banana'},
+                    {value: 'orange', label: 'Orange'},
+                    {value: 'mango', label: 'Mango'},
+                    {value: 'strawberry', label: 'Strawberry'},
+                    {value: 'grapes', label: 'Grapes'},
+                    {value: 'watermelon', label: 'Watermelon'},
+                    {value: 'pineapple', label: 'Pineapple'},
+                    {value: 'avocado', label: 'Avocado'},
+                    {value: 'blueberry', label: 'Blueberry'},
+                ]},
                 {type: 'int', path: 'favorite_int', label: 'Favorite integer between 500 and 1000', min: 500, max: 1000},
             ]" />
             <button v-on:click="vars.whatever = !vars.whatever">toggle</button>
