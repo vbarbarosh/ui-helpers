@@ -4,7 +4,7 @@ vue_component('form-classic', {
         <div class="red">
             <slot />
         </div>
-        <div class="mg15">
+        <div class="mg10">
             <div v-for="item in local_items" :key="item.key" class="flex-col flex-align-stretch">
                 <form-render-label :value="modelValue" :item />
                 <form-render-control :value="modelValue" :item />
