@@ -96,6 +96,7 @@ function vue_directive(name, params)
         inject('components/inputs/input-range.js');
         inject('components/inputs/input-search.js');
         inject('components/inputs/input-select.js');
+        inject('components/inputs/input-select-many.js');
         inject('components/inputs/input-string.js');
         inject('components/inputs/input-tel.js');
         inject('components/inputs/input-text.js');

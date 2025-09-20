@@ -48,7 +48,12 @@
     "orange",
     "strawberry"
   ],
-  "radios": "strawberry"
+  "radios": "strawberry",
+  "select_many": [
+    "banana",
+    "mango",
+    "avocado"
+  ]
 }'>
     <div class="hsplit gap15">
         <div>
@@ -161,6 +166,22 @@
                         {value: 'blueberry', label: 'Blueberry'},
                     ]" /></td>
                     <td>{{ vars.select }}</td>
+                </tr>
+                <tr>
+                    <th>input-select-many</th>
+                    <td><input-select-many v-model="vars.select_many" :options="[
+                        {value: 'apple', label: 'Apple'},
+                        {value: 'banana', label: 'Banana'},
+                        {value: 'orange', label: 'Orange'},
+                        {value: 'mango', label: 'Mango'},
+                        {value: 'strawberry', label: 'Strawberry'},
+                        {value: 'grapes', label: 'Grapes'},
+                        {value: 'watermelon', label: 'Watermelon'},
+                        {value: 'pineapple', label: 'Pineapple'},
+                        {value: 'avocado', label: 'Avocado'},
+                        {value: 'blueberry', label: 'Blueberry'},
+                    ]" /></td>
+                    <td>{{ vars.select_many }}</td>
                 </tr>
                 <tr>
                     <th>input-string</th>
