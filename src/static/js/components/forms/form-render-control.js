@@ -5,6 +5,7 @@ vue_component('form-render-control', {
         <component v-if="form_types[item.type]"
                    v-model="item.value"
                    v-bind:is="form_types[item.type]"
+                   v-bind:id="item.id"
                    v-bind="computed_props" />
     `,
     computed: {
