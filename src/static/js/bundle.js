@@ -179,6 +179,7 @@ function vue_directive(name, params)
             warnings: false,
         });
         app.use(ElementPlus);
+        let debug_counter = 0;
         app.mixin({
             computed: {
                 win: function () { return window; },
@@ -187,6 +188,9 @@ function vue_directive(name, params)
                 Plot: function () { return window.Plot; },
             },
             methods: {
+                tick: function () {
+                    return debug_counter++;
+                },
                 px,
                 pc,
                 format_bytes,
