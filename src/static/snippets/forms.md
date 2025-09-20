@@ -3,12 +3,7 @@
 ## Experiments
 
 ```vue
-<data-vars v-slot="vars" :vars="{form: {}, whatever: false}">
-    <div class="hsplit gap10">
-        <div class="w300">
-            <span class="p2 border">{{ tick() }}</span>
-            <span v-if="vars.whatever">HELLO</span>
-            <form-classic v-model="vars.form" :items="vars.items ??= [
+<data-vars v-slot="vars" :vars="{form: {}, whatever: false, items: [
                 {type: 'string', path: 'first_name', label: 'First Name'},
                 {type: 'string', path: 'last_name', label: 'Last Name'},
                 {type: 'color', path: 'favorite_color', label: 'Favorite Color'},
@@ -38,7 +33,44 @@
                     {value: 'blueberry', label: 'Blueberry'},
                 ]},
                 {type: 'int', path: 'favorite_int', label: 'Favorite integer between 500 and 1000', min: 500, max: 1000},
-            ]" />
+            ]}">
+    <div class="hsplit gap10">
+        <div class="w300">
+            <span class="p2 border">{{ tick() }}</span>
+            <span v-if="vars.whatever">HELLO</span>
+            <form-classic v-model="vars.form" :items="vars.items" />
+            <hr class="mv25">
+            <div class="flex-col flex-align-stretch gap10">
+                <input-string v-model="vars.form.first_name" label="First Name" />
+                <input-string v-model="vars.form.last_name" label="Last Name" />
+                <input-color v-model="vars.form.favorite_color" label="Favorite Color" />
+                <input-checkbox v-model="vars.form.terms" label="Accept terms" />
+                <input-radios v-model="vars.form.favorite_fruit" label="Favorite Fruit" :options="vars.fruits ??= [
+                    {value: 'apple', label: 'Apple'},
+                    {value: 'banana', label: 'Banana'},
+                    {value: 'orange', label: 'Orange'},
+                    {value: 'mango', label: 'Mango'},
+                    {value: 'strawberry', label: 'Strawberry'},
+                    {value: 'grapes', label: 'Grapes'},
+                    {value: 'watermelon', label: 'Watermelon'},
+                    {value: 'pineapple', label: 'Pineapple'},
+                    {value: 'avocado', label: 'Avocado'},
+                    {value: 'blueberry', label: 'Blueberry'},
+                ]" />
+                <input-select-many v-model="vars.form.favorite_fruits" label="Favorite Fruits" :options="vars.fruits ??= [
+                    {value: 'apple', label: 'Apple'},
+                    {value: 'banana', label: 'Banana'},
+                    {value: 'orange', label: 'Orange'},
+                    {value: 'mango', label: 'Mango'},
+                    {value: 'strawberry', label: 'Strawberry'},
+                    {value: 'grapes', label: 'Grapes'},
+                    {value: 'watermelon', label: 'Watermelon'},
+                    {value: 'pineapple', label: 'Pineapple'},
+                    {value: 'avocado', label: 'Avocado'},
+                    {value: 'blueberry', label: 'Blueberry'},
+                ]" />
+                <input-int v-model="vars.form.favorite_int" label="Favorite integer between 500 and 1000" min="500" max="1000" />
+            </div>
             <button v-on:click="vars.whatever = !vars.whatever">toggle</button>
         </div>
         <div>
