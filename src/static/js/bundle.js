@@ -69,6 +69,7 @@ function vue_directive(name, params)
         inject('components/etc/reset-on-change.js');
         inject('components/etc/spinner.js');
         inject('components/forms/form-classic.js');
+        inject('components/forms/form-classic-item.js');
         inject('components/forms/form-file-drop-zone.js');
         inject('components/forms/form-files-drop-zone.js');
         inject('components/forms/form-hor.js');

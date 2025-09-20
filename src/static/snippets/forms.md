@@ -12,6 +12,7 @@
                 {type: 'string', path: 'first_name', label: 'First Name'},
                 {type: 'string', path: 'last_name', label: 'Last Name'},
                 {type: 'color', path: 'favorite_color', label: 'Favorite Color'},
+                {type: 'checkbox', path: 'terms', label: 'Accept terms'},
                 {type: 'radios', path: 'favorite_fruit', label: 'Favorite Fruit', options: [
                     {value: 'apple', label: 'Apple'},
                     {value: 'banana', label: 'Banana'},

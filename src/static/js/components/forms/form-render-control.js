@@ -1,5 +1,5 @@
 vue_component('form-render-control', {
-    props: ['value', 'item'],
+    props: ['item'],
     inject: ['form_types'],
     template: `
         <component v-if="form_types[item.type]"

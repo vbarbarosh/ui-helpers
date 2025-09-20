@@ -5,10 +5,7 @@ vue_component('form-classic', {
             <slot />
         </div>
         <div class="mg10">
-            <div v-for="item in local_items" :key="item.key" class="flex-col flex-align-stretch">
-                <form-render-label :value="modelValue" :item />
-                <form-render-control :value="modelValue" :item />
-            </div>
+            <form-classic-item v-for="item in local_items" v-bind:key="item.key" v-bind:item="item" />
         </div>
     `,
     data: function () {
