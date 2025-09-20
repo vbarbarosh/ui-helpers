@@ -11,6 +11,8 @@
             <form-classic v-model="vars.form" :items="vars.items ??= [
                 {type: 'string', path: 'first_name', label: 'First Name'},
                 {type: 'string', path: 'last_name', label: 'Last Name'},
+                {type: 'color', path: 'favorite_color', label: 'Favorite Color'},
+                {type: 'int', path: 'favorite_int', label: 'Favorite integer between 500 and 1000', min: 500, max: 1000},
             ]" />
             <button v-on:click="vars.whatever = !vars.whatever">toggle</button>
         </div>
