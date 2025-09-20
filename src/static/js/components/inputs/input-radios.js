@@ -1,10 +1,10 @@
 vue_component('input-radios', {
     emits: ['update:modelValue'],
-    props: ['modelValue', 'options', 'label', 'disabled', 'readonly'],
+    props: ['modelValue', 'id', 'options', 'label', 'disabled', 'readonly'],
     template: `
         <div class="input-radios">
             <label v-for="item in local_items" v-bind:key="item.key" class="flex-row-center-left gap5 cur-pointer">
-                <input v-on:input="input(item)" v-bind:checked="(modelValue === item.value)" type="radio">
+                <input v-on:input="input(item)" v-bind:id="id" v-bind:checked="(modelValue === item.value)" type="radio">
                 <span>{{ item.label }}</span>
             </label>
         </div> 
