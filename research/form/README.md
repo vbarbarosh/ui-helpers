@@ -132,6 +132,7 @@
 
 - https://formkit.com/
 - https://vueform.com/
+- https://builder.vueform.com/demo?v=dev
 - https://primevue.org/treeselect/
 - https://element-plus.org/en-US/component/overview.html
 
@@ -152,3 +153,9 @@
 - https://www.wufoo.com/gallery/templates/
 - https://component.gallery/components/form/
 - https://uiverse.io/forms
+- https://ui-libs.vercel.app/
+- https://vee-validate.logaretm.com/v4/
+- https://vuelidate-next.netlify.app/
+- https://ui.nuxt.com/components/form-field
+- https://ark-ui.com/docs/components/field
+- https://vuetifyjs.com/en/components/forms/#usage
