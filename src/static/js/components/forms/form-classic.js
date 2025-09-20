@@ -27,6 +27,7 @@ vue_component('form-classic', {
                         type: item.type,
                         get value() { return _this.modelValue[item.path]; },
                         set value(next) { _this.modelValue[item.path] = next; },
+                        get root_value() { return _this.modelValue; },
                         label: item.label,
                         path: item.path,
                         orig: item,
