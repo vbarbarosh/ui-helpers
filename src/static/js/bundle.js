@@ -173,7 +173,7 @@ function vue_directive(name, params)
             return;
         }
         console.log('🎉 All scripts loaded');
-        window.app = Vue.createApp({template: '<app />'});
+        window.app = Vue.createApp({template: '<form-types><app /></form-types>'});
         // Warning: a promise was created in a handler at [...] but was not returned from it, see http://goo.gl/rRqMUw
         // http://bluebirdjs.com/docs/warning-explanations.html#warning-a-promise-was-created-in-a-handler-but-was-not-returned-from-it
         Promise.config({
