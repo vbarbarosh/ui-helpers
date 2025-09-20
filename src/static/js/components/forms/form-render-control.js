@@ -19,7 +19,12 @@ vue_component('form-render-control', {
                 modelValue: this.item.value,
                 'onUpdate:modelValue': v => this.item.value = v,
             };
-            return Vue.h(Vue.resolveComponent(this.form_types[this.item.type]), props);
+            if (typeof this.form_types[this.item.type] === 'string') {
+                return Vue.h(Vue.resolveComponent(this.form_types[this.item.type]), props);
+            }
+            if (typeof this.form_types[this.item.type]) {
+                return Vue.h(this.form_types[this.item.type], props);
+            }
         }
         return null;
     },

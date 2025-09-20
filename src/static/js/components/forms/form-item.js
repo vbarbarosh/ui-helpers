@@ -1,5 +1,6 @@
 vue_component('form-item', {
-    props: ['label'],
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'type', 'label'],
     inject: ['form_items'],
     render: function () {
         return [];
@@ -29,8 +30,23 @@ vue_component('form-item', {
             return Vue.h('label', {for: this.id}, this.label);
         },
         render_control: function () {
+            const _this = this;
             if (this.$slots.default) {
                 return this.$slots.default({id: this.id});
+            }
+            if (this.type) {
+                const item = {
+                    id: this.id,
+                    key: this.id,
+                    type: this.type,
+                    get value() { return _this.modelValue; },
+                    set value(next) { _this.$emit('update:modelValue', next); },
+                    get root_value() { return _this.modelValue; },
+                    label: this.label,
+                    path: null,
+                    orig: {},
+                }
+                return Vue.h(Vue.resolveComponent('form-render-control'), {item});
             }
         },
     },

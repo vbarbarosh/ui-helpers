@@ -35,7 +35,21 @@
 <data-vars v-slot="vars" :vars="{form: {}}">
     <div class="hsplit gap10">
         <div>
-            <form-classic>
+            <span class="p3 border">{{ tick() }}</span>
+            <form-classic v-model="vars.form" :items="[{type: 'el-date-picker', path: 'ggg', label: 'HERE'}]">
+                <form-type v-slot="slot" type="el-date-picker">
+                    <el-date-picker v-model="slot.value" v-bind:id="slot.id" placeholder="Pick a day" />
+                </form-type>
+                <form-type v-slot="slot" type="department">
+                    <el-select v-model="slot.value" v-bind:id="slot.id" :options="[
+                        {value: 'marketing', label: 'Marketing ' + win.Date.now()},
+                        {value: 'product', label: 'Product'},
+                        {value: 'engineering', label: 'Engineering'},
+                        {value: 'sales', label: 'Sales'},
+                        {value: 'support', label: 'Customer Support'},
+                    ]" />
+                </form-type>
+<!--
                 <form-item label="el-checkbox-group">
                     <template v-slot:label_outer="slot">
                         <label v-bind:for="slot.id" class="flex-row-center-left gap5">
@@ -49,9 +63,12 @@
                         </el-checkbox-group>
                     </template>
                 </form-item>
+-->
                 <form-item v-slot="slot" label="el-date-picker">
                     <el-date-picker v-model="vars.datepicker" v-bind:id="slot.id" placeholder="Pick a day" />
                 </form-item>
+                <form-item v-model="vars.datepicker" type="el-date-picker" label="Whatever" />
+                <form-item v-model="vars.department" type="department" label="Department" />
             </form-classic>
         </div>
         <div>

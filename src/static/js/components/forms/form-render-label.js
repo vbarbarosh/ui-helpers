@@ -4,6 +4,6 @@ vue_component('form-render-label', {
         if (this.item.inst) {
             return this.item.inst.render_label();
         }
-        return Vue.h('label', {for: this.item.id}, item.label);
+        return Vue.h('label', {for: this.item.id}, this.item.label);
     },
 });
