@@ -13,17 +13,24 @@ vue_component('form-render-control', {
             return this.item.inst.render_control();
         }
         if (this.form_types[this.item.type]) {
-            const props =                     {
-                id: this.item.id,
-                ...this.computed_props,
-                modelValue: this.item.value,
-                'onUpdate:modelValue': v => this.item.value = v,
-            };
             if (typeof this.form_types[this.item.type] === 'string') {
-                return Vue.h(Vue.resolveComponent(this.form_types[this.item.type]), props);
+                const props = {
+                    id: this.item.id,
+                    ...this.computed_props,
+                    modelValue: this.item.value,
+                    'onUpdate:modelValue': v => this.item.value = v,
+                };
+                return Vue.h(Vue.resolveComponent(this.form_types[this.item.type]), props, this.$slots);
             }
-            if (typeof this.form_types[this.item.type]) {
-                return Vue.h(this.form_types[this.item.type], props);
+            if (this.form_types[this.item.type]) {
+                const props = {
+                    id: this.item.id,
+                    other: this.computed_props,
+                    modelValue: this.item.value,
+                    'onUpdate:modelValue': v => this.item.value = v,
+                };
+                console.log('render-control', this.item.type, this.$slots);
+                return Vue.h(this.form_types[this.item.type], props, this.$slots);
             }
         }
         return null;

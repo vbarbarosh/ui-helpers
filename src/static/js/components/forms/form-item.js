@@ -1,5 +1,6 @@
 vue_component('form-item', {
     emits: ['update:modelValue'],
+    inheritAttrs: false, // <form-item /> accepts extra props not listed in `props` key
     props: ['modelValue', 'type', 'label'],
     inject: ['form_items'],
     render: function () {
@@ -31,9 +32,6 @@ vue_component('form-item', {
         },
         render_control: function () {
             const _this = this;
-            if (this.$slots.default) {
-                return this.$slots.default({id: this.id});
-            }
             if (this.type) {
                 const item = {
                     id: this.id,
@@ -44,9 +42,13 @@ vue_component('form-item', {
                     get root_value() { return _this.modelValue; },
                     label: this.label,
                     path: null,
-                    orig: {},
+                    orig: this.$attrs,
+                    inst: null,
                 }
-                return Vue.h(Vue.resolveComponent('form-render-control'), {item});
+                return Vue.h(Vue.resolveComponent('form-render-control'), {item}, this.$slots);
+            }
+            if (this.$slots.default) {
+                return this.$slots.default({id: this.id});
             }
         },
     },
