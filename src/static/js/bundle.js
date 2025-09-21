@@ -209,9 +209,9 @@ function vue_directive(name, params)
             console.log('errorHandler', error);
             await error_handler(error);
         };
-        app.config.warnHandler = async function (error) {
-            console.log('warnHandler', error);
-        };
+        // app.config.warnHandler = async function (error) {
+        //     console.log('warnHandler', error);
+        // };
         vue_components.forEach(function (item) {
             app.component(item.name, item.params);
         });
