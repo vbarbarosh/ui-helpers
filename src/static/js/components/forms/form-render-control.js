@@ -1,6 +1,11 @@
 vue_component('form-render-control', {
     props: ['item'],
     inject: ['form_types'],
+    provide: function () {
+        return {
+            slot_hack: this,
+        };
+    },
     // template: `
     //     <component v-if="form_types[item.type]"
     //                v-model="item.value"
@@ -27,9 +32,9 @@ vue_component('form-render-control', {
                     id: this.item.id,
                     other: this.computed_props,
                     modelValue: this.item.value,
+                    slot_hack_defined: Boolean(this.$slots.default),
                     'onUpdate:modelValue': v => this.item.value = v,
                 };
-                console.log('render-control', this.item.type, this.$slots);
                 return Vue.h(this.form_types[this.item.type], props, this.$slots);
             }
         }

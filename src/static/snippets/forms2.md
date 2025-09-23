@@ -20,7 +20,7 @@
                 </form-type>
                 <form-type v-slot="slot" type="el-select">
                     <el-select v-model="slot.value" v-bind:id="slot.id" v-bind="slot.other">
-                        <slot />
+                        <slot-hack v-if="slot.slot_hack_defined" />
                     </el-select>
                 </form-type>
 <!--
@@ -50,9 +50,9 @@
                 ]" />
                 <!-- ⚠️ Not Implemented (q: how to pass/forward content [default slot] to a template above?) -->
                 <form-item v-model="vars.custom_props" type="el-select" label="form-item with type - default slot will be passed to the control">
-                    <el-option value="1" label="One" />
-                    <el-option value="2" label="Two" />
-                    <el-option value="3" label="Three" />
+                    <el-option :value="1" label="One" />
+                    <el-option :value="2" label="Two" />
+                    <el-option :value="3" label="Three" />
                 </form-item>
             </form-classic>
         </div>

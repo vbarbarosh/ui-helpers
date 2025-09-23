@@ -67,6 +67,7 @@ function vue_directive(name, params)
         inject('components/etc/highlight.js');
         inject('components/etc/lipsum.js');
         inject('components/etc/reset-on-change.js');
+        inject('components/etc/slot-hack.js');
         inject('components/etc/spinner.js');
         inject('components/forms/form-classic.js');
         inject('components/forms/form-classic-item.js');
