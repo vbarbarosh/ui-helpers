@@ -1,5 +1,32 @@
 # Tables
 
+## microsoftedge.github.io/Demos/json-dummy-data/64KB.json
+
+```vue
+<data-vars v-slot="vars" :vars="{selection: []}">
+<data-fetch v-slot="fetch" url="https://microsoftedge.github.io/Demos/json-dummy-data/64KB.json" auto>
+    <div class="sticky-t flex-row flex-align-center gap10 mb15 white">
+        <button-refresh v-on:click="fetch.refresh" :disabled="fetch.loading" />
+        <button-json :value="fetch.response" />
+        <button-selection :value="vars.selection" />
+        <spinner v-if="fetch.loading" />
+    </div>
+    <table-sel :selection="vars.selection" :items="fetch.response" :columns="[
+            {label: 'name', read: v => v.name},
+            {label: 'language', read: v => v.language},
+            {label: 'id', read: v => v.id},
+            {label: 'bio', read: v => v.bio},
+            {label: 'version', read: v => v.version},
+            {component: 'button-json'},
+        ]">
+        <template v-slot:picture="{item}">
+            <img :src="thumbnailer(item.picture.large, {w: 50})" alt="" />
+        </template>
+    </table-sel>
+</data-fetch>
+</data-vars>
+```
+
 ## randomuser
 
 ```vue
