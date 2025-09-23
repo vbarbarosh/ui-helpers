@@ -310,7 +310,7 @@
 
 ## Basic (input and label are separate elements)
 
-```vue
+```html
 <data-vars v-slot="vars">
     <div class="hsplit">
         <div class="flex-col gap10">
@@ -344,7 +344,7 @@
             </form-vert>
         </div>
         <div class="fluid">
-            {{ vars }}
+            { vars }
         </div>
     </div>
 </data-vars>
