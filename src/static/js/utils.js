@@ -388,6 +388,11 @@ function http_put_json(url, body, options)
     return axios.put(url, body, {responseType: 'json', ...options}).then(v => v.data);
 }
 
+function http_patch_json(url, body, options)
+{
+    return axios.patch(url, body, {responseType: 'json', ...options}).then(v => v.data);
+}
+
 function http_delete(url, options)
 {
     return axios.delete(url, {responseType: 'text', ...options}).then(v => v.data);

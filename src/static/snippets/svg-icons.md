@@ -19,13 +19,14 @@
     <svg-icon-filetype-md class="w50 h50" />
     <svg-icon-folder class="w50 h50" />
     <svg-icon-folder-fill class="w50 h50" />
+    <svg-icon-form class="w50 h50" />
+    <svg-icon-icons8-107448-delete class="w50 h50" />
     <svg-icon-icons8-12053-document class="w50 h50" />
     <svg-icon-icons8-12141-file class="w50 h50" />
     <svg-icon-icons8-12229-home class="w50 h50" />
     <svg-icon-icons8-12775-opened-folder class="w50 h50" />
     <svg-icon-icons8-12778-picture class="w50 h50" />
     <svg-icon-icons8-12783-music class="w50 h50" />
-    <svg-icon-icons8-107448-delete class="w50 h50" />
     <svg-icon-icons8-folder class="w50 h50" />
     <svg-icon-icons8-image-file class="w50 h50" />
     <svg-icon-json class="w50 h50" />

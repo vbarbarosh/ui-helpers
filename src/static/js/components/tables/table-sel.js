@@ -22,6 +22,7 @@ vue_component('table-sel', {
                 </td>
                 <td v-for="col in computed_columns" v-on:mousedown="mousedown_selrect_start">
                     <slot v-if="col.slot" v-bind:name="col.slot" v-bind:item="item" />
+                    <component v-else-if="col.component?.is" v-bind:is="col.component.is" v-bind="{...col.component, is: undefined}" v-bind:value="col.read(item)" />
                     <component v-else-if="col.component" v-bind:is="col.component" v-bind:value="col.read(item)" />
                     <template v-else>
                         {{ col.read(item) }}

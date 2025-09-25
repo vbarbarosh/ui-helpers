@@ -43,6 +43,7 @@ function vue_directive(name, params)
         inject('components/breadcrumbs/breadcrumbs-item.js');
         inject('components/breadcrumbs/breadcrumbs.js');
         inject('components/buttons/button-blue.js');
+        inject('components/buttons/button-form.js');
         inject('components/buttons/button-green.js');
         inject('components/buttons/button-json.js');
         inject('components/buttons/button-red.js');
@@ -114,6 +115,7 @@ function vue_directive(name, params)
         inject('components/live/live-vue.js');
         inject('components/modals/modal-blocking.js');
         inject('components/modals/modal-error.js');
+        inject('components/modals/modal-form.js');
         inject('components/modals/modal-hello.js');
         inject('components/modals/modal-json.js');
         inject('components/svg/svg-icon-ai.js');
@@ -133,6 +135,7 @@ function vue_directive(name, params)
         inject('components/svg/svg-icon-filetype-md.js');
         inject('components/svg/svg-icon-folder-fill.js');
         inject('components/svg/svg-icon-folder.js');
+        inject('components/svg/svg-icon-form.js');
         inject('components/svg/svg-icon-icons8-107448-delete.js');
         inject('components/svg/svg-icon-icons8-12053-document.js');
         inject('components/svg/svg-icon-icons8-12141-file.js');
