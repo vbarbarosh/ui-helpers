@@ -8,16 +8,7 @@ vue_component('modal-form', {
                     <div class="sticky-t">
                         <copy-to-clipboard v-bind:value="json" class="m10n" />
                     </div>
-<form-types>
-<form-type v-slot="slot" type="microsoft_dummy">
-    <form-classic v-model="slot.value" :items="vars.items ??= [
-        {type: 'string', path: 'id', label: 'ID'},
-        {type: 'string', path: 'name', label: 'Name'},
-        {type: 'string', path: 'language', label: 'Language'},
-        {type: 'textarea', path: 'bio', label: 'BIO'},
-        {type: 'string', path: 'version', label: 'Version'},
-    ]" />
-</form-type>
+<form-types v-bind:types="value.form_types">
                     <form-classic>
                         <form-item v-model="value.form" v-bind:type="value.type" />
                     </form-classic>

@@ -13,7 +13,7 @@ vue_component('form-type', {
     },
     created: function () {
         const __this = this;
-        this.form_types[this.type] = {
+        this.form_types[this.type] = Vue.markRaw({
             emits: ['update:modelValue'],
             props: ['modelValue', 'id', 'other', 'slot_hack_defined'],
             render: function () {
@@ -26,7 +26,7 @@ vue_component('form-type', {
                     set value(next) { _this.$emit('update:modelValue', next); },
                 });
             },
-        };
+        });
     },
     unmounted: function () {
         delete this.form_types[this.type];

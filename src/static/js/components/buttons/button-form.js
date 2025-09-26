@@ -1,6 +1,7 @@
 vue_component('button-form', {
     emits: [],
     props: ['value', 'type', 'save', 'remove'],
+    inject: {'form_types': {default: {}}},
     template: `
         <button v-on:click="click" class="w25 h25 vm cur-pointer xbutton">
             <svg-icon-form class="db ww hh" />
@@ -15,8 +16,8 @@ vue_component('button-form', {
     },
     methods: {
         click: async function () {
-            const {type, save, remove} = this;
-            await modal_form({form: JSON.parse(JSON.stringify(this.value)), type, save, remove}).promise();
+            const {type, save, remove, form_types} = this;
+            await modal_form({form: JSON.parse(JSON.stringify(this.value)), type, save, remove, form_types}).promise();
         },
     },
     created: function () {

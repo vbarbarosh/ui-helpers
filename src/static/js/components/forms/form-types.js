@@ -26,6 +26,7 @@ vue_component('form-types', {
                 time: 'input-time',
                 url: 'input-url',
                 week: 'input-week',
+                ...this.types
             },
         };
     },
