@@ -10,7 +10,11 @@
         <button-refresh v-on:click="fetch.refresh" :disabled="fetch.loading" />
         <button-json :value="fetch.response" />
         <button-selection :value="vars.selection" />
-        <button-form :value="{}" type="microsoft_dummy" v-bind:save="v => win.http_post_json('http://127.0.0.1:3000/items', v).then(fetch.refresh)" />
+        <button-form :value="{}" type="microsoft_dummy"
+                     v-bind:save="v => win.http_post_json('http://127.0.0.1:3000/items', v).then(fetch.refresh)" />
+        <button v-on:click="win.blocking(win.Promise.all(vars.selection.map(v => win.http_delete(`http://127.0.0.1:3000/items/${v.id}`))).then(fetch.refresh))">
+            Remove [{{ vars.selection.length }}]
+        </button>
         <spinner v-if="fetch.loading" />
     </div>
     <form-type v-slot="slot" name="microsoft_dummy">
@@ -34,7 +38,6 @@
             <form-item type="string" path="version" label="Version" />
         </form-classic>
     -->
-    <pre>{{vars.form}}</pre>
     <table-sel :selection="vars.selection" :items="fetch.response" :columns="[
             {label: 'name', read: v => v.name},
             {label: 'language', read: v => v.language},
@@ -42,7 +45,9 @@
             {label: 'bio', read: v => v.bio},
             {label: 'version', read: v => v.version},
             {component: 'button-json'},
-            {component: {is: 'button-form', type: 'microsoft_dummy', save: v => win.http_patch_json(`http://127.0.0.1:3000/items/${v.id}`, v).then(fetch.refresh), remove: v => win.http_delete(`http://127.0.0.1:3000/items/${v.id}`).then(fetch.refresh)}},
+            {component: {is: 'button-form', type: 'microsoft_dummy',
+                         save: v => win.http_patch_json(`http://127.0.0.1:3000/items/${v.id}`, v).then(fetch.refresh),
+                         remove: v => win.http_delete(`http://127.0.0.1:3000/items/${v.id}`).then(fetch.refresh)}},
         ]" />
 </data-fetch>
 </data-vars>
