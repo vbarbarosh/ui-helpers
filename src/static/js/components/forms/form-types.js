@@ -3,6 +3,10 @@ vue_component('form-types', {
     provide: function () {
         return {
             form_types: {
+                'layout-columns': {
+                    is: 'form-layout-columns',
+                    container: true,
+                },
                 checkbox: 'input-checkbox',
                 checkboxes: 'input-checkboxes',
                 color: 'input-color',

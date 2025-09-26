@@ -3,7 +3,7 @@
 ## microsoftedge.github.io/Demos/json-dummy-data/64KB.json
 
 ```vue
-<data-vars v-slot="vars" :vars="{form: {}, selection: []}">
+<data-vars v-slot="vars" :vars="{form: {name: {}}, selection: []}">
 <!--<data-fetch v-slot="fetch" url="https://microsoftedge.github.io/Demos/json-dummy-data/64KB.json" auto>-->
 <data-fetch v-slot="fetch" url="http://127.0.0.1:3000/items" auto>
     <div class="sticky-t flex-row flex-align-center gap10 mb15 white">
@@ -17,6 +17,25 @@
         </button>
         <spinner v-if="fetch.loading" />
     </div>
+
+    <textarea>
+        randomuser
+    </textarea>
+
+    <form-type v-slot="slot" name="randomuser.gender">
+        <form-item v-model="slot.value" type="radios" :options="[{value: 'male', label: 'Male'}, {value: 'female', label: 'Female'}]" label="Gender" />
+    </form-type>
+
+    <form-classic>
+        <form-item v-model="vars.form.gender" type="radios" :options="[{value: 'male', label: 'Male'}, {value: 'female', label: 'Female'}]" label="Gender" />
+        <form-layout-columns cols="2,5,5">
+            <form-item v-model="vars.form.name.title" type="string" label="Title" />
+            <form-item v-model="vars.form.name.first" type="string" label="First" />
+            <form-item v-model="vars.form.name.last" type="string" label="Last" />
+        </form-layout-columns>
+    </form-classic>
+
+    <pre>{{vars.form}}</pre>
     <form-type v-slot="slot" name="microsoft_dummy">
         <form-classic v-model="slot.value" :items="vars.items ??= [
             {type: 'string', path: 'id', label: 'ID'},
