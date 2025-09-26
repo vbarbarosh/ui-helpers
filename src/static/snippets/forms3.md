@@ -4,10 +4,10 @@
     <div class="hsplit gap10">
         <div>
             <form-classic>
-                <form-type v-slot="slot" type="el-date-picker">
+                <form-type v-slot="slot" name="el-date-picker">
                     <el-date-picker v-model="slot.value" v-bind:id="slot.id" placeholder="Pick a day" />
                 </form-type>
-                <form-type v-slot="slot" type="department">
+                <form-type v-slot="slot" name="department">
                     <el-select v-model="slot.value" v-bind:id="slot.id" :options="[
                         {value: 'marketing', label: 'Marketing ' + win.Date.now()},
                         {value: 'product', label: 'Product'},
@@ -16,7 +16,7 @@
                         {value: 'support', label: 'Customer Support'},
                     ]" />
                 </form-type>
-                <form-type v-slot="slot" type="el-select">
+                <form-type v-slot="slot" name="el-select">
                     <el-select v-model="slot.value" v-bind:id="slot.id" v-bind="slot.other">
                         <slot-hack v-if="slot.slot_hack_defined" />
                     </el-select>

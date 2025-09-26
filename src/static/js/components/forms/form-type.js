@@ -1,5 +1,5 @@
 vue_component('form-type', {
-    props: ['type'],
+    props: ['name'],
     inject: ['form_types'],
     _template: `
         <slot name="foo">
@@ -13,7 +13,7 @@ vue_component('form-type', {
     },
     created: function () {
         const __this = this;
-        this.form_types[this.type] = Vue.markRaw({
+        this.form_types[this.name] = Vue.markRaw({
             emits: ['update:modelValue'],
             props: ['modelValue', 'id', 'other', 'slot_hack_defined'],
             render: function () {
@@ -29,6 +29,6 @@ vue_component('form-type', {
         });
     },
     unmounted: function () {
-        delete this.form_types[this.type];
+        delete this.form_types[this.name];
     },
 });

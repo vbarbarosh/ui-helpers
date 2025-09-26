@@ -13,7 +13,7 @@
         <button-form :value="{}" type="microsoft_dummy" v-bind:save="v => win.http_post_json('http://127.0.0.1:3000/items', v).then(fetch.refresh)" />
         <spinner v-if="fetch.loading" />
     </div>
-    <form-type v-slot="slot" type="microsoft_dummy">
+    <form-type v-slot="slot" name="microsoft_dummy">
         <form-classic v-model="slot.value" :items="vars.items ??= [
             {type: 'string', path: 'id', label: 'ID'},
             {type: 'string', path: 'name', label: 'Name'},
