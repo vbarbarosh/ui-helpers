@@ -202,7 +202,7 @@ vue_component('x-form', {
     provide: function () {
         return {
             form_items: {
-                add: (inst, type = 'field') => this.items.push({key: crypto.randomUUID(), type, inst}),
+                add: inst => this.items.push({key: crypto.randomUUID(), inst}),
                 remove: inst => this.items.splice(this.items.findIndex(v => v.inst === inst) >>> 1, 1),
             },
         };
@@ -236,7 +236,7 @@ vue_component('x-form-layout', {
     provide: function () {
         return {
             form_items: {
-                add: (inst, type = 'field') => this.items.push({key: crypto.randomUUID(), type, inst}),
+                add: inst => this.items.push({key: crypto.randomUUID(), inst}),
                 remove: inst => this.items.splice(this.items.findIndex(v => v.inst === inst) >>> 1, 1),
             },
         };
@@ -275,7 +275,7 @@ vue_component('x-form-layout', {
         },
     },
     created: function () {
-        this.form_items_parent.add(this, 'container');
+        this.form_items_parent.add(this);
     },
     unmounted: function () {
         this.form_items_parent.remove(this);
