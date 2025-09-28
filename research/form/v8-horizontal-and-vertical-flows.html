@@ -348,12 +348,12 @@ vue_component('app', {
                         </x-form-item>
                         <x-form-item v-model="form.name.title" type="text" label="Title" />
                         <x-form-item v-model="form.name.first" type="text" label="First" />
-                        <x-form-layout layout="wrapper-accordion" layout2="layout-table" topology="label,control" label="Whatever">
+                        <x-form-layout layout="wrapper-accordion" layout2="layout-table" label="Whatever">
                             <x-form-item v-model="form.name.title" type="text" label="Title" />
                             <x-form-item v-model="form.name.first" type="text" label="First" />
                             <x-form-item v-model="form.name.last" type="text" label="Last" />
                         </x-form-layout>
-                        <x-form-layout layout="wrapper-accordion" layout2="layout-table" topology="label,control">
+                        <x-form-layout layout="wrapper-accordion" layout2="layout-table">
                             <template v-slot:label>
                                 --- I'm a <u>custom</u> label! ---
                                 <br>
