@@ -38,17 +38,62 @@ const form_types = {
     week: 'input-week',
 };
 
+// vue_component('layout-item', {
+//     props: ['item'],
+//     template: `
+//         <slot v-if="(item.type === 'container')" name="container">
+//             <render-function :fn="item.inst.render_layout" />
+//         </slot>
+//         <slot v-else-if="(item.type === 'field')" name="field">
+//             <render-function :fn="item.inst.render_label" />
+//             <render-function :fn="item.inst.render_control" />
+//         </slot>
+//         <slot v-else>
+//             <warn-invalid-layout-item-type :item />
+//         </slot>
+//     `,
+// });
+//
+// vue_component('layout-basic', {
+//     props: ['items'],
+//     template: `
+//         <div class="mg10">
+//             <template v-for="(item,i) in items" v-bind:key="item.key" >
+//                 <slot v-bind:item="item">
+//                     <div class="hsplit gap10">
+//                         <div class="w150"><render-function v-if="item.inst.render_label" :fn="item.inst.render_label" /></div>
+//                         <div class="fluid"><render-function v-if="item.inst.render_control" :fn="item.inst.render_control" /></div>
+//                     </div>
+//                 </slot>
+//             </template>
+//         </div>
+//     `,
+// });
+
+vue_component('warn-invalid-layout-item-type', {
+    props: ['item'],
+    template: `
+        <span>⚠️ Unknown item type: [{{ item.type }}]</span>
+    `,
+});
+
 vue_component('layout-basic', {
     props: ['items'],
     template: `
         <div class="mg10">
-            <template v-for="(item,i) in items" v-bind:key="item.key" >
-                <slot v-bind:item="item">
+            <template v-for="(item,i) in items" v-bind:key="item.key">
+                <template v-if="(item.type === 'container')">
+                    <render-function :fn="item.inst.render_layout" />
+                </template>
+                <template v-else-if="(item.type === 'field')">
                     <div class="hsplit gap10">
-                        <div class="w150"><render-function v-if="item.inst.render_label" :fn="item.inst.render_label" /></div>
-                        <div class="fluid"><render-function v-if="item.inst.render_control" :fn="item.inst.render_control" /></div>
+                        <div class="w150"><render-function :fn="item.inst.render_label" /></div>
+                        <div class="fluid"><render-function :fn="item.inst.render_control" /></div>
                     </div>
-                </slot>
+                </template>
+                <template v-else>
+                    <warn-invalid-layout-item-type :item />
+                </template>
             </template>
         </div>
     `,
@@ -61,16 +106,54 @@ vue_component('layout-table', {
             <thead>
             </thead>
             <tbody>
-                <tr v-for="item in items" v-bind:key="item.key">
-                    <td v-if="(item.inst.$attrs['ggg-table-full-row'] === '')" colspan="2">
-                        <slot :item />
-                    </td>
+<!--
+                <template v-for="item in items" v-bind:key="item.key">
+                    <template v-if="i(tem.inst.$attrs.topology === 'table_tr')">
+                        render TR with contents here (a way to add props to TR element)
+                    </template>
+                    <template v-else-if="(item.inst.$attrs.topology === 'whole_row')">
+                        <tr>
+                            render TD with contents here (a way to add props to TD element)
+                        </tr>
+                    </template>
+                    <template v-else-if="(item.inst.$attrs.topology === 'whole_cell')">
+                        <tr>
+                            <td colspan="2">
+                                render contents for entire cell here
+                            </td>
+                        </tr>
+                    </template>
+                    <template v-else-if="(item.inst.$attrs.topology === "label,control")">
+                        <tr>
+                            <th><render-function :fn="item.inst.render_label" /></th>
+                            <td><render-function :fn="item.inst.render_control" /></td>
+                        </tr>
+                    </template>
                     <template v-else>
-                        <th><render-function v-if="item.inst.render_label" :fn="item.inst.render_label" /></th>
-                        <td>
-                            <slot :item>
-                                <render-function v-if="item.inst.render_control" :fn="item.inst.render_control" />
-                            </slot>
+                        <tr>
+                            <td colspan="2">
+                                ⚠️ Unrecognized topology: [{{ item.inst.$attrs.topology }}]
+                            </td>
+                        </tr>
+                    </template>
+                </template>
+-->
+                <tr v-for="item in items" v-bind:key="item.key">
+                    <!--<td><render-function v-if="item.inst.$slots.ggg" :fn="item.inst.$slots.ggg" /></td>-->
+                    <template v-if="(item.inst.$attrs.topology === 'label,control')">
+                        <th><render-function :fn="item.inst.render_label" /></th>
+                        <td><render-function :fn="item.inst.render_layout" /></td>
+                    </template>
+                    <td v-else-if="(item.type === 'container')" colspan="2">
+                        <render-function :fn="item.inst.render_layout" />
+                    </td>
+                    <template v-else-if="(item.type === 'field')">
+                        <th><render-function :fn="item.inst.render_label" /></th>
+                        <td><render-function :fn="item.inst.render_control" /></td>
+                    </template>
+                    <template v-else>
+                        <td colspan="2">
+                            <warn-invalid-layout-item-type :item />
                         </td>
                     </template>
                 </tr>
@@ -83,11 +166,17 @@ vue_component('layout-columns', {
     props: ['items', 'cols'],
     template: `
         <div class="flex-row gap10">
-            <div v-for="item in computed_items" v-bind:key="item.key" v-bind:style="item.style" class="flex-col gap5">
-                <slot v-bind:item="item.orig">
-                    <render-function :fn="item.orig.inst.render_label" />
-                    <render-function :fn="item.orig.inst.render_control" />
-                </slot>
+            <div v-for="ci in computed_items" v-bind:key="ci.key" v-bind:style="ci.style" class="flex-col gap5">
+                <template v-if="(ci.orig.type === 'container')">
+                    <render-function :fn="ci.orig.inst.render_layout" />
+                </template>
+                <template v-else-if="(ci.orig.type === 'field')">
+                    <render-function :fn="ci.orig.inst.render_label" />
+                    <render-function :fn="ci.orig.inst.render_control" />
+                </template>
+                <template v-else>
+                    <warn-invalid-layout-item-type :item="ci.orig" />
+                </template>
             </div>
         </div>
     `,
@@ -102,7 +191,7 @@ vue_component('layout-columns', {
 });
 
 vue_component('wrapper-accordion', {
-    props: ['items'],
+    props: ['items', 'layout'],
     template: `
         <div class="mg10">
             <slot name="label">
@@ -112,7 +201,7 @@ vue_component('wrapper-accordion', {
                 </div>
             </slot>
             <div v-show="open">
-                <slot name="container" :items />
+                <component v-bind:is="(layout ?? 'layout-basic')" v-bind="$attrs" :items />
             </div>
         </div>
     `,
@@ -135,7 +224,7 @@ vue_component('x-form', {
     provide: function () {
         return {
             form_items: {
-                add: inst => this.items.push({key: crypto.randomUUID(), inst}),
+                add: (inst, type = 'field') => this.items.push({key: crypto.randomUUID(), type, inst}),
                 remove: inst => this.items.splice(this.items.findIndex(v => v.inst === inst) >>> 1, 1),
             },
         };
@@ -161,7 +250,7 @@ vue_component('x-form', {
 });
 
 vue_component('x-form-layout', {
-    props: ['layout'],
+    props: ['layout', 'layout2', 'label'],
     inheritAttrs: false,
     inject: {
         form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
@@ -169,53 +258,7 @@ vue_component('x-form-layout', {
     provide: function () {
         return {
             form_items: {
-                add: inst => this.items.push({key: crypto.randomUUID(), inst}),
-                remove: inst => this.items.splice(this.items.findIndex(v => v.inst === inst) >>> 1, 1),
-            },
-        };
-    },
-    template: '<slot />',
-    data: function () {
-        return {
-            items: [],
-        };
-    },
-    methods: {
-        render_layout: function (params, slots) {
-            // <layout-columns :items cols="2,5,5" />
-            return Vue.h(Vue.resolveComponent(this.layout), {...this.$attrs, items: this.items}, {
-                default: function (slot) {
-                    if (slot.item.inst.render_layout) {
-                        return slot.item.inst.render_layout();
-                    }
-                    return [];
-//             <template v-if="!(slot.item.inst.type)">
-//                 <render-function v-slot="slot2" :fn="slot.item.inst.render_layout">
-//                     <layout-basic :items="slot2.items" />
-//                 </render-function>
-//             </template>
-                },
-            });
-        },
-    },
-    created: function () {
-        this.form_items_parent.add(this);
-    },
-    unmounted: function () {
-        this.form_items_parent.remove(this);
-    },
-});
-
-vue_component('x-form-wrapper', {
-    props: ['name', 'layout'],
-    inheritAttrs: false,
-    inject: {
-        form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
-    },
-    provide: function () {
-        return {
-            form_items: {
-                add: inst => this.items.push({key: crypto.randomUUID(), inst}),
+                add: (inst, type = 'field') => this.items.push({key: crypto.randomUUID(), type, inst}),
                 remove: inst => this.items.splice(this.items.findIndex(v => v.inst === inst) >>> 1, 1),
             },
         };
@@ -228,25 +271,74 @@ vue_component('x-form-wrapper', {
     },
     methods: {
         render_label: function () {
-            return 'CUSTOM LABEL';
+            if (this.$slots.label) {
+                return this.$slots.label();
+            }
+            return Vue.h('label', null, this.label);
         },
         render_layout: function (params, slots) {
-            const _this = this;
-            return Vue.h(Vue.resolveComponent(this.name), {...this.$attrs, items: this.items}, {
-                container: function (slot) {
-                    return Vue.h(Vue.resolveComponent(_this.layout ?? 'layout-basic'), {items: slot.items});
+            // <layout-columns :items cols="2,5,5" />
+            return Vue.h(Vue.resolveComponent(this.layout), {...this.$attrs, layout: this.layout2, items: this.items}, {
+                default: function (slot) {
+                    // if (slot.item.inst.render_layout) {
+                    //     return slot.item.inst.render_layout();
+                    // }
+                    return [];
+//             <template v-if="!(slot.item.inst.type)">
+//                 <render-function v-slot="slot2" :fn="slot.item.inst.render_layout">
+//                     <layout-basic :items="slot2.items" />
+//                 </render-function>
+//             </template>
                 },
             });
         },
     },
     created: function () {
-        this.form_items_parent.add(this);
+        this.form_items_parent.add(this, 'container');
     },
     unmounted: function () {
         this.form_items_parent.remove(this);
     },
 });
 
+// vue_component('x-form-wrapper', {
+//     props: ['name', 'layout'],
+//     inheritAttrs: false,
+//     inject: {
+//         form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
+//     },
+//     provide: function () {
+//         return {
+//             form_items: {
+//                 add: (inst, type = 'field') => this.items.push({key: crypto.randomUUID(), type, inst}),
+//                 remove: inst => this.items.splice(this.items.findIndex(v => v.inst === inst) >>> 1, 1),
+//             },
+//         };
+//     },
+//     template: '<slot />',
+//     data: function () {
+//         return {
+//             items: [],
+//         };
+//     },
+//     methods: {
+//         render_layout: function (params, slots) {
+//             const _this = this;
+//             return Vue.h(Vue.resolveComponent(this.name), {...this.$attrs, items: this.items}, {
+//                 container: function (slot) {
+//                     return Vue.h(Vue.resolveComponent(_this.layout ?? 'layout-basic'), {items: slot.items});
+//                 },
+//             });
+//         },
+//     },
+//     created: function () {
+//         this.form_items_parent.add(this, 'container');
+//     },
+//     unmounted: function () {
+//         this.form_items_parent.remove(this);
+//     },
+// });
+//
 // vue_component('x-form-layout-basic', {
 //     inject: {
 //         form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
@@ -375,45 +467,54 @@ vue_component('app', {
                     <x-form-layout layout="layout-table">
                         <x-form-item v-model="form.name.title" type="text" label="Title" />
                         <x-form-item v-model="form.name.first" type="text" label="First" />
-                        <x-form-wrapper name="wrapper-accordion" layout="layout-table">
+                        <x-form-layout layout="wrapper-accordion" layout2="layout-table" topology="label,control" label="Whatever">
                             <x-form-item v-model="form.name.title" type="text" label="Title" />
                             <x-form-item v-model="form.name.first" type="text" label="First" />
                             <x-form-item v-model="form.name.last" type="text" label="Last" />
-                        </x-form-wrapper>
-                        <x-form-wrapper name="wrapper-accordion" layout="layout-table" ggg-table-full-row>
+                        </x-form-layout>
+                        <x-form-layout layout="wrapper-accordion" layout2="layout-table" topology="label,control">
+                            <template v-slot:label>
+                                I'm a <u>custom</u> label!
+                            </template>
                             <x-form-item v-model="form.name.title" type="text" label="Title" />
                             <x-form-item v-model="form.name.first" type="text" label="First" />
                             <x-form-item v-model="form.name.last" type="text" label="Last" />
-                        </x-form-wrapper>
+                        </x-form-layout>
                         <x-form-item v-model="form.name.last" type="text" label="Last" />
                     </x-form-layout>
-                    <x-form-wrapper name="wrapper-accordion">
+                    <x-form-layout layout="wrapper-accordion" layout2="layout-columns" cols="2,5,5">
                         <x-form-item v-model="form.name.title" type="text" label="Title" />
                         <x-form-item v-model="form.name.first" type="text" label="First" />
                         <x-form-item v-model="form.name.last" type="text" label="Last" />
-                    </x-form-wrapper>
+                    </x-form-layout>
                 </x-form-layout>
             </x-form>
         </div>
-        <div>
-            <div class="mg10">
-                <div>
-                    <label>Gender</label>
-                    <input v-model="form.gender" type="text">
+        <div class="mg10">
+<pre class="ph10 pv5 yellow dashed">
+<b>layout-engine</b>:
+- для каждого элемента (items) создает свою строчку (свой контейнер)
+- внутри этой строчки создаются места для <b>label,control,help,error</b>
+- элемент может указать какие слоты ему нужны
+    - например отрисовать себя на всей строчке
+    - или отрисовать себя в ячейке для control
+</pre>
+            <div>
+                <label>Gender</label>
+                <input v-model="form.gender" type="text">
+            </div>
+            <div class="flex-row gap10">
+                <div style="flex: 2 0 0;min-width:0;" class="flex-col gap5">
+                    <label>Title</label>
+                    <input v-model="form.name.title" type="text">
                 </div>
-                <div class="flex-row gap10">
-                    <div style="flex: 2 0 0;min-width:0;" class="flex-col gap5">
-                        <label>Title</label>
-                        <input v-model="form.name.title" type="text">
-                    </div>
-                    <div style="flex: 5 0 0;min-width:0;" class="flex-col gap5">
-                        <label>First</label>
-                        <input v-model="form.name.first" type="text">
-                    </div>
-                    <div style="flex: 5 0 0;min-width:0;" class="flex-col gap5">
-                        <label>Last</label>
-                        <input v-model="form.name.last" type="text">
-                    </div>
+                <div style="flex: 5 0 0;min-width:0;" class="flex-col gap5">
+                    <label>First</label>
+                    <input v-model="form.name.first" type="text">
+                </div>
+                <div style="flex: 5 0 0;min-width:0;" class="flex-col gap5">
+                    <label>Last</label>
+                    <input v-model="form.name.last" type="text">
                 </div>
             </div>
         </div>
