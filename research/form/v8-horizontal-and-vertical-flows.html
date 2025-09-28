@@ -9,6 +9,33 @@
 </head>
 <body>
 
+<!--
+- layout
+  - выделяет именованные места (слоты) и вставляет в них элементы (разметку)
+  - стандартные слоты:
+    - label
+    - control
+    - container/cell
+  - слоты уникальные для layout
+    - table: tr, th, td
+
+I will continue with my own reasoning.
+
+Having the following markup, how could I "tell" that some part of it should be rendered a bit differently? Currently, x-form-layout should be rendered as "cell" slot... Seems that each form-item should expose slots map telling layout engine which slots to render. But still, it's not clear how to define slot functions... Default/standard form-item have 2 render functions: render_label and render_control. They are designed for "label" and "control" slots. Following this way, form-layout component should define render_cell function for "cell" slot. Now I need to define scope for "label", "control" and "cell" slots.
+
+label: should render <label for="id">...</label>
+control: should render whatever input component was mapped to the <form-type type="..." />
+cell: for layout-basic - it could be anything which will be wrapped by DIV; for layout-table - it could be anything which will be wrapped by <tr><td colspan="2">___</td></tr>
+
+So, a "cell" is a space for both "label" and "control" but wrapped by whatever is necessary by current layout engine to keep layout consistent.
+
+In some rare cases it would be necessary to override TD or even entire TR elements. layout-table will expose eponymous slots: "TR" for entire row (delegate is responsible to return exactly one top level element TR); "TH" for label and "TD" for control (delegate's responsibilities are the same as for TR)
+
+---
+
+What I need is a mechanism for defining/exposing slots on form-item elements, and mechanism for allowing user define slot mapping right from markup.
+-->
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
 <script>
@@ -82,13 +109,13 @@ vue_component('layout-basic', {
     template: `
         <div class="mg10">
             <template v-for="(item,i) in items" v-bind:key="item.key">
-                <template v-if="(item.type === 'container')">
-                    <render-function :fn="item.inst.render_layout" />
+                <template v-if="(item.inst.insertions.container)">
+                    <div><render-function :fn="item.inst.insertions.container" /></div>
                 </template>
-                <template v-else-if="(item.type === 'field')">
+                <template v-else-if="(item.inst.insertions.label && item.inst.insertions.control)">
                     <div class="hsplit gap10">
-                        <div class="w150"><render-function :fn="item.inst.render_label" /></div>
-                        <div class="fluid"><render-function :fn="item.inst.render_control" /></div>
+                        <div class="w150"><render-function :fn="item.inst.insertions.label" /></div>
+                        <div class="fluid"><render-function :fn="item.inst.insertions.control" /></div>
                     </div>
                 </template>
                 <template v-else>
@@ -106,57 +133,36 @@ vue_component('layout-table', {
             <thead>
             </thead>
             <tbody>
-<!--
                 <template v-for="item in items" v-bind:key="item.key">
-                    <template v-if="i(tem.inst.$attrs.topology === 'table_tr')">
-                        render TR with contents here (a way to add props to TR element)
+                    <template v-if="item.inst.insertions.layout_table_tr">
+                        <render-function :fn="item.inst.insertions.layout_table_tr" />
                     </template>
-                    <template v-else-if="(item.inst.$attrs.topology === 'whole_row')">
+                    <template v-else-if="item.inst.insertions.layout_table_tr2">
                         <tr>
-                            render TD with contents here (a way to add props to TD element)
+                            <render-function :fn="item.inst.insertions.layout_table_tr2" />
                         </tr>
                     </template>
-                    <template v-else-if="(item.inst.$attrs.topology === 'whole_cell')">
+                    <template v-else-if="item.inst.insertions.container">
                         <tr>
                             <td colspan="2">
-                                render contents for entire cell here
+                                <render-function :fn="item.inst.insertions.container" />
                             </td>
                         </tr>
                     </template>
-                    <template v-else-if="(item.inst.$attrs.topology === "label,control")">
+                    <template v-else-if="(item.inst.insertions.label && item.inst.insertions.control)">
                         <tr>
-                            <th><render-function :fn="item.inst.render_label" /></th>
-                            <td><render-function :fn="item.inst.render_control" /></td>
+                            <th><render-function :fn="item.inst.insertions.label" /></th>
+                            <td><render-function :fn="item.inst.insertions.control" /></td>
                         </tr>
                     </template>
                     <template v-else>
                         <tr>
                             <td colspan="2">
-                                ⚠️ Unrecognized topology: [{{ item.inst.$attrs.topology }}]
+                                ⚠️ Unrecognized insertions: {{ win.Object.keys(item.inst.insertions) }}
                             </td>
                         </tr>
                     </template>
                 </template>
--->
-                <tr v-for="item in items" v-bind:key="item.key">
-                    <!--<td><render-function v-if="item.inst.$slots.ggg" :fn="item.inst.$slots.ggg" /></td>-->
-                    <template v-if="(item.inst.$attrs.topology === 'label,control')">
-                        <th><render-function :fn="item.inst.render_label" /></th>
-                        <td><render-function :fn="item.inst.render_layout" /></td>
-                    </template>
-                    <td v-else-if="(item.type === 'container')" colspan="2">
-                        <render-function :fn="item.inst.render_layout" />
-                    </td>
-                    <template v-else-if="(item.type === 'field')">
-                        <th><render-function :fn="item.inst.render_label" /></th>
-                        <td><render-function :fn="item.inst.render_control" /></td>
-                    </template>
-                    <template v-else>
-                        <td colspan="2">
-                            <warn-invalid-layout-item-type :item />
-                        </td>
-                    </template>
-                </tr>
             </tbody>
         </table>
     `,
@@ -166,18 +172,22 @@ vue_component('layout-columns', {
     props: ['items', 'cols'],
     template: `
         <div class="flex-row gap10">
-            <div v-for="ci in computed_items" v-bind:key="ci.key" v-bind:style="ci.style" class="flex-col gap5">
-                <template v-if="(ci.orig.type === 'container')">
-                    <render-function :fn="ci.orig.inst.render_layout" />
+            <template v-for="ci in computed_items" v-bind:key="ci.key">
+                <template v-if="ci.orig.inst.insertions.container">
+                    <div v-bind:style="ci.style">
+                        <render-function :fn="ci.orig.inst.insertions.container" />
+                    </div>
                 </template>
-                <template v-else-if="(ci.orig.type === 'field')">
-                    <render-function :fn="ci.orig.inst.render_label" />
-                    <render-function :fn="ci.orig.inst.render_control" />
+                <template v-else-if="(ci.orig.inst.insertions.label && ci.orig.inst.insertions.control)">
+                    <div v-bind:style="ci.style" class="flex-col gap5">
+                        <render-function :fn="ci.orig.inst.insertions.label" />
+                        <render-function :fn="ci.orig.inst.insertions.control" />
+                    </div>
                 </template>
                 <template v-else>
                     <warn-invalid-layout-item-type :item="ci.orig" />
                 </template>
-            </div>
+            </template>
         </div>
     `,
     computed: {
@@ -267,6 +277,9 @@ vue_component('x-form-layout', {
     data: function () {
         return {
             items: [],
+            insertions: (this.label || this.$slots.label)
+                ? {label: this.render_label, control: this.render_container, ...this.$slots}
+                : {container: this.render_container, ...this.$slots},
         };
     },
     methods: {
@@ -276,7 +289,7 @@ vue_component('x-form-layout', {
             }
             return Vue.h('label', null, this.label);
         },
-        render_layout: function (params, slots) {
+        render_container: function (params, slots) {
             // <layout-columns :items cols="2,5,5" />
             return Vue.h(Vue.resolveComponent(this.layout), {...this.$attrs, layout: this.layout2, items: this.items}, {
                 default: function (slot) {
@@ -422,6 +435,11 @@ vue_component('x-form-item', {
     data: function () {
         return {
             id: `id-${crypto.randomUUID()}`,
+            insertions: {
+                label: this.render_label,
+                control: this.render_control,
+                ...this.$slots,
+            },
         };
     },
     methods: {
@@ -465,6 +483,14 @@ vue_component('app', {
                         <x-form-item v-model="form.name.last" type="text" label="Last" />
                     </x-form-layout>
                     <x-form-layout layout="layout-table">
+                        <x-form-item>
+                            <template #label>GGG</template>
+                            <template #control>XXXX</template>
+                            <template #container>CONTAINER</template>
+                            <template #layout_table_tr>
+                                <tr><td>layout_table_tr</td></tr>
+                            </template>
+                        </x-form-item>
                         <x-form-item v-model="form.name.title" type="text" label="Title" />
                         <x-form-item v-model="form.name.first" type="text" label="First" />
                         <x-form-layout layout="wrapper-accordion" layout2="layout-table" topology="label,control" label="Whatever">
@@ -474,7 +500,9 @@ vue_component('app', {
                         </x-form-layout>
                         <x-form-layout layout="wrapper-accordion" layout2="layout-table" topology="label,control">
                             <template v-slot:label>
-                                I'm a <u>custom</u> label!
+                                --- I'm a <u>custom</u> label! ---
+                                <br>
+                                {{ form.name.title }}
                             </template>
                             <x-form-item v-model="form.name.title" type="text" label="Title" />
                             <x-form-item v-model="form.name.first" type="text" label="First" />
