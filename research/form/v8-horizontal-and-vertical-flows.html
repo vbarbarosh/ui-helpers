@@ -176,7 +176,49 @@ vue_component('layout-columns', {
     },
 });
 
-vue_component('wrapper-accordion', {
+vue_component('layout-tabs', {
+    props: ['items'],
+    template: `
+        <tabs>
+            <tabs-item v-for="item in items" v-bind:key="item.key" v-bind:label="item.inst.label">
+                <render-function :fn="(item.inst.insertions.container ?? item.inst.insertions.control)" />
+            </tabs-item>
+        </tabs>
+    `,
+});
+
+vue_component('layout-accordion', {
+    props: ['items'],
+    template: `
+        <div>
+            🚧 Not Implemented 🚧
+        </div>
+    `,
+    data: function () {
+        return {
+            open: false,
+        };
+    },
+    methods: {
+        click_expand: function () {
+            this.open = true;
+        },
+        click_collapse: function () {
+            this.open = false;
+        },
+    },
+});
+
+vue_component('layout-wrapper', {
+    props: ['items', 'wrapper', 'layout2'],
+    template: `
+        <component v-bind:is="wrapper">
+            <component v-bind:is="(layout2 ?? 'layout-basic')" :items />
+        </component>
+    `,
+});
+
+vue_component('expand', {
     props: ['items', 'layout'],
     template: `
         <div class="mg10">
@@ -286,7 +328,7 @@ vue_component('x-form', {
 
 vue_component('x-form-item', {
     emits: ['update:modelValue'],
-    props: ['modelValue', 'type', 'label', 'wrapper', 'layout'],
+    props: ['modelValue', 'type', 'label', 'layout'],
     inheritAttrs: false,
     inject: {
         form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
@@ -398,27 +440,26 @@ vue_component('app', {
                                 <tr><td>layout_table_tr</td></tr>
                             </template>
                         </x-form-item>
-                        <x-form-item v-model="form.name.title" type="text" label="Item with children"
-                         layout="layout-table" wrapper="wrapper-accordion">
+                        <x-form-item layout="layout-table" label="Item with children" >
                             <x-form-item v-model="form.name.title" type="text" label="CC Title" />
                             <x-form-item v-model="form.name.first" type="text" label="CC First" />
                             <x-form-item v-model="form.name.last" type="text" label="CC Last" />
                         </x-form-item>
                         <x-form-item v-model="form.name.title" type="text" label="Title" />
                         <x-form-item v-model="form.name.first" type="text" label="First" />
-                        <x-form-item layout="layout-table" wrapper="wrapper-accordion"  label="Whatever111">
+                        <x-form-item layout="layout-table" wrapper="expand"  label="Whatever111">
                             <x-form-item v-model="form.name.title" type="text" label="Title" />
                             <x-form-item v-model="form.name.first" type="text" label="First" />
                             <x-form-item v-model="form.name.last" type="text" label="Last" />
                         </x-form-item>
                         <x-form-item #control label="Whatever2">
-                            <wrapper-accordion>
+                            <expand>
                                 <x-form layout="layout-table">
                                     <x-form-item v-model="form.name.title" type="text" label="Title" />
                                     <x-form-item v-model="form.name.first" type="text" label="First" />
                                     <x-form-item v-model="form.name.last" type="text" label="Last" />
                                 </x-form>
-                            </wrapper-accordion>
+                            </expand>
                         </x-form-item>
                         <x-form-item #container>
                             <tabs>
@@ -438,7 +479,7 @@ vue_component('app', {
                                 </tabs-item>
                             </tabs>
                         </x-form-item>
-                        <x-form-item layout="layout-table" wrapp="wrapper-accordion">
+                        <x-form-item layout="layout-table" wrapper="expand">
                             <template v-slot:label>
                                 --- I'm a <u>custom</u> label! ---
                                 <br>
@@ -449,8 +490,34 @@ vue_component('app', {
                             <x-form-item v-model="form.name.last" type="text" label="Last" />
                         </x-form-item>
                         <x-form-item v-model="form.name.last" type="text" label="Last" />
+                        <x-form-item layout="layout-tabs" label="Tabs please!">
+                            <x-form-item v-model="form.name.title" type="text" label="Title" />
+                            <x-form-item v-model="form.name.first" type="text" label="First" />
+                            <x-form-item v-model="form.name.last" type="text" label="Last" />
+                            <x-form-item layout="layout-table" label="Nested Triple">
+                                <x-form-item v-model="form.name.title" type="text" label="TT.Title" />
+                                <x-form-item v-model="form.name.first" type="text" label="TT.First" />
+                                <x-form-item v-model="form.name.last" type="text" label="TT.Last" />
+                            </x-form-item>
+                        </x-form-item>
+                        <x-form-item layout="layout-accordion" label="Tabs please!">
+                            <x-form-item layout="layout-table" lable="Expand">
+                                <x-form-item v-model="form.name.title" type="text" label="Title" />
+                                <x-form-item v-model="form.name.first" type="text" label="First" />
+                                <x-form-item v-model="form.name.last" type="text" label="Last" />
+                            </x-form-item>
+                        </x-form-item>
+                        <x-form-item layout="layout-wrapper" wrapper="DIV" style="border:10px solid #ff8;">
+                            <x-form-item layout="layout-wrapper" wrapper="DIV" style="border:10px solid #f88;">
+                                <x-form-item layout="layout-wrapper" wrapper="expand" _label="Tabs please!">
+                                    <x-form-item v-model="form.name.title" type="text" label="Title" />
+                                    <x-form-item v-model="form.name.first" type="text" label="First" />
+                                    <x-form-item v-model="form.name.last" type="text" label="Last" />
+                                </x-form-item>
+                            </x-form-item>
+                        </x-form-item>
                     </x-form-item>
-                    <x-form-item layout="layout-columns" cols="2,5,5" wrapper="wrapper-accordion">
+                    <x-form-item layout="layout-columns" cols="2,5,5">
                         <x-form-item v-model="form.name.title" type="text" label="Title" />
                         <x-form-item v-model="form.name.first" type="text" label="First" />
                         <x-form-item v-model="form.name.last" type="text" label="Last" />
