@@ -72,6 +72,9 @@ vue_component('warn-invalid-layout-item-type', {
     `,
 });
 
+// - label
+// - control
+// - container
 vue_component('layout-basic', {
     props: ['items'],
     template: `
@@ -94,6 +97,11 @@ vue_component('layout-basic', {
     `,
 });
 
+// - label
+// - control
+// - container
+// - layout_table_tr
+// - layout_table_tr2
 vue_component('layout-table', {
     props: ['items'],
     template: `
@@ -229,8 +237,56 @@ vue_component('x-form', {
     },
 });
 
-vue_component('x-form-layout', {
-    props: ['layout', 'layout2', 'label'],
+// vue_component('x-form-layout', {
+//     props: ['layout', 'layout2', 'label'],
+//     inheritAttrs: false,
+//     inject: {
+//         form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
+//     },
+//     provide: function () {
+//         return {
+//             form_items: {
+//                 add: inst => this.items.push({key: crypto.randomUUID(), inst}),
+//                 remove: inst => this.items.splice(this.items.findIndex(v => v.inst === inst) >>> 1, 1),
+//             },
+//         };
+//     },
+//     template: '<slot />',
+//     data: function () {
+//         return {
+//             items: [],
+//             insertions: (this.label || this.$slots.label)
+//                 ? {label: this.render_label, control: this.render_container, ...this.$slots}
+//                 : {container: this.render_container, ...this.$slots},
+//         };
+//     },
+//     methods: {
+//         render_label: function () {
+//             if (this.$slots.label) {
+//                 return this.$slots.label();
+//             }
+//             return Vue.h('label', null, this.label);
+//         },
+//         render_container: function (params, slots) {
+//             // <layout-columns :items cols="2,5,5" />
+//             return Vue.h(Vue.resolveComponent(this.layout), {...this.$attrs, layout: this.layout2, items: this.items}, {
+//                 default: function () {
+//                     return ['xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'];
+//                 },
+//             });
+//         },
+//     },
+//     created: function () {
+//         this.form_items_parent.add(this);
+//     },
+//     unmounted: function () {
+//         this.form_items_parent.remove(this);
+//     },
+// });
+
+vue_component('x-form-item', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'type', 'label', 'wrapper', 'layout'],
     inheritAttrs: false,
     inject: {
         form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
@@ -238,48 +294,11 @@ vue_component('x-form-layout', {
     provide: function () {
         return {
             form_items: {
-                add: inst => this.items.push({key: crypto.randomUUID(), inst}),
-                remove: inst => this.items.splice(this.items.findIndex(v => v.inst === inst) >>> 1, 1),
+                add: inst => this.child_items.push({key: crypto.randomUUID(), inst}),
+                remove: inst => this.child_items.splice(this.child_items.findIndex(v => v.inst === inst) >>> 1, 1),
             },
         };
     },
-    template: '<slot />',
-    data: function () {
-        return {
-            items: [],
-            insertions: (this.label || this.$slots.label)
-                ? {label: this.render_label, control: this.render_container, ...this.$slots}
-                : {container: this.render_container, ...this.$slots},
-        };
-    },
-    methods: {
-        render_label: function () {
-            if (this.$slots.label) {
-                return this.$slots.label();
-            }
-            return Vue.h('label', null, this.label);
-        },
-        render_container: function (params, slots) {
-            // <layout-columns :items cols="2,5,5" />
-            return Vue.h(Vue.resolveComponent(this.layout), {...this.$attrs, layout: this.layout2, items: this.items}, {
-                default: function () {
-                    return ['xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'];
-                },
-            });
-        },
-    },
-    created: function () {
-        this.form_items_parent.add(this);
-    },
-    unmounted: function () {
-        this.form_items_parent.remove(this);
-    },
-});
-
-vue_component('x-form-item', {
-    emits: ['update:modelValue'],
-    props: ['modelValue', 'type', 'label'],
-    inject: ['form_items'],
     template: '<slot />',
     data: function () {
         return {
@@ -287,8 +306,10 @@ vue_component('x-form-item', {
             insertions: {
                 label: this.render_label,
                 control: this.render_control,
+                ...(this.label ? {} : {container: this.render_control}),
                 ...this.$slots,
             },
+            child_items: [],
         };
     },
     methods: {
@@ -296,6 +317,43 @@ vue_component('x-form-item', {
             return Vue.h('label', {for: this.id}, this.label);
         },
         render_control: function () {
+            if (this.wrapper) {
+                if (this.layout) {
+                    return Vue.h(Vue.resolveComponent(this.wrapper), null, {
+                        default: () => [
+                            Vue.h(Vue.resolveComponent(this.layout), {
+                                ...this.$attrs,
+                                items: this.child_items,
+                            }),
+                        ],
+                    });
+                }
+                return Vue.h(Vue.resolveComponent(this.wrapper), null, {
+                    default: () => [
+                        Vue.h(Vue.resolveComponent(form_types[this.type]), {
+                            id: this.id,
+                            modelValue: this.modelValue,
+                            'onUpdate:modelValue': v => this.$emit('update:modelValue', v),
+                        }),
+                    ],
+                });
+            }
+            if (this.layout) {
+                if (this.wrapper) {
+                    return Vue.h(Vue.resolveComponent(this.wrapper), null, {
+                        default: () => [
+                            Vue.h(Vue.resolveComponent(this.layout), {
+                                ...this.$attrs,
+                                items: this.child_items,
+                            }),
+                        ],
+                    });
+                }
+                return Vue.h(Vue.resolveComponent(this.layout), {
+                    ...this.$attrs,
+                    items: this.child_items,
+                });
+            }
             return Vue.h(Vue.resolveComponent(form_types[this.type]), {
                 id: this.id,
                 modelValue: this.modelValue,
@@ -304,10 +362,10 @@ vue_component('x-form-item', {
         },
     },
     created: function () {
-        this.form_items.add(this);
+        this.form_items_parent.add(this);
     },
     unmounted: function () {
-        this.form_items.remove(this);
+        this.form_items_parent.remove(this);
     },
 });
 
@@ -324,14 +382,14 @@ vue_component('app', {
     <div class="fix-f hsplit gap15 m10">
         <div class="fluid mg15 rainbow oa">
             <x-form>
-                <x-form-layout layout="layout-basic">
+                <x-form-item layout="layout-basic">
                     <x-form-item v-model="form.gender" type="text" label="Gender" />
-                    <x-form-layout layout="layout-columns" cols="2,5,5">
-                        <x-form-item v-model="form.name.title" type="text" label="Title" />
-                        <x-form-item v-model="form.name.first" type="text" label="First" />
-                        <x-form-item v-model="form.name.last" type="text" label="Last" />
-                    </x-form-layout>
-                    <x-form-layout layout="layout-table">
+                    <x-form-item layout="layout-columns" cols="2,5,5">
+                        <x-form-item v-model="form.name.title" type="text" label="cols.Title" />
+                        <x-form-item v-model="form.name.first" type="text" label="cols.First" />
+                        <x-form-item v-model="form.name.last" type="text" label="cols.Last" />
+                    </x-form-item>
+                    <x-form-item layout="layout-table">
                         <x-form-item>
                             <template #label>GGG</template>
                             <template #control>XXXX</template>
@@ -340,14 +398,20 @@ vue_component('app', {
                                 <tr><td>layout_table_tr</td></tr>
                             </template>
                         </x-form-item>
+                        <x-form-item v-model="form.name.title" type="text" label="Item with children"
+                         layout="layout-table" wrapper="wrapper-accordion">
+                            <x-form-item v-model="form.name.title" type="text" label="CC Title" />
+                            <x-form-item v-model="form.name.first" type="text" label="CC First" />
+                            <x-form-item v-model="form.name.last" type="text" label="CC Last" />
+                        </x-form-item>
                         <x-form-item v-model="form.name.title" type="text" label="Title" />
                         <x-form-item v-model="form.name.first" type="text" label="First" />
-                        <x-form-layout layout="wrapper-accordion" layout2="layout-table" label="Whatever">
+                        <x-form-item layout="layout-table" wrapper="wrapper-accordion"  label="Whatever111">
                             <x-form-item v-model="form.name.title" type="text" label="Title" />
                             <x-form-item v-model="form.name.first" type="text" label="First" />
                             <x-form-item v-model="form.name.last" type="text" label="Last" />
-                        </x-form-layout>
-                        <x-form-layout #control label="Whatever">
+                        </x-form-item>
+                        <x-form-item #control label="Whatever2">
                             <wrapper-accordion>
                                 <x-form layout="layout-table">
                                     <x-form-item v-model="form.name.title" type="text" label="Title" />
@@ -355,7 +419,7 @@ vue_component('app', {
                                     <x-form-item v-model="form.name.last" type="text" label="Last" />
                                 </x-form>
                             </wrapper-accordion>
-                        </x-form-layout>
+                        </x-form-item>
                         <x-form-item #container>
                             <tabs>
                                 <tabs-item label="First">
@@ -374,7 +438,7 @@ vue_component('app', {
                                 </tabs-item>
                             </tabs>
                         </x-form-item>
-                        <x-form-layout layout="wrapper-accordion" layout2="layout-table">
+                        <x-form-item layout="layout-table" wrapp="wrapper-accordion">
                             <template v-slot:label>
                                 --- I'm a <u>custom</u> label! ---
                                 <br>
@@ -383,15 +447,15 @@ vue_component('app', {
                             <x-form-item v-model="form.name.title" type="text" label="Title" />
                             <x-form-item v-model="form.name.first" type="text" label="First" />
                             <x-form-item v-model="form.name.last" type="text" label="Last" />
-                        </x-form-layout>
+                        </x-form-item>
                         <x-form-item v-model="form.name.last" type="text" label="Last" />
-                    </x-form-layout>
-                    <x-form-layout layout="wrapper-accordion" layout2="layout-columns" cols="2,5,5">
+                    </x-form-item>
+                    <x-form-item layout="layout-columns" cols="2,5,5" wrapper="wrapper-accordion">
                         <x-form-item v-model="form.name.title" type="text" label="Title" />
                         <x-form-item v-model="form.name.first" type="text" label="First" />
                         <x-form-item v-model="form.name.last" type="text" label="Last" />
-                    </x-form-layout>
-                </x-form-layout>
+                    </x-form-item>
+                </x-form-item>
             </x-form>
         </div>
         <div class="mg10">
