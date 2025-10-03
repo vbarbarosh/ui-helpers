@@ -312,38 +312,7 @@ vue_component('x-form-item', {
             return Vue.h('label', {for: this.id}, this.label);
         },
         render_control: function () {
-            if (this.wrapper) {
-                if (this.layout) {
-                    return Vue.h(Vue.resolveComponent(this.wrapper), null, {
-                        default: () => [
-                            Vue.h(Vue.resolveComponent(this.layout), {
-                                ...this.$attrs,
-                                items: this.child_items,
-                            }),
-                        ],
-                    });
-                }
-                return Vue.h(Vue.resolveComponent(this.wrapper), null, {
-                    default: () => [
-                        Vue.h(Vue.resolveComponent(form_types[this.type]), {
-                            id: this.id,
-                            modelValue: this.modelValue,
-                            'onUpdate:modelValue': v => this.$emit('update:modelValue', v),
-                        }),
-                    ],
-                });
-            }
             if (this.layout) {
-                if (this.wrapper) {
-                    return Vue.h(Vue.resolveComponent(this.wrapper), null, {
-                        default: () => [
-                            Vue.h(Vue.resolveComponent(this.layout), {
-                                ...this.$attrs,
-                                items: this.child_items,
-                            }),
-                        ],
-                    });
-                }
                 return Vue.h(Vue.resolveComponent(this.layout), {
                     ...this.$attrs,
                     items: this.child_items,
