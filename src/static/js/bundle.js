@@ -71,18 +71,10 @@ function vue_directive(name, params)
         inject('components/etc/reset-on-change.js');
         inject('components/etc/slot-hack.js');
         inject('components/etc/spinner.js');
-        inject('components/forms/form-classic-item.js');
-        inject('components/forms/form-classic.js');
-        inject('components/forms/form-hor.js');
         inject('components/forms/form-item.js');
-        inject('components/forms/form-label.js');
-        inject('components/forms/form-layout-columns.js');
-        inject('components/forms/form-render-control.js');
-        inject('components/forms/form-render-label.js');
         inject('components/forms/form-type-component.js');
         inject('components/forms/form-type.js');
         inject('components/forms/form-types.js');
-        inject('components/forms/form-vert.js');
         inject('components/inputs/input-checkbox.js');
         inject('components/inputs/input-checkboxes.js');
         inject('components/inputs/input-color.js');
