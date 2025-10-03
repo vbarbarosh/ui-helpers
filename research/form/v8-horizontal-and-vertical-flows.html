@@ -249,10 +249,11 @@ vue_component('expand', {
 });
 
 vue_component('x-form', {
-    props: ['layout'],
+    props: ['modelValue', 'layout'],
     inheritAttrs: false,
     provide: function () {
         return {
+            form_value: this.modelValue,
             form_items: {
                 add: inst => this.items.push({key: crypto.randomUUID(), inst}),
                 remove: inst => this.items.splice(this.items.findIndex(v => v.inst === inst) >>> 1, 1),
@@ -281,9 +282,10 @@ vue_component('x-form', {
 
 vue_component('x-form-item', {
     emits: ['update:modelValue'],
-    props: ['modelValue', 'type', 'label', 'layout'],
+    props: ['modelValue', 'type', 'label', 'layout', 'items'],
     inheritAttrs: false,
     inject: {
+        form_value: 'form_value',
         form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
     },
     provide: function () {
@@ -294,7 +296,11 @@ vue_component('x-form-item', {
             },
         };
     },
-    template: '<slot />',
+    template: `
+        <slot>
+            <x-form-item v-for="item in computed_items" v-bind="item" />
+        </slot>
+    `,
     data: function () {
         return {
             id: `id-${crypto.randomUUID()}`,
@@ -307,16 +313,54 @@ vue_component('x-form-item', {
             child_items: [],
         };
     },
+    computed: {
+        computed_items: function () {
+            const _this = this;
+            return (this.items ?? []).map(function (item) {
+                const out = {
+                    ...item,
+                    get modelValue() {
+                        if (item.path === undefined) {
+                            return null;
+                        }
+                        let out = _this.form_value;
+                        item.path.split('.').forEach(key => out = out?.[key]);
+                        return out;
+                    },
+                    'onUpdate:modelValue': function (value) {
+                        if (item.path === undefined) {
+                            return;
+                        }
+                        let key;
+                        let tmp = _this.form_value;
+                        item.path.split('.').forEach(function (_key) {
+                            if (key) {
+                                tmp = tmp[key];
+                            }
+                            key = _key;
+                        });
+                        tmp[key] = value;
+                    },
+                };
+                delete out.path;
+                return out;
+            });
+        },
+    },
     methods: {
         render_label: function () {
             return Vue.h('label', {for: this.id}, this.label);
         },
         render_control: function () {
-            if (this.layout) {
-                return Vue.h(Vue.resolveComponent(this.layout), {
+            const layout = this.layout ?? (this.type ? null : 'layout-basic');
+            if (layout) {
+                return Vue.h(Vue.resolveComponent(layout), {
                     ...this.$attrs,
                     items: this.child_items,
                 });
+            }
+            if (!form_types[this.type]) {
+                return ['⚠️ no type ⚠️'];
             }
             return Vue.h(Vue.resolveComponent(form_types[this.type]), {
                 id: this.id,
@@ -447,8 +491,13 @@ vue_component('app', {
                 </x-form-item>
             </x-form>
         </div>
-        <div class="mg10">
-<pre class="ph10 pv5 yellow dashed">
+        <div class="fluid mg15 rainbow oa">
+            <x-form v-model="form">
+                <x-form-item :items />
+            </x-form>
+        </div>
+        <div class="mg10 w400">
+<pre class="ph10 pv5 yellow dashed" style="white-space:pre-line;">
 <b>layout-engine</b>:
 - для каждого элемента (items) создает свою строчку (свой контейнер)
 - внутри этой строчки создаются места для <b>label,control,help,error</b>
@@ -475,9 +524,6 @@ vue_component('app', {
                 </div>
             </div>
         </div>
-        <div class="w400">
-            <prism-js :value="form_json" />
-        </div>
     </div>
 `,
     data: function () {
@@ -497,6 +543,103 @@ vue_component('app', {
                 state: '',
                 zip: '',
             },
+            items: [
+                {type: 'text', path: 'gender', label: 'Gender'},
+                {layout: 'layout-columns', cols: '2,5,5', items: [
+                    {type: 'text', path: 'name.title', label: 'cols.Title'},
+                    {type: 'text', path: 'name.first', label: 'cols.First'},
+                    {type: 'text', path: 'name.last', label: 'cols.Last'},
+                ]},
+                {layout: 'layout-table', items: [
+                    // <x-form-item>
+                    //     <template #label>GGG</template>
+                    //     <template #control>XXXX</template>
+                    //     <template #container>CONTAINER</template>
+                    //     <template #layout_table_tr>
+                    //         <tr><td>layout_table_tr</td></tr>
+                    //     </template>
+                    // </x-form-item>
+                    {type: 'xxx', items: []},
+                    {layout: 'layout-table', items: [
+                        {type: 'text', path: 'name.title', label: 'CC Title'},
+                        {type: 'text', path: 'name.first', label: 'CC First'},
+                        {type: 'text', path: 'name.last', label: 'CC Last'},
+                    ]},
+                    {type: 'text', path: 'name.title', label: 'Title'},
+                    {type: 'text', path: 'name.first', label: 'First'},
+                    {layout: 'layout-table', label: 'Whatever111', items: [
+                        {type: 'text', path: 'name.title', label: 'CC Title'},
+                        {type: 'text', path: 'name.first', label: 'CC First'},
+                        {type: 'text', path: 'name.last', label: 'CC Last'},
+                    ]},
+                    // <x-form-item #control label="Whatever2">
+                    //     <expand>
+                    //         <x-form layout="layout-table">
+                    //             <x-form-item v-model="form.name.title" type="text" label="Title" />
+                    //             <x-form-item v-model="form.name.first" type="text" label="First" />
+                    //             <x-form-item v-model="form.name.last" type="text" label="Last" />
+                    //         </x-form>
+                    //     </expand>
+                    // </x-form-item>
+                    {type: 'xxx', items: []},
+                    // <x-form-item #container>
+                    //     <tabs>
+                    //         <tabs-item label="First">
+                    //             <x-form layout="layout-table">
+                    //                 <x-form-item v-model="form.name.title" type="text" label="tab-Title" />
+                    //                 <x-form-item v-model="form.name.first" type="text" label="tab-First" />
+                    //                 <x-form-item v-model="form.name.last" type="text" label="tab-Last" />
+                    //             </x-form>
+                    //         </tabs-item>
+                    //         <tabs-item label="Second">
+                    //             <x-form layout="layout-columns" cols="2,5,5">
+                    //                 <x-form-item v-model="form.name.title" type="text" label="tab-Title" />
+                    //                 <x-form-item v-model="form.name.first" type="text" label="tab-First" />
+                    //                 <x-form-item v-model="form.name.last" type="text" label="tab-Last" />
+                    //             </x-form>
+                    //         </tabs-item>
+                    //     </tabs>
+                    // </x-form-item>
+                    {type: 'xxx', items: []},
+                    {layout: 'layout-table', label: '--- I\'m a custom label! ---', items: [
+                        {type: 'text', path: 'name.title', label: 'Title'},
+                        {type: 'text', path: 'name.first', label: 'First'},
+                        {type: 'text', path: 'name.last', label: 'Last'},
+                    ]},
+                    {type: 'text', path: 'name.last', label: 'Last'},
+                    {layout: 'layout-tabs', label: 'Tabs please!', items: [
+                        {type: 'text', path: 'name.title', label: 'Title'},
+                        {type: 'text', path: 'name.first', label: 'First'},
+                        {type: 'text', path: 'name.last', label: 'Last'},
+                        {layout: 'layout-table', label: 'Nested Triple', items: [
+                            {type: 'text', path: 'name.title', label: 'TT.Title'},
+                            {type: 'text', path: 'name.first', label: 'TT.First'},
+                            {type: 'text', path: 'name.last', label: 'TT.Last'},
+                        ]},
+                    ]},
+                    {layout: 'layout-accordion', label: 'Accordion please!', items: [
+                        {layout: 'layout-table', label: 'Expand', items: [
+                            {type: 'text', path: 'name.title', label: 'Title'},
+                            {type: 'text', path: 'name.first', label: 'First'},
+                            {type: 'text', path: 'name.last', label: 'Last'},
+                        ]},
+                    ]},
+                    {layout: 'layout-wrapper', wrapper: 'DIV', style: 'border:10px solid #ff8;', items: [
+                        {layout: 'layout-wrapper', wrapper: 'DIV', style: 'border:10px solid #f88;', items: [
+                            {layout: 'layout-wrapper', wrapper: 'expand', style: 'border:10px solid #f88;', items: [
+                                {type: 'text', path: 'name.title', label: 'Title'},
+                                {type: 'text', path: 'name.first', label: 'First'},
+                                {type: 'text', path: 'name.last', label: 'Last'},
+                            ]},
+                        ]},
+                    ]},
+                ]},
+                {layout: 'layout-columns', cols: '2,5,5', items: [
+                    {type: 'text', path: 'name.title', label: 'Title'},
+                    {type: 'text', path: 'name.first', label: 'First'},
+                    {type: 'text', path: 'name.last', label: 'Last'},
+                ]},
+            ],
         };
     },
     computed: {
