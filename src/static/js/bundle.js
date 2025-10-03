@@ -80,8 +80,6 @@ function vue_directive(name, params)
         inject('components/forms/form-layout-columns.js');
         inject('components/forms/form-render-control.js');
         inject('components/forms/form-render-label.js');
-        inject('components/forms/form-string.js');
-        inject('components/forms/form-textarea.js');
         inject('components/forms/form-type-component.js');
         inject('components/forms/form-type.js');
         inject('components/forms/form-types.js');
