@@ -279,53 +279,6 @@ vue_component('x-form', {
     },
 });
 
-// vue_component('x-form-layout', {
-//     props: ['layout', 'layout2', 'label'],
-//     inheritAttrs: false,
-//     inject: {
-//         form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
-//     },
-//     provide: function () {
-//         return {
-//             form_items: {
-//                 add: inst => this.items.push({key: crypto.randomUUID(), inst}),
-//                 remove: inst => this.items.splice(this.items.findIndex(v => v.inst === inst) >>> 1, 1),
-//             },
-//         };
-//     },
-//     template: '<slot />',
-//     data: function () {
-//         return {
-//             items: [],
-//             insertions: (this.label || this.$slots.label)
-//                 ? {label: this.render_label, control: this.render_container, ...this.$slots}
-//                 : {container: this.render_container, ...this.$slots},
-//         };
-//     },
-//     methods: {
-//         render_label: function () {
-//             if (this.$slots.label) {
-//                 return this.$slots.label();
-//             }
-//             return Vue.h('label', null, this.label);
-//         },
-//         render_container: function (params, slots) {
-//             // <layout-columns :items cols="2,5,5" />
-//             return Vue.h(Vue.resolveComponent(this.layout), {...this.$attrs, layout: this.layout2, items: this.items}, {
-//                 default: function () {
-//                     return ['xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'];
-//                 },
-//             });
-//         },
-//     },
-//     created: function () {
-//         this.form_items_parent.add(this);
-//     },
-//     unmounted: function () {
-//         this.form_items_parent.remove(this);
-//     },
-// });
-
 vue_component('x-form-item', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'type', 'label', 'layout'],
