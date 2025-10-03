@@ -59,7 +59,7 @@
                             Next
                         </button>
                     </div>
-                    <form-files-drop-zone v-model="vars.files" limit="100" />
+                    <input-files-drop-zone v-model="vars.files" limit="100" />
                     <s3-objects-replace @change="() => win.blocking(fetch.refresh).then(() => vars.files = [])" :items="vars.files" :vars />
                     <vb-table v-if="vars.files" :items="vars.files" :columns="[{label: 'name'}, {label: 'size'}, {label: 'fullPath'}]">
                         <template v-slot:actions="{item}">

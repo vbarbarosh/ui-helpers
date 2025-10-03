@@ -73,8 +73,6 @@ function vue_directive(name, params)
         inject('components/etc/spinner.js');
         inject('components/forms/form-classic-item.js');
         inject('components/forms/form-classic.js');
-        inject('components/forms/form-file-drop-zone.js');
-        inject('components/forms/form-files-drop-zone.js');
         inject('components/forms/form-hor.js');
         inject('components/forms/form-int.js');
         inject('components/forms/form-item.js');
@@ -93,7 +91,9 @@ function vue_directive(name, params)
         inject('components/inputs/input-color.js');
         inject('components/inputs/input-date.js');
         inject('components/inputs/input-email.js');
+        inject('components/inputs/input-file-drop-zone.js');
         inject('components/inputs/input-file.js');
+        inject('components/inputs/input-files-drop-zone.js');
         inject('components/inputs/input-files.js');
         inject('components/inputs/input-int.js');
         inject('components/inputs/input-month.js');
@@ -102,8 +102,8 @@ function vue_directive(name, params)
         inject('components/inputs/input-radios.js');
         inject('components/inputs/input-range.js');
         inject('components/inputs/input-search.js');
-        inject('components/inputs/input-select.js');
         inject('components/inputs/input-select-many.js');
+        inject('components/inputs/input-select.js');
         inject('components/inputs/input-string.js');
         inject('components/inputs/input-tel.js');
         inject('components/inputs/input-text.js');

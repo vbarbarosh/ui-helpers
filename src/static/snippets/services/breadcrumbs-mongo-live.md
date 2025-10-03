@@ -50,7 +50,7 @@
                     <button v-on:click="() => win.modal_mongo_documents_remove(vars).promise().then(v => v && (vars.col = null, fetch.refresh()))">Drop Document</button>
                     <button v-on:click="() => win.modal_mongo_documents_upload(vars).promise().then(v => v && (vars.files = [], fetch.refresh()))" v-bind:disabled="!vars.files.length">Upload</button>
                 </div>
-                <form-files-drop-zone v-model="vars.files" :filter="file => file.name.endsWith('.json')" limit="200" />
+                <input-files-drop-zone v-model="vars.files" :filter="file => file.name.endsWith('.json')" limit="200" />
                 <vb-table v-if="fetch.response" :items="fetch.response.items">
                     <template v-slot:actions="{item}">
                         <button @click="vars.doc = item._id">open</button>

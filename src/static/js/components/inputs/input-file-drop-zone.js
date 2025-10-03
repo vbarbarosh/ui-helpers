@@ -1,4 +1,4 @@
-vue_component('form-file-drop-zone', {
+vue_component('input-file-drop-zone', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'label'],
     template: `
@@ -6,7 +6,7 @@ vue_component('form-file-drop-zone', {
                v-on:dragleave="dragleave"
                v-on:drop="drop"
                v-bind:class="{active: is_active}"
-               class="form-file-drop-zone">
+               class="form-input-drop-zone">
             <span v-if="label" class="form-label">{{ label }}</span>
             <input ref="input" v-on:change="change_input" type="file" style="display:none;" />
             <div>
@@ -50,7 +50,7 @@ vue_component('form-file-drop-zone', {
 });
 
 css`
-    .form-file-drop-zone {
+    .form-input-drop-zone {
         display: flex;
         flex-direction: column;
         gap: 0.5em;
@@ -61,11 +61,11 @@ css`
         background: #fafafa;
         transition: border-color 0.2s;
     }
-    .form-file-drop-zone.active {
+    .form-input-drop-zone.active {
         border-color: #1976d2;
         background: #e3f2fd;
     }
-    .form-file-drop-zone > div {
+    .form-input-drop-zone > div {
         padding: 2em;
         text-align: center;
         color: #666;
