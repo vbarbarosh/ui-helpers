@@ -70,6 +70,46 @@ vue_component('layout-basic', {
     `,
 });
 
+vue_component('layout-inline', {
+    props: ['inst', 'items'],
+    template: `
+        <template v-for="item in items" :key="item.key">
+            <template v-if="item.inst.insertions.container">
+                <div><render-function :fn="item.inst.insertions.container" /></div>
+            </template>
+            <template v-else-if="(item.inst.insertions.label && item.inst.insertions.control)">
+                <div class="flex-row-center-left gap5">
+                    <render-function :fn="item.inst.insertions.control" />
+                    <render-function :fn="item.inst.insertions.label" />
+                </div>
+            </template>
+            <template v-else>
+                <warn-invalid-layout-item-type :item />
+            </template>
+        </template>
+    `,
+});
+
+vue_component('layout-inline-rev', {
+    props: ['inst', 'items'],
+    template: `
+        <template v-for="item in items" :key="item.key">
+            <template v-if="item.inst.insertions.container">
+                <div><render-function :fn="item.inst.insertions.container" /></div>
+            </template>
+            <template v-else-if="(item.inst.insertions.label && item.inst.insertions.control)">
+                <div class="flex-row-center-left gap5">
+                    <render-function :fn="item.inst.insertions.control" />
+                    <render-function :fn="item.inst.insertions.label" />
+                </div>
+            </template>
+            <template v-else>
+                <warn-invalid-layout-item-type :item />
+            </template>
+        </template>
+    `,
+});
+
 // - label
 // - control
 // - container
@@ -290,7 +330,7 @@ vue_component('x-form-item', {
             insertions: {
                 label: this.render_label,
                 control: this.render_control,
-                ...(this.label ? {} : {container: this.render_control}),
+                ...((this.label || this.label === '') ? {} : {container: this.render_control}),
                 ...(this.$attrs.hack_ins_containerl ? {container: this.render_control} : {}),
                 ...(this.$attrs.hack_ins_nolab ? {label: () => []} : {}),
                 ...this.$slots,
@@ -387,7 +427,9 @@ vue_component('app', {
                         <x-form-item v-model="form.name.first" type="text" label="cols.First" />
                         <x-form-item v-model="form.name.last" type="text" label="cols.Last" />
                     </x-form-item>
-
+                    <x-form-item layout="layout-inline-rev" label>
+                        <x-form-item type="checkbox" label="Remember me" />
+                    </x-form-item>
                     <x-form-item v-model="form.gender" type="text" label="Gender" />
                     <x-form-item layout="layout-columns" cols="2,5,5">
                         <x-form-item v-model="form.name.title" type="text" label="cols.Title" />
