@@ -13,7 +13,25 @@
 <script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
 <script>
 const form_types = {
-    checkbox: 'input-checkbox',
+    checkbox: {
+        name: 'input-checkbox',
+        insertions: function (form_item) {
+            if (form_item.$attrs.noinline !== undefined) {
+                return {};
+            }
+            return {
+                label: function () {
+                    return [];
+                },
+                control: function () {
+                    return Vue.h('DIV', {class: 'flex-row-center-left gap5'}, [
+                        form_item.render_control(),
+                        form_item.render_label(),
+                    ]);
+                },
+            };
+        },
+    },
     checkboxes: 'input-checkboxes',
     color: 'input-color',
     date: 'input-date',
@@ -325,6 +343,18 @@ vue_component('x-form-item', {
         </slot>
     `,
     data: function () {
+        let ov = {};
+        if (this.$attrs.hack_checkbox !== undefined) {
+            ov = {label: () => [], control: () => {
+                return Vue.h('DIV', {class: 'flex-row-center-left gap5'}, [
+                    this.render_control(),
+                    this.render_label(),
+                ]);
+            }};
+        }
+        else if (form_types[this.type]?.insertions) {
+            ov = form_types[this.type]?.insertions(this);
+        }
         return {
             id: `id-${crypto.randomUUID()}`,
             insertions: {
@@ -333,6 +363,7 @@ vue_component('x-form-item', {
                 ...((this.label || this.label === '') ? {} : {container: this.render_control}),
                 ...(this.$attrs.hack_ins_containerl ? {container: this.render_control} : {}),
                 ...(this.$attrs.hack_ins_nolab ? {label: () => []} : {}),
+                ...ov,
                 ...this.$slots,
             },
             child_items: [],
@@ -388,7 +419,7 @@ vue_component('x-form-item', {
             if (!form_types[this.type]) {
                 return ['⚠️ no type ⚠️'];
             }
-            return Vue.h(Vue.resolveComponent(form_types[this.type]), {
+            return Vue.h(Vue.resolveComponent(form_types[this.type]?.name ?? form_types[this.type]), {
                 id: this.id,
                 modelValue: this.modelValue,
                 'onUpdate:modelValue': v => this.$emit('update:modelValue', v),
@@ -426,7 +457,9 @@ vue_component('app', {
                         <x-form-item v-model="form.name.title" type="text" label="cols.Title" />
                         <x-form-item v-model="form.name.first" type="text" label="cols.First" />
                         <x-form-item v-model="form.name.last" type="text" label="cols.Last" />
+                        <x-form-item type="checkbox" label="GGG Remember me" />
                     </x-form-item>
+                    <x-form-item type="checkbox" label="Remember me" hack_checkbox />
                     <x-form-item layout="layout-inline-rev" label>
                         <x-form-item type="checkbox" label="Remember me" />
                     </x-form-item>
