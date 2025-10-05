@@ -101,30 +101,6 @@ vue_component('layout-basic', {
     `,
 });
 
-
-vue_component('layout-group', {
-    props: ['items'],
-    template: `
-        <fieldset>
-            <legend>Some Label</legend>
-            <form-layout-basic :items />
-        </fieldset>
-    `,
-    data: function () {
-        return {
-            open: false,
-        };
-    },
-    methods: {
-        click_expand: function () {
-            this.open = true;
-        },
-        click_collapse: function () {
-            this.open = false;
-        },
-    },
-});
-
 vue_component('layout-inline', {
     props: ['inst', 'items'],
     template: `
