@@ -17,9 +17,7 @@ function* gen(items)
 {
     for (const item of items) {
         if (item.children) {
-            for (const child of item.children) {
-                yield child;
-            }
+            yield* item.children;
         }
         else {
             yield item;
