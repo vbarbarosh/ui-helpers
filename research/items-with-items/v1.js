@@ -6,9 +6,23 @@ cli(main);
 
 async function main()
 {
-    const items = [{value: 1}, {value: 2}, {value: 3, children: [{value: 'a1'}, {value: 'a2'}, {value: 'a3'}]}, {value: 4}];
+    const items = gen([{value: 1}, {value: 2}, {value: 3, children: [{value: 'a1'}, {value: 'a2'}, {value: 'a3'}]}, {value: 4}]);
 
     for (const item of items) {
         console.log(item.value);
+    }
+}
+
+function* gen(items)
+{
+    for (const item of items) {
+        if (item.children) {
+            for (const child of item.children) {
+                yield child;
+            }
+        }
+        else {
+            yield item;
+        }
     }
 }
