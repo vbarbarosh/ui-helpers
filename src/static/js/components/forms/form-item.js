@@ -21,12 +21,32 @@ vue_component('form-item', {
         </slot>
     `,
     data: function () {
+        let ov = {};
+        if (this.$attrs.hack_checkbox !== undefined) {
+            ov = {
+                label: () => [],
+                control: () => {
+                    return Vue.h('DIV', {class: 'flex-row-center-left gap5'}, [
+                        this.render_control(),
+                        this.render_label(),
+                    ]);
+                }};
+        }
+        else if (this.form_types[this.type]?.insertions) {
+            ov = this.form_types[this.type]?.insertions(this);
+        }
+        else if (this.form_types[this.layout]?.insertions) {
+            ov = this.form_types[this.layout]?.insertions(this);
+        }
         return {
             id: `id-${crypto.randomUUID()}`,
             insertions: {
                 label: this.render_label,
                 control: this.render_control,
-                ...(this.label ? {} : {container: this.render_control}),
+                ...((this.label || this.label === '') ? {} : {container: this.render_control}),
+                ...(this.$attrs.hack_ins_containerl ? {container: this.render_control} : {}),
+                ...(this.$attrs.hack_ins_nolab ? {label: () => []} : {}),
+                ...ov,
                 ...this.$slots,
             },
             child_items: [],
@@ -68,6 +88,9 @@ vue_component('form-item', {
     },
     methods: {
         render_label: function () {
+            if (this.$slots.label) {
+                return this.$slots.label();
+            }
             return Vue.h('label', {for: this.id}, this.label);
         },
         render_control: function () {
@@ -75,13 +98,14 @@ vue_component('form-item', {
             if (layout) {
                 return Vue.h(Vue.resolveComponent(layout), {
                     ...this.$attrs,
+                    inst: this,
                     items: this.child_items,
                 });
             }
             if (!this.form_types[this.type]) {
                 return ['⚠️ no type ⚠️'];
             }
-            return Vue.h(Vue.resolveComponent(this.form_types[this.type]), {
+            return Vue.h(Vue.resolveComponent(this.form_types[this.type]?.name ?? this.form_types[this.type]), {
                 id: this.id,
                 modelValue: this.modelValue,
                 'onUpdate:modelValue': v => this.$emit('update:modelValue', v),

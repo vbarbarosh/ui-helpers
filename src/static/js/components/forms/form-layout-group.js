@@ -1,9 +1,10 @@
-vue_component('form-layout-accordion', {
+vue_component('form-layout-group', {
     props: ['inst', 'items'],
     template: `
-        <div>
-            🚧 Not Implemented 🚧
-        </div>
+        <fieldset>
+            <legend><slot name="legend">Some Label</slot></legend>
+            <form-layout-basic :items />
+        </fieldset>    
     `,
     data: function () {
         return {

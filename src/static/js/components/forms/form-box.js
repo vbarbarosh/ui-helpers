@@ -14,7 +14,7 @@ vue_component('form-box', {
         <div class="red">
             <slot />
         </div>
-        <component v-slot="slot" v-bind:is="(layout ?? 'layout-basic')" :items v-bind="$attrs">
+        <component v-slot="slot" v-bind:is="(layout ?? 'form-layout-basic')" :items v-bind="$attrs">
             <template v-if="slot.item.inst.render_layout">
                 <render-function v-slot="slot2" :fn="slot.item.inst.render_layout">
                     <!--<layout-basic :items="slot2.items" />-->

@@ -1,5 +1,5 @@
 vue_component('form-layout-basic', {
-    props: ['items'],
+    props: ['inst', 'items'],
     template: `
         <div class="mg10">
             <template v-for="(item,i) in items" v-bind:key="item.key">
@@ -13,7 +13,7 @@ vue_component('form-layout-basic', {
                     </div>
                 </template>
                 <template v-else>
-                    <warn-invalid-layout-item-type :item />
+                    <form-invalid-layout-item-type :item />
                 </template>
             </template>
         </div>

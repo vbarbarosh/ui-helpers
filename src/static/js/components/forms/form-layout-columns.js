@@ -1,5 +1,5 @@
-vue_component('layout-columns', {
-    props: ['items', 'cols'],
+vue_component('form-layout-columns', {
+    props: ['inst', 'items', 'cols'],
     template: `
         <div class="flex-row gap10">
             <template v-for="ci in computed_items" v-bind:key="ci.key">

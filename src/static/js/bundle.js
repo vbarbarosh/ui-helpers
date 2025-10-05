@@ -64,6 +64,7 @@ function vue_directive(name, params)
         inject('components/data/data-vars.js');
         inject('components/etc/copy-to-clipboard.js');
         inject('components/etc/download-zip.js');
+        inject('components/etc/expand.js');
         inject('components/etc/files-browser.js');
         inject('components/etc/highlight.js');
         inject('components/etc/lipsum.js');
@@ -71,7 +72,18 @@ function vue_directive(name, params)
         inject('components/etc/reset-on-change.js');
         inject('components/etc/slot-hack.js');
         inject('components/etc/spinner.js');
+        inject('components/etc/warn-invalid-layout-item-type.js');
+        inject('components/forms/form-box.js');
+        inject('components/forms/form-invalid-layout-item-type.js');
         inject('components/forms/form-item.js');
+        inject('components/forms/form-layout-accordion.js');
+        inject('components/forms/form-layout-basic.js');
+        inject('components/forms/form-layout-columns.js');
+        inject('components/forms/form-layout-group.js');
+        inject('components/forms/form-layout-inline-rev.js');
+        inject('components/forms/form-layout-table.js');
+        inject('components/forms/form-layout-tabs.js');
+        inject('components/forms/form-layout-wrapper.js');
         inject('components/forms/form-type-component.js');
         inject('components/forms/form-type.js');
         inject('components/forms/form-types.js');

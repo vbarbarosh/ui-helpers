@@ -1,5 +1,5 @@
 vue_component('form-layout-tabs', {
-    props: ['items'],
+    props: ['inst', 'items'],
     template: `
         <tabs>
             <tabs-item v-for="item in items" v-bind:key="item.key" v-bind:label="item.inst.label">

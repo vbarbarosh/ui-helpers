@@ -1,5 +1,5 @@
 vue_component('form-layout-table', {
-    props: ['items'],
+    props: ['inst', 'items'],
     template: `
         <table>
             <thead>
