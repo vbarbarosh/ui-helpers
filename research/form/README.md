@@ -159,3 +159,13 @@
 - https://ui.nuxt.com/components/form-field
 - https://ark-ui.com/docs/components/field
 - https://vuetifyjs.com/en/components/forms/#usage
+- https://www.formsite.com/templates/industry/
+- https://www.123formbuilder.com/free-form-templates/
+- https://eu.jotform.com/form-templates/business-registration-form
+- https://www.jotform.com/form-templates/
+- https://docs.camunda.io/docs/apis-tools/frontend-development/forms/introduction-to-forms/#form-js
+- https://github.com/bpmn-io/form-js?tab=readme-ov-file
+- https://bpmn.io/toolkit/form-js/
+- https://demo.bpmn.io/form/s/start
+- https://www.cognitoforms.com/templates
+- https://www.interaction-design.org/literature/article/ui-form-design

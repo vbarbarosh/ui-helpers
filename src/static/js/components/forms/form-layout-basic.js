@@ -1,7 +1,7 @@
 vue_component('form-layout-basic', {
     props: ['inst', 'items'],
     template: `
-        <div class="mg10">
+        <div class="mg10 numerate">
             <template v-for="(item,i) in items" v-bind:key="item.key">
                 <template v-if="(item.inst.insertions.container)">
                     <div><render-function :fn="item.inst.insertions.container" /></div>
@@ -19,3 +19,13 @@ vue_component('form-layout-basic', {
         </div>
     `,
 });
+
+css`
+    .numerate {
+        counter-reset: numerate;
+    }
+    .numerate > *::before {
+        counter-increment: numerate;
+        content: "#" counter(numerate) " ";
+    }
+`;

@@ -228,6 +228,123 @@ const items = [
 ];
 </script>
 
+<script data-img="images/img_15.png" data-source="https://24ways.org/2009/have-a-field-day-with-html5-forms/" type="text/plain">
+const items = [
+    {type: 'group', label: 'Step 1: Your details', items: [
+        {type: 'string', label: 'Name'},
+        {type: 'string', label: 'Email'},
+        {type: 'string', label: 'Phone'},
+    ]},
+    {type: 'group', label: 'Step 2: Delivery address', items: [
+        {type: 'textarea', label: 'Address'},
+        {type: 'string', label: 'Post code'},
+        {type: 'string', label: 'Country'},
+    ]},
+    {type: 'group', label: 'Step 3: Card details', items: [
+        {type: 'xxx', label: 'Card type'},
+        {type: 'string', label: 'Security code'},
+        {type: 'string', label: 'Name on card'},
+    ]},
+];
+</script>
+
+<script data-img="images/img_16.png" data-source="https://ivyforms.com/blog/types-of-forms/" type="text/plain">
+const items = [
+    {type: 'cols', cols: '3,2', items: [
+        {type: 'container', items: [
+            {type: 'cols', items: [
+                {type: 'string', label: 'First'},
+                {type: 'string', label: 'Last'},
+            ]},
+            {type: 'cols', items: [
+                {type: 'string', label: 'Email'},
+                {type: 'string', label: 'Telephone'},
+            ]},
+            {type: 'textarea', label: 'Some long title here'},
+        ]},
+        {type: 'container', items: [
+            {type: 'header', label: 'Contact'},
+            {type: 'static', label: '📖', value: 'test@test.com'},
+            {type: 'static', label: '📖', value: '+32 71 123 456},
+            {type: 'static', label: '📖', value: 'E6K\nQuai ggg ggg\n6000 Charly\n\nBoo'},
+        ]},
+    ]},
+];
+</script>
+
+<script data-img="images/img_17.png" data-source="https://www.interaction-design.org/literature/article/ui-form-design" type="text/plain">
+const items = [
+    {type: 'cols', items: [
+        {type: 'container', style: 'background:#fff', items: [
+            {type: 'header', label: 'General Information'},
+            {type: 'string', label: 'Title'},
+            {type: 'cols', items: [
+                {type: 'string', label: 'First'},
+                {type: 'string', label: 'Last'},
+            ]},
+            {type: 'string', label: 'Position'},
+            {type: 'string', label: 'Company'},
+            {type: 'cols', items: [
+                {type: 'string', label: 'Business Arena'},
+                {type: 'string', label: 'Employees'},
+            ]},
+        ]},
+        {type: 'container', style: 'background:#463aca' items: [
+            {type: 'header', label: 'Contact Details'},
+            {type: 'string', label: 'Street + Nr'},
+            {type: 'string', label: 'Additional Information'},
+            {type: 'cols', items: [
+                {type: 'string', label: 'Zip Code'},
+                {type: 'string', label: 'Place'},
+            ]},
+            {type: 'string', label: 'Country'},
+            {type: 'cols', items: [
+                {type: 'string', label: 'Code'},
+                {type: 'string', label: 'Phone Number'},
+            ]},
+            {type: 'string', label: 'Your Email'},
+            {type: 'checkbox', label: 'I do accept the Terms and Conditions of your site'},
+        ]},
+    ]},
+];
+</script>
+
+<script data-img="images/img_18.png" data-source="https://www.jotform.com/form-templates/feedback-form" type="text/plain">
+const items = [
+    {type: 'header', label: 'Feedback Form', message: 'We would love to hear your thoughts, suggestions, concerns or problems with anything so we can improve!'},
+    {type: 'divider'},
+    {type: 'radios', label: 'Feedback Type', options: [
+        {label: 'Comments'},
+        {label: 'Suggestions'},
+        {label: 'Questions'},
+    ]},
+    {type: 'textarea', label: 'Describe Your Feedback'},
+    {type: 'cols', label: 'Name', items: [
+        {type: '', label: 'First Name'},
+        {type: '', label: 'Last Name'},
+    ]},
+    {type: 'cols', label: 'Email', cols: '2,2', items: [
+        {type: '', label: 'example@email.com'},
+    ]},
+];
+</script>
+
+<script data-img="images/img_19.png" data-source="https://www.jotform.com/form-templates/exit-interview-form" type="text/plain">
+const items = [
+    {type: 'cols', items: [
+        {type: '', label: 'Employee Name', items: [
+            {type: 'string', label: 'First Name'},
+            {type: 'string', label: 'Last Name'},
+        ]},
+        {type: 'string', label: 'Job Title'},
+    ]},
+    {type: '', label: 'Start Date'},
+    {type: '', label: 'Separation Date'},
+    {type: '', label: 'Total Length of Service'},
+    {type: '', label: 'Reason for Leaving'},
+];
+</script>
+
 <script data-img="images/img4.png" type="text/plain">
 <template>
     <form-classic v-model="form" :items />

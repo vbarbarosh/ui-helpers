@@ -1,5 +1,5 @@
 vue_component('form-types', {
-    props: ['modelValue', 'items', 'types'],
+    props: ['types'],
     provide: function () {
         return {
             form_types: {
@@ -64,7 +64,7 @@ vue_component('form-types', {
                                     'onUpdate:modelValue': v => form_item.$emit('update:modelValue', v),
                                 };
                                 return Vue.h(Vue.resolveComponent('expand'), props, {
-                                    default: () => Vue.h(Vue.resolveComponent('form-layout-basic'), {items: form_item.child_items, inst: form_item}),
+                                    default: () => Vue.h(Vue.resolveComponent('form-layout-table'), {items: form_item.child_items, inst: form_item}),
                                 });
                             },
                         };
