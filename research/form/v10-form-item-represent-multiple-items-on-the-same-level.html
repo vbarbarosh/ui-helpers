@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <title>horizontal and vertical flows | form | research | ui-helpers</title>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
+<script>
+const form_layouts = {
+    'layout-group': {
+        insertions: function (form_item) {
+            return {
+                container: function () {
+                   return Vue.h(Vue.resolveComponent('layout-group'), {form_item}, {
+                        legend: form_item.render_label,
+                    });
+                },
+            };
+        },
+    },
+};
+const form_types = {
+    expand2: {
+        insertions: function (form_item) {
+            return {
+                control: function () {
+                    const props = {
+                        form_item,
+                        modelValue: form_item.modelValue,
+                        'onUpdate:modelValue': v => form_item.$emit('update:modelValue', v),
+                    };
+                    return Vue.h(Vue.resolveComponent('expand2'), props);
+                },
+            };
+        },
+    },
+    checkbox: {
+        name: 'input-checkbox',
+        insertions: function (form_item) {
+            if (form_item.$attrs.noinline !== undefined) {
+                return {};
+            }
+            return {
+                label: function () {
+                    return [];
+                },
+                control: function () {
+                    return Vue.h('DIV', {class: 'flex-row-center-left gap5'}, [
+                        form_item.render_control(),
+                        form_item.render_label(),
+                    ]);
+                },
+            };
+        },
+    },
+    checkboxes: 'input-checkboxes',
+    color: 'input-color',
+    date: 'input-date',
+    email: 'input-email',
+    file: 'input-file',
+    files: 'input-files',
+    int: 'input-int',
+    month: 'input-month',
+    password: 'input-password',
+    radio: 'input-radio',
+    radios: 'input-radios',
+    range: 'input-range',
+    search: 'input-search',
+    select: 'input-select',
+    'select-many': 'input-select-many',
+    string: 'input-text',
+    tel: 'input-tel',
+    text: 'input-text',
+    textarea: 'input-textarea',
+    time: 'input-time',
+    url: 'input-url',
+    week: 'input-week',
+};
+
+vue_component('warn-invalid-layout-item-type', {
+    props: ['item'],
+    template: `
+        <span>⚠️ Unknown item type: [{{ item.type }}]</span>
+    `,
+});
+
+// - label
+// - control
+// - container
+vue_component('layout-basic', {
+    props: ['form_item'],
+    template: `
+        <div class="mg10">
+            <template v-for="(item,i) in form_item.items_to_render" v-bind:key="item.key">
+                <template v-if="(item.insertions.container)">
+                    <div><render-function :fn="item.insertions.container" /></div>
+                </template>
+                <template v-else-if="(item.insertions.label && item.insertions.control)">
+                    <div class="hsplit gap10">
+                        <div class="w150"><render-function :fn="item.insertions.label" /></div>
+                        <div class="fluid"><render-function :fn="item.insertions.control" /></div>
+                    </div>
+                </template>
+                <template v-else>
+                    <warn-invalid-layout-item-type :item />
+                </template>
+            </template>
+        </div>
+    `,
+});
+
+vue_component('layout-inline', {
+    props: ['inst', 'items'],
+    template: `
+        <template v-for="item in items" :key="item.key">
+            <template v-if="item.inst.insertions.container">
+                <div><render-function :fn="item.inst.insertions.container" /></div>
+            </template>
+            <template v-else-if="(item.inst.insertions.label && item.inst.insertions.control)">
+                <div class="flex-row-center-left gap5">
+                    <render-function :fn="item.inst.insertions.control" />
+                    <render-function :fn="item.inst.insertions.label" />
+                </div>
+            </template>
+            <template v-else>
+                <warn-invalid-layout-item-type :item />
+            </template>
+        </template>
+    `,
+});
+
+vue_component('layout-inline-rev', {
+    props: ['inst', 'items'],
+    template: `
+        <template v-for="item in items" :key="item.key">
+            <template v-if="item.inst.insertions.container">
+                <div><render-function :fn="item.inst.insertions.container" /></div>
+            </template>
+            <template v-else-if="(item.inst.insertions.label && item.inst.insertions.control)">
+                <div class="flex-row-center-left gap5">
+                    <render-function :fn="item.inst.insertions.control" />
+                    <render-function :fn="item.inst.insertions.label" />
+                </div>
+            </template>
+            <template v-else>
+                <warn-invalid-layout-item-type :item />
+            </template>
+        </template>
+    `,
+});
+
+// - label
+// - control
+// - container
+// - layout_table_tr
+// - layout_table_tr2
+vue_component('layout-table', {
+    props: ['form_item'],
+    template: `
+        <table>
+            <thead>
+            </thead>
+            <tbody>
+                <template v-for="item in form_item.items_to_render" v-bind:key="item.key">
+                    <template v-if="item.insertions.layout_table_tr">
+                        <render-function :fn="item.insertions.layout_table_tr" />
+                    </template>
+                    <template v-else-if="item.insertions.layout_table_tr2">
+                        <tr>
+                            <render-function :fn="item.insertions.layout_table_tr2" />
+                        </tr>
+                    </template>
+                    <template v-else-if="item.insertions.container">
+                        <tr>
+                            <td colspan="2">
+                                <render-function :fn="item.insertions.container" />
+                            </td>
+                        </tr>
+                    </template>
+                    <template v-else-if="(item.insertions.label && item.insertions.control)">
+                        <tr>
+                            <th><render-function :fn="item.insertions.label" /></th>
+                            <td><render-function :fn="item.insertions.control" /></td>
+                        </tr>
+                    </template>
+                    <template v-else>
+                        <tr>
+                            <td colspan="2">
+                                ⚠️ Unrecognized insertions: {{ win.Object.keys(item.insertions) }}
+                            </td>
+                        </tr>
+                    </template>
+                </template>
+            </tbody>
+        </table>
+    `,
+});
+
+vue_component('expand2', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'form_item'],
+    template: `
+        <div>
+            <button v-if="!open" v-on:click="click_expand">expand</button>
+            <button v-else v-on:click="click_collapse">collapse</button>
+        </div>
+    `,
+    data: function () {
+        return {
+            open: this.modelValue,
+        };
+    },
+    methods: {
+        click_expand: function () {
+            this.open = true;
+            this.$emit('update:modelValue', this.open);
+            this.form_item.custom_items = null;
+        },
+        click_collapse: function () {
+            this.open = false;
+            this.$emit('update:modelValue', this.open);
+            this.form_item.custom_items = [];
+        },
+    },
+    created: function () {
+        this.form_item.custom_items = this.open ? null : [];
+    },
+    unmounted: function () {
+        this.form_item.custom_items = null;
+    },
+});
+
+vue_component('x-form', {
+    props: ['modelValue', 'layout'],
+    inheritAttrs: false,
+    provide: function () {
+        return {
+            form_value: this.modelValue,
+            form_items: {
+                add: inst => this.items.push(inst),
+                remove: inst => this.items.splice(this.items.indexOf(inst) >>> 1, 1),
+            },
+        };
+    },
+    template: `
+        <div class="red">
+            <x-form-item><slot /></x-form-item>
+        </div>
+        <component v-if="(items.length === 1)" v-bind:is="(layout ?? 'layout-basic')" :form_item="items[0]" v-bind="$attrs" />
+    `,
+    data: function () {
+        return {
+            items: [],
+        };
+    },
+});
+
+vue_component('x-form-item', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'type', 'label', 'layout', 'items'],
+    inheritAttrs: false,
+    inject: {
+        form_value: 'form_value',
+        form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
+    },
+    provide: function () {
+        return {
+            form_items: {
+                add: inst => this.child_items.push(inst),
+                remove: inst => this.child_items.splice(this.child_items.indexOf(inst) >>> 1, 1),
+            },
+        };
+    },
+    template: `
+        <slot>
+            <x-form-item v-for="item in computed_items" v-bind="item" />
+        </slot>
+    `,
+    data: function () {
+        let ov = {};
+        if (this.$attrs.hack_checkbox !== undefined) {
+            ov = {label: () => [], control: () => {
+                return Vue.h('DIV', {class: 'flex-row-center-left gap5'}, [
+                    this.render_control(),
+                    this.render_label(),
+                ]);
+            }};
+        }
+        else if (form_types[this.type]?.insertions) {
+            ov = form_types[this.type]?.insertions(this);
+        }
+        else if (form_layouts[this.layout]?.insertions) {
+            ov = form_layouts[this.layout]?.insertions(this);
+        }
+
+        return {
+            id: `id-${crypto.randomUUID()}`,
+            key: `key-${crypto.randomUUID()}`,
+            custom_items: null,
+            insertions: {
+                label: this.render_label,
+                control: this.render_control,
+                ...((this.label || this.label === '') ? {} : {container: this.render_control}),
+                ...(this.$attrs.hack_ins_containerl ? {container: this.render_control} : {}),
+                ...(this.$attrs.hack_ins_nolab ? {label: () => []} : {}),
+                ...ov,
+                ...this.$slots,
+            },
+            child_items: [],
+        };
+    },
+    computed: {
+        computed_items: function () {
+            const _this = this;
+            return (this.items ?? []).map(function (item) {
+                const out = {
+                    ...item,
+                    get modelValue() {
+                        if (item.path === undefined) {
+                            return null;
+                        }
+                        let out = _this.form_value;
+                        item.path.split('.').forEach(key => out = out?.[key]);
+                        return out;
+                    },
+                    'onUpdate:modelValue': function (value) {
+                        if (item.path === undefined) {
+                            return;
+                        }
+                        let key;
+                        let tmp = _this.form_value;
+                        item.path.split('.').forEach(function (_key) {
+                            if (key) {
+                                tmp = tmp[key];
+                            }
+                            key = _key;
+                        });
+                        tmp[key] = value;
+                    },
+                };
+                delete out.path;
+                return out;
+            });
+        },
+        items_to_render: function () {
+            console.log('items_to_render', this.custom_items);
+            return this.child_items.flatMap(function (child) {
+                if (child.custom_items) {
+                    return [child];
+                }
+                return [child, ...child.items_to_render];
+            });
+        },
+    },
+    methods: {
+        render_label: function () {
+            if (this.$slots.label) {
+                return this.$slots.label();
+            }
+            return Vue.h('label', {for: this.id}, this.label);
+        },
+        render_control: function () {
+            const layout = this.layout ?? (this.type ? null : 'layout-basic');
+            if (layout) {
+                return Vue.h(Vue.resolveComponent(layout), {
+                    ...this.$attrs,
+                    form_item: this,
+                });
+            }
+            if (!form_types[this.type]) {
+                return [`⚠️ no type ⚠️: ${this.type}`];
+            }
+            return Vue.h(Vue.resolveComponent(form_types[this.type]?.name ?? form_types[this.type]), {
+                id: this.id,
+                modelValue: this.modelValue,
+                'onUpdate:modelValue': v => this.$emit('update:modelValue', v),
+            });
+        },
+    },
+    created: function () {
+        this.form_items_parent.add(this);
+    },
+    unmounted: function () {
+        this.form_items_parent.remove(this);
+    },
+});
+
+vue_component('render-function', {
+    inheritAttrs: false,
+    props: ['fn', 'item'],
+    render: function () {
+        return this.fn({item: this.item}, this.$slots);
+    },
+});
+
+vue_component('app', {
+    template: `
+    <div class="fix-f hsplit gap15 m10">
+        <div class="fluid mg15 oa">
+            <x-form layout="layout-table" class="green">
+                <x-form-item v-model="form.name.title" type="text" label="CC Title" />
+                <x-form-item v-model="form.name.first" type="text" label="CC First" />
+                <x-form-item v-model="form.name.last" type="text" label="CC Last" />
+                <x-form-item v-model="form.ex1"" type="expand2" label="Nested">
+                    <x-form-item v-model="form.name.title" type="text" label="Nested Title" />
+                    <x-form-item v-model="form.name.first" type="text" label="Nested First" />
+                    <x-form-item v-model="form.name.last" type="text" label="Nested Last" />
+                    <x-form-item v-model="form.ex2" type="expand2" label="Nested2">
+                        <x-form-item v-model="form.name.title" type="text" label="33 Nested Title" />
+                        <x-form-item v-model="form.name.first" type="text" label="33 Nested First" />
+                        <x-form-item v-model="form.name.last" type="text" label="33 Nested Last" />
+                    </x-form-item>
+                    <x-form-item>
+                        <x-form-item v-model="form.name.title" type="text" label="44 Nested Title" />
+                        <x-form-item v-model="form.name.first" type="text" label="44 Nested First" />
+                        <x-form-item v-model="form.name.last" type="text" label="x44 Nested Last" />
+                    </x-form-item>
+                </x-form-item>
+            </x-form>
+        </div>
+        <div class="fluid mg15 rainbow oa">
+<!--
+            <x-form v-model="form">
+                <x-form-item :items />
+            </x-form>
+-->
+        </div>
+        <div class="mg10 w400">
+<pre class="ph10 pv5 yellow dashed" style="white-space:pre-line;">
+<b>layout-engine</b>:
+- для каждого элемента (items) создает свою строчку (свой контейнер)
+- внутри этой строчки создаются места для <b>label,control,help,error</b>
+- элемент может указать какие слоты ему нужны
+    - например отрисовать себя на всей строчке
+    - или отрисовать себя в ячейке для control
+</pre>
+            <div>
+                <label>Gender</label>
+                <input v-model="form.gender" type="text">
+            </div>
+            <div class="flex-row gap10">
+                <div style="flex: 2 0 0;min-width:0;" class="flex-col gap5">
+                    <label>Title</label>
+                    <input v-model="form.name.title" type="text">
+                </div>
+                <div style="flex: 5 0 0;min-width:0;" class="flex-col gap5">
+                    <label>First</label>
+                    <input v-model="form.name.first" type="text">
+                </div>
+                <div style="flex: 5 0 0;min-width:0;" class="flex-col gap5">
+                    <label>Last</label>
+                    <input v-model="form.name.last" type="text">
+                </div>
+            </div>
+            <pre>{{form}}</pre>
+        </div>
+    </div>
+`,
+    data: function () {
+        return {
+            form: {
+                gender: '',
+                name: {
+                    title: 'tt',
+                    first: 'ff',
+                    last: 'll',
+                },
+                first_name: '',
+                last_name: '',
+                address: '',
+                address2: '',
+                city: '',
+                state: '',
+                zip: '',
+            },
+            items: [
+                {layout: 'layout-group', label: 'Personal information', hack_ins_containerl:1, items: [
+                    {type: 'text', path: 'name.title', label: 'Title'},
+                    {type: 'text', path: 'name.first', label: 'First'},
+                    {type: 'text', path: 'name.last', label: 'Last'},
+                ]},
+                {layout: 'layout-group', label: 'Account information', hack_ins_nolab: 1, items: [
+                    {type: 'text', path: 'name.title', label: 'Title'},
+                    {type: 'text', path: 'name.first', label: 'First'},
+                    {type: 'text', path: 'name.last', label: 'Last'},
+                ]},
+                {type: 'text', path: 'gender', label: 'Gender'},
+                {type: 'checkbox', path: 'remember_me', label: 'Remember Me'},
+                {type: 'checkbox', path: 'remember_me', label: 'Remember Me', noinline: true},
+                {layout: 'layout-columns', cols: '2,5,5', items: [
+                    {type: 'text', path: 'name.title', label: 'cols.Title'},
+                    {type: 'text', path: 'name.first', label: 'cols.First'},
+                    {type: 'text', path: 'name.last', label: 'cols.Last'},
+                ]},
+                {layout: 'layout-table', items: [
+                    // <x-form-item>
+                    //     <template #label>GGG</template>
+                    //     <template #control>XXXX</template>
+                    //     <template #container>CONTAINER</template>
+                    //     <template #layout_table_tr>
+                    //         <tr><td>layout_table_tr</td></tr>
+                    //     </template>
+                    // </x-form-item>
+                    {type: 'xxx', items: []},
+                    {layout: 'layout-table', items: [
+                        {type: 'text', path: 'name.title', label: 'CC Title'},
+                        {type: 'text', path: 'name.first', label: 'CC First'},
+                        {type: 'text', path: 'name.last', label: 'CC Last'},
+                    ]},
+                    {type: 'text', path: 'name.title', label: 'Title'},
+                    {type: 'text', path: 'name.first', label: 'First'},
+                    {layout: 'layout-table', label: 'Whatever111', items: [
+                        {type: 'text', path: 'name.title', label: 'CC Title'},
+                        {type: 'text', path: 'name.first', label: 'CC First'},
+                        {type: 'text', path: 'name.last', label: 'CC Last'},
+                    ]},
+                    // <x-form-item #control label="Whatever2">
+                    //     <expand>
+                    //         <x-form layout="layout-table">
+                    //             <x-form-item v-model="form.name.title" type="text" label="Title" />
+                    //             <x-form-item v-model="form.name.first" type="text" label="First" />
+                    //             <x-form-item v-model="form.name.last" type="text" label="Last" />
+                    //         </x-form>
+                    //     </expand>
+                    // </x-form-item>
+                    {type: 'xxx', items: []},
+                    // <x-form-item #container>
+                    //     <tabs>
+                    //         <tabs-item label="First">
+                    //             <x-form layout="layout-table">
+                    //                 <x-form-item v-model="form.name.title" type="text" label="tab-Title" />
+                    //                 <x-form-item v-model="form.name.first" type="text" label="tab-First" />
+                    //                 <x-form-item v-model="form.name.last" type="text" label="tab-Last" />
+                    //             </x-form>
+                    //         </tabs-item>
+                    //         <tabs-item label="Second">
+                    //             <x-form layout="layout-columns" cols="2,5,5">
+                    //                 <x-form-item v-model="form.name.title" type="text" label="tab-Title" />
+                    //                 <x-form-item v-model="form.name.first" type="text" label="tab-First" />
+                    //                 <x-form-item v-model="form.name.last" type="text" label="tab-Last" />
+                    //             </x-form>
+                    //         </tabs-item>
+                    //     </tabs>
+                    // </x-form-item>
+                    {type: 'xxx', items: []},
+                    {layout: 'layout-table', label: '--- I\'m a custom label! ---', items: [
+                        {type: 'text', path: 'name.title', label: 'Title'},
+                        {type: 'text', path: 'name.first', label: 'First'},
+                        {type: 'text', path: 'name.last', label: 'Last'},
+                    ]},
+                    {type: 'text', path: 'name.last', label: 'Last'},
+                    {layout: 'layout-tabs', label: 'Tabs please!', items: [
+                        {type: 'text', path: 'name.title', label: 'Title'},
+                        {type: 'text', path: 'name.first', label: 'First'},
+                        {type: 'text', path: 'name.last', label: 'Last'},
+                        {layout: 'layout-table', label: 'Nested Triple', items: [
+                            {type: 'text', path: 'name.title', label: 'TT.Title'},
+                            {type: 'text', path: 'name.first', label: 'TT.First'},
+                            {type: 'text', path: 'name.last', label: 'TT.Last'},
+                        ]},
+                    ]},
+                    {layout: 'layout-accordion', label: 'Accordion please!', items: [
+                        {layout: 'layout-table', label: 'Expand', items: [
+                            {type: 'text', path: 'name.title', label: 'Title'},
+                            {type: 'text', path: 'name.first', label: 'First'},
+                            {type: 'text', path: 'name.last', label: 'Last'},
+                        ]},
+                    ]},
+                    {layout: 'layout-wrapper', wrapper: 'DIV', style: 'border:10px solid #ff8;', items: [
+                        {layout: 'layout-wrapper', wrapper: 'expand', style: 'border:10px solid #f88;', items: [
+                            {type: 'text', path: 'name.title', label: 'Title'},
+                            {type: 'text', path: 'name.first', label: 'First'},
+                            {type: 'text', path: 'name.last', label: 'Last'},
+                        ]},
+                    ]},
+                ]},
+                {layout: 'layout-columns', cols: '2,5,5', items: [
+                    {type: 'text', path: 'name.title', label: 'Title'},
+                    {type: 'text', path: 'name.first', label: 'First'},
+                    {type: 'text', path: 'name.last', label: 'Last'},
+                ]},
+            ],
+        };
+    },
+    computed: {
+        form_json: function () {
+            return JSON.stringify(this.form, null, 4);
+        },
+    },
+})
+</script>
+
+</body>
+</html>
