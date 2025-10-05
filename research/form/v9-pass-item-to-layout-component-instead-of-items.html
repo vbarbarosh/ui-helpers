@@ -12,6 +12,19 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
 <script>
+const form_layouts = {
+    'layout-group': {
+        insertions: function (form_item) {
+            return {
+                container: function () {
+                   return Vue.h(Vue.resolveComponent('layout-group'), {inst: form_item, items: form_item.child_items}, {
+                        legend: form_item.render_label,
+                    });
+                },
+            };
+        },
+    },
+};
 const form_types = {
     checkbox: {
         name: 'input-checkbox',
@@ -86,6 +99,30 @@ vue_component('layout-basic', {
             </template>
         </div>
     `,
+});
+
+
+vue_component('layout-group', {
+    props: ['items'],
+    template: `
+        <fieldset>
+            <legend>Some Label</legend>
+            <form-layout-basic :items />
+        </fieldset>
+    `,
+    data: function () {
+        return {
+            open: false,
+        };
+    },
+    methods: {
+        click_expand: function () {
+            this.open = true;
+        },
+        click_collapse: function () {
+            this.open = false;
+        },
+    },
 });
 
 vue_component('layout-inline', {
@@ -211,7 +248,11 @@ vue_component('layout-group', {
     props: ['items', 'inst'],
     template: `
         <fieldset>
-            <legend>{{ inst.label }}</legend>
+            <legend>
+                <slot name="legend">
+                    {{ inst.label }}
+                </slot>
+            </legend>
             <layout-basic :items :inst />
         </fieldset>
     `,
@@ -355,6 +396,9 @@ vue_component('x-form-item', {
         else if (form_types[this.type]?.insertions) {
             ov = form_types[this.type]?.insertions(this);
         }
+        else if (form_layouts[this.layout]?.insertions) {
+            ov = form_layouts[this.layout]?.insertions(this);
+        }
         return {
             id: `id-${crypto.randomUUID()}`,
             insertions: {
@@ -405,6 +449,9 @@ vue_component('x-form-item', {
     },
     methods: {
         render_label: function () {
+            if (this.$slots.label) {
+                return this.$slots.label();
+            }
             return Vue.h('label', {for: this.id}, this.label);
         },
         render_control: function () {
@@ -447,6 +494,23 @@ vue_component('app', {
     <div class="fix-f hsplit gap15 m10">
         <div class="fluid mg15 oa">
             <x-form class="green">
+
+                <x-form-item layout="layout-wrapper" wrapper="DIV" style="border:2px dashed;">
+                    <x-form-item layout="layout-group" label="Personal information">
+                        <x-form-item v-model="form.first" type="string" label="First Name" />
+                        <x-form-item v-model="form.last" type="string" label="Last Name" />
+                    </x-form-item>
+                    <x-form-item layout="layout-group" label="___Account Information___IGNORED___">
+                        <template #label>
+                            xx<b>Account</b> <u>Information</u>
+                        </template>
+                        <x-form-item v-model="form.email" type="email" label="Email" />
+                        <x-form-item v-model="form.password" type="password" label="Password" />
+                        <x-form-item v-model="form.password2" type="password" label="Confirm" />
+                    </x-form-item>
+                    <x-form-item v-model="form.remember_me" type="checkbox" label="Remember me" />
+                </x-form-item>
+
                 <x-form-item layout="layout-basic">
                     <x-form-item layout="layout-group" label="Personal information">
                         <x-form-item v-model="form.name.title" type="text" label="cols.Title" />
