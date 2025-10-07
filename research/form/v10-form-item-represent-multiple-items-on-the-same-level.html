@@ -25,7 +25,13 @@ const form_layouts = {
         },
     },
 };
+
 const form_types = {
+    unwrap: {
+        form_item_ext_get_rows: function (form_item) {
+            return form_item.child_items.flatMap(v => v.items_to_render_in_parent);
+        },
+    },
     expand2: {
         insertions: function (form_item) {
             return {
@@ -202,6 +208,38 @@ vue_component('layout-table', {
     `,
 });
 
+vue_component('layout-columns', {
+    props: ['form_item', 'cols'],
+    template: `
+        <div class="flex-row gap10">
+            <template v-for="ci in computed_items" v-bind:key="ci.orig.key">
+                <template v-if="ci.orig.insertions.container">
+                    <div v-bind:style="ci.style">
+                        <render-function :fn="ci.orig.insertions.container" />
+                    </div>
+                </template>
+                <template v-else-if="(ci.orig.insertions.label && ci.orig.insertions.control)">
+                    <div v-bind:style="ci.style" class="flex-col gap5">
+                        <render-function :fn="ci.orig.insertions.label" />
+                        <render-function :fn="ci.orig.insertions.control" />
+                    </div>
+                </template>
+                <template v-else>
+                    <warn-invalid-layout-item-type :item="ci.orig" />
+                </template>
+            </template>
+        </div>
+    `,
+    computed: {
+        computed_items: function () {
+            const cols = (this.cols||'1').split(',');
+            return this.form_item.items_to_render.map(function (item, i) {
+                return {orig: item, style: `flex: ${cols[i] ?? 1} 0 0; min-width: 0;`};
+            });
+        },
+    },
+});
+
 vue_component('expand2', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'form_item'],
@@ -217,22 +255,26 @@ vue_component('expand2', {
         };
     },
     methods: {
+        form_item_ext_get_rows: function () {
+            if (this.open) {
+                return [this.form_item, ...this.form_item.items_to_render];
+            }
+            return [this.form_item];
+        },
         click_expand: function () {
             this.open = true;
             this.$emit('update:modelValue', this.open);
-            this.form_item.custom_items = null;
         },
         click_collapse: function () {
             this.open = false;
             this.$emit('update:modelValue', this.open);
-            this.form_item.custom_items = [];
         },
     },
     created: function () {
-        this.form_item.custom_items = this.open ? null : [];
+        this.form_item.extensions.push(this);
     },
     unmounted: function () {
-        this.form_item.custom_items = null;
+        this.form_item.extensions.splice(this.form_item.extensions.indexOf(this) >>> 1, 1);
     },
 });
 
@@ -302,7 +344,7 @@ vue_component('x-form-item', {
         return {
             id: `id-${crypto.randomUUID()}`,
             key: `key-${crypto.randomUUID()}`,
-            custom_items: null,
+            extensions: [],
             insertions: {
                 label: this.render_label,
                 control: this.render_control,
@@ -348,14 +390,17 @@ vue_component('x-form-item', {
                 return out;
             });
         },
+        items_to_render_in_parent: function () {
+            if (form_types[this.type]?.form_item_ext_get_rows) {
+                return form_types[this.type].form_item_ext_get_rows(this);
+            }
+            if (this.extensions.length) {
+                return this.extensions[0].form_item_ext_get_rows();
+            }
+            return [this];
+        },
         items_to_render: function () {
-            console.log('items_to_render', this.custom_items);
-            return this.child_items.flatMap(function (child) {
-                if (child.custom_items) {
-                    return [child];
-                }
-                return [child, ...child.items_to_render];
-            });
+            return this.child_items.flatMap(v => v.items_to_render_in_parent);
         },
     },
     methods: {
@@ -404,6 +449,16 @@ vue_component('app', {
     <div class="fix-f hsplit gap15 m10">
         <div class="fluid mg15 oa">
             <x-form layout="layout-table" class="green">
+                <x-form-item type="unwrap" label="Unwrap">
+                    <x-form-item v-model="form.name.title" type="text" label="__1__ CC Title ___" />
+                    <x-form-item v-model="form.name.title" type="text" label="__1__ CC Title ___" />
+                    <x-form-item v-model="form.name.title" type="text" label="__1__ CC Title ___" />
+                    <x-form-item layout="expand2">
+                        <x-form-item v-model="form.name.title" type="text" label="__2__ CC Title ___" />
+                        <x-form-item v-model="form.name.title" type="text" label="__2__ CC Title ___" />
+                        <x-form-item v-model="form.name.title" type="text" label="__2__ CC Title ___" />
+                    </x-form-item>
+                </x-form-item>
                 <x-form-item v-model="form.name.title" type="text" label="CC Title" />
                 <x-form-item v-model="form.name.first" type="text" label="CC First" />
                 <x-form-item v-model="form.name.last" type="text" label="CC Last" />
@@ -415,11 +470,16 @@ vue_component('app', {
                         <x-form-item v-model="form.name.title" type="text" label="33 Nested Title" />
                         <x-form-item v-model="form.name.first" type="text" label="33 Nested First" />
                         <x-form-item v-model="form.name.last" type="text" label="33 Nested Last" />
+                        <x-form-item v-model="form.ex3" type="expand2" label="Nested3">
+                            <x-form-item v-model="form.name.title" type="text" label="44 Nested Title" />
+                            <x-form-item v-model="form.name.first" type="text" label="44 Nested First" />
+                            <x-form-item v-model="form.name.last" type="text" label="44 Nested Last" />
+                        </x-form-item>
                     </x-form-item>
-                    <x-form-item>
-                        <x-form-item v-model="form.name.title" type="text" label="44 Nested Title" />
-                        <x-form-item v-model="form.name.first" type="text" label="44 Nested First" />
-                        <x-form-item v-model="form.name.last" type="text" label="x44 Nested Last" />
+                    <x-form-item layout="layout-columns">
+                        <x-form-item v-model="form.name.title" type="text" label="XX Nested Title" />
+                        <x-form-item v-model="form.name.first" type="text" label="XX Nested First" />
+                        <x-form-item v-model="form.name.last" type="text" label="XX Nested Last" />
                     </x-form-item>
                 </x-form-item>
             </x-form>
