@@ -28,8 +28,96 @@ const form_layouts = {
 
 const form_types = {
     unwrap: {
-        form_item_ext_get_rows: function (form_item) {
-            return form_item.child_items.flatMap(v => v.items_to_render_in_parent);
+        install_plugin: function (form_item) {
+            return {
+                items_to_render: function () {
+                    return form_item.child_items_to_render;
+                },
+                uninstall: function () {
+                },
+            };
+        },
+    },
+    none: {
+        install_plugin: function (form_item) {
+            return {
+                items_to_render: function () {
+                    return [];
+                },
+                uninstall: function () {
+                },
+            };
+        },
+    },
+    remote: {
+        install_plugin: function (form_item) {
+            const data = [11,22,33,44,55];
+            const val = Vue.ref(0);
+            setTimeout(() => val.value = 1, 1000);
+            return {
+                items_to_render: function () {
+                    if (val.value) {
+                        return data.map(function (v) {
+                            return {insertions: {label: () => [], control: () => v}};
+                        });
+                    }
+                    return [
+                        {insertions: {label: () => 'Remote', control: () => 'Loading...'}},
+                    ];
+                },
+                uninstall: function () {
+                    console.log('expand.uninstall');
+                },
+            };
+        },
+    },
+    section: {
+        install_plugin: function (form_item) {
+            return {
+                items_to_render: function () {
+                    return [
+                        {
+                            insertions: {
+                                layout_table_tr: () => Vue.h('tr', {class: 'yellow'}, [
+                                    Vue.h('td', {colspan: 2}, [
+                                        form_item.render_label(),
+                                    ])
+                                ]),
+                                container: form_item.render_label,
+                            },
+                        },
+                        ...form_item.child_items_to_render,
+                    ];
+                },
+                uninstall: function () {
+                    console.log('expand.uninstall');
+                },
+            };
+        },
+    },
+    expand: {
+        install_plugin: function (form_item) {
+            form_item.insertions = {};
+            let counter = Vue.ref(0);
+            return {
+                items_to_render: function () {
+                    console.log('items_to_render');
+                    const options = {
+                        form_item,
+                        incr: () => console.log(counter.value++),
+                        onVnodeMounted: function (vnode) {
+                            console.log('onVnodeMounted', vnode);
+                        },
+                    };
+                    return [
+                        {insertions: {label: () => [], control: () => Vue.h(Vue.resolveComponent('expand2'), options)}},
+                        ...((counter.value % 2) ? form_item.child_items_to_render : []),
+                    ];
+                },
+                uninstall: function () {
+                    console.log('expand.uninstall');
+                },
+            };
         },
     },
     expand2: {
@@ -100,10 +188,10 @@ vue_component('warn-invalid-layout-item-type', {
 // - control
 // - container
 vue_component('layout-basic', {
-    props: ['form_item'],
+    props: ['items'],
     template: `
         <div class="mg10">
-            <template v-for="(item,i) in form_item.items_to_render" v-bind:key="item.key">
+            <template v-for="(item,i) in items" v-bind:key="item.key">
                 <template v-if="(item.insertions.container)">
                     <div><render-function :fn="item.insertions.container" /></div>
                 </template>
@@ -122,16 +210,16 @@ vue_component('layout-basic', {
 });
 
 vue_component('layout-inline', {
-    props: ['inst', 'items'],
+    props: ['items'],
     template: `
         <template v-for="item in items" :key="item.key">
-            <template v-if="item.inst.insertions.container">
-                <div><render-function :fn="item.inst.insertions.container" /></div>
+            <template v-if="item.insertions.container">
+                <div><render-function :fn="item.insertions.container" /></div>
             </template>
-            <template v-else-if="(item.inst.insertions.label && item.inst.insertions.control)">
+            <template v-else-if="(item.insertions.label && item.insertions.control)">
                 <div class="flex-row-center-left gap5">
-                    <render-function :fn="item.inst.insertions.control" />
-                    <render-function :fn="item.inst.insertions.label" />
+                    <render-function :fn="item.insertions.control" />
+                    <render-function :fn="item.insertions.label" />
                 </div>
             </template>
             <template v-else>
@@ -142,16 +230,16 @@ vue_component('layout-inline', {
 });
 
 vue_component('layout-inline-rev', {
-    props: ['inst', 'items'],
+    props: ['items'],
     template: `
         <template v-for="item in items" :key="item.key">
-            <template v-if="item.inst.insertions.container">
-                <div><render-function :fn="item.inst.insertions.container" /></div>
+            <template v-if="item.insertions.container">
+                <div><render-function :fn="item.insertions.container" /></div>
             </template>
-            <template v-else-if="(item.inst.insertions.label && item.inst.insertions.control)">
+            <template v-else-if="(item.insertions.label && item.insertions.control)">
                 <div class="flex-row-center-left gap5">
-                    <render-function :fn="item.inst.insertions.control" />
-                    <render-function :fn="item.inst.insertions.label" />
+                    <render-function :fn="item.insertions.control" />
+                    <render-function :fn="item.insertions.label" />
                 </div>
             </template>
             <template v-else>
@@ -167,13 +255,13 @@ vue_component('layout-inline-rev', {
 // - layout_table_tr
 // - layout_table_tr2
 vue_component('layout-table', {
-    props: ['form_item'],
+    props: ['items'],
     template: `
         <table>
             <thead>
             </thead>
             <tbody>
-                <template v-for="item in form_item.items_to_render" v-bind:key="item.key">
+                <template v-for="item in items" v-bind:key="item.key">
                     <template v-if="item.insertions.layout_table_tr">
                         <render-function :fn="item.insertions.layout_table_tr" />
                     </template>
@@ -209,7 +297,7 @@ vue_component('layout-table', {
 });
 
 vue_component('layout-columns', {
-    props: ['form_item', 'cols'],
+    props: ['items', 'cols'],
     template: `
         <div class="flex-row gap10">
             <template v-for="ci in computed_items" v-bind:key="ci.orig.key">
@@ -233,7 +321,7 @@ vue_component('layout-columns', {
     computed: {
         computed_items: function () {
             const cols = (this.cols||'1').split(',');
-            return this.form_item.items_to_render.map(function (item, i) {
+            return this.items.map(function (item, i) {
                 return {orig: item, style: `flex: ${cols[i] ?? 1} 0 0; min-width: 0;`};
             });
         },
@@ -242,11 +330,15 @@ vue_component('layout-columns', {
 
 vue_component('expand2', {
     emits: ['update:modelValue'],
-    props: ['modelValue', 'form_item'],
+    props: ['modelValue', 'form_item', 'incr'],
     template: `
         <div>
             <button v-if="!open" v-on:click="click_expand">expand</button>
             <button v-else v-on:click="click_collapse">collapse</button>
+            <button @click="incr()">++</button>
+            <div class="border">
+                <layout-basic v-if="open" :items="form_item.child_items_to_render" />
+            </div>
         </div>
     `,
     data: function () {
@@ -255,12 +347,6 @@ vue_component('expand2', {
         };
     },
     methods: {
-        form_item_ext_get_rows: function () {
-            if (this.open) {
-                return [this.form_item, ...this.form_item.items_to_render];
-            }
-            return [this.form_item];
-        },
         click_expand: function () {
             this.open = true;
             this.$emit('update:modelValue', this.open);
@@ -269,12 +355,6 @@ vue_component('expand2', {
             this.open = false;
             this.$emit('update:modelValue', this.open);
         },
-    },
-    created: function () {
-        this.form_item.extensions.push(this);
-    },
-    unmounted: function () {
-        this.form_item.extensions.splice(this.form_item.extensions.indexOf(this) >>> 1, 1);
     },
 });
 
@@ -292,9 +372,11 @@ vue_component('x-form', {
     },
     template: `
         <div class="red">
-            <x-form-item><slot /></x-form-item>
+            <x-form-item type="unwrap"><slot /></x-form-item>
         </div>
-        <component v-if="(items.length === 1)" v-bind:is="(layout ?? 'layout-basic')" :form_item="items[0]" v-bind="$attrs" />
+        <component v-if="(items.length === 1)"
+                   v-bind:is="(layout ?? 'layout-basic')"
+                   :items="items.flatMap(v => v.items_to_render)" v-bind="$attrs" />
     `,
     data: function () {
         return {
@@ -344,7 +426,6 @@ vue_component('x-form-item', {
         return {
             id: `id-${crypto.randomUUID()}`,
             key: `key-${crypto.randomUUID()}`,
-            extensions: [],
             insertions: {
                 label: this.render_label,
                 control: this.render_control,
@@ -355,6 +436,7 @@ vue_component('x-form-item', {
                 ...this.$slots,
             },
             child_items: [],
+            plugins: [],
         };
     },
     computed: {
@@ -390,17 +472,14 @@ vue_component('x-form-item', {
                 return out;
             });
         },
-        items_to_render_in_parent: function () {
-            if (form_types[this.type]?.form_item_ext_get_rows) {
-                return form_types[this.type].form_item_ext_get_rows(this);
-            }
-            if (this.extensions.length) {
-                return this.extensions[0].form_item_ext_get_rows();
+        items_to_render: function () {
+            if (this.plugins.length) {
+                return this.plugins[0].items_to_render();
             }
             return [this];
         },
-        items_to_render: function () {
-            return this.child_items.flatMap(v => v.items_to_render_in_parent);
+        child_items_to_render: function () {
+            return this.child_items.flatMap(v => v.items_to_render);
         },
     },
     methods: {
@@ -415,13 +494,22 @@ vue_component('x-form-item', {
             if (layout) {
                 return Vue.h(Vue.resolveComponent(layout), {
                     ...this.$attrs,
-                    form_item: this,
+                    items: this.child_items_to_render,
                 });
             }
-            if (!form_types[this.type]) {
+            if (!form_types[this.type] || (typeof form_types[this.type] === 'object' && !form_types[this.type].name)) {
                 return [`⚠️ no type ⚠️: ${this.type}`];
             }
-            return Vue.h(Vue.resolveComponent(form_types[this.type]?.name ?? form_types[this.type]), {
+            let r;
+            try {
+                r = Vue.resolveComponent(form_types[this.type]?.name ?? form_types[this.type]);
+            }
+            catch (error) {
+                console.log(form_types[this.type]?.name ?? form_types[this.type]);
+                console.error(error);
+                r = 'DIV';
+            }
+            return Vue.h(r, {
                 id: this.id,
                 modelValue: this.modelValue,
                 'onUpdate:modelValue': v => this.$emit('update:modelValue', v),
@@ -429,10 +517,14 @@ vue_component('x-form-item', {
         },
     },
     created: function () {
+        if (form_types[this.type]?.install_plugin) {
+            this.plugins.push(form_types[this.type]?.install_plugin(this));
+        }
         this.form_items_parent.add(this);
     },
     unmounted: function () {
         this.form_items_parent.remove(this);
+        this.plugins.forEach(v => v.uninstall());
     },
 });
 
@@ -449,6 +541,35 @@ vue_component('app', {
     <div class="fix-f hsplit gap15 m10">
         <div class="fluid mg15 oa">
             <x-form layout="layout-table" class="green">
+                <x-form-item type="text" label="First" />
+                <x-form-item type="text" label="Last" />
+
+                <x-form-item type="expand">
+                    <x-form-item type="section" label="Personal information">
+                        <x-form-item type="text" label="First" />
+                        <x-form-item type="text" label="Last" />
+                    </x-form-item>
+                    <x-form-item type="section" label="Account information">
+                        <x-form-item type="text" label="Email" />
+                        <x-form-item type="text" label="Password" />
+                        <x-form-item type="text" label="Confirm" />
+                        <x-form-item type="checkbox" label="Remember me" />
+                    </x-form-item>
+                </x-form-item>
+
+                <x-form-item type="unwrap">
+                    <x-form-item type="text" label="Unwrap -> Text1" />
+                    <x-form-item type="text" label="Unwrap -> Text2" />
+                    <x-form-item type="expand" xlayout="layout-table">
+                        <x-form-item type="text" label="Text22" />
+                        <x-form-item type="text" label="Text22" />
+                        <x-form-item type="expand" layout="layout-basic">
+                            <x-form-item type="text" label="Text33" />
+                            <x-form-item type="text" label="Text33" />
+                        </x-form-item>
+                    </x-form-item>
+                </x-form-item>
+<!--
                 <x-form-item type="unwrap" label="Unwrap">
                     <x-form-item v-model="form.name.title" type="text" label="__1__ CC Title ___" />
                     <x-form-item v-model="form.name.title" type="text" label="__1__ CC Title ___" />
@@ -459,6 +580,7 @@ vue_component('app', {
                         <x-form-item v-model="form.name.title" type="text" label="__2__ CC Title ___" />
                     </x-form-item>
                 </x-form-item>
+
                 <x-form-item v-model="form.name.title" type="text" label="CC Title" />
                 <x-form-item v-model="form.name.first" type="text" label="CC First" />
                 <x-form-item v-model="form.name.last" type="text" label="CC Last" />
@@ -482,6 +604,7 @@ vue_component('app', {
                         <x-form-item v-model="form.name.last" type="text" label="XX Nested Last" />
                     </x-form-item>
                 </x-form-item>
+-->
             </x-form>
         </div>
         <div class="fluid mg15 rainbow oa">
