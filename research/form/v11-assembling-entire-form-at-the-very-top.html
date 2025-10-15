@@ -39,27 +39,49 @@ const form_types = {
     },
     header: {
         make_insertions: function ({form_item, query, make_insertions}) {
-            return {
-                insertions: {
-                    label: () => '1111',
-                    control: () => '2222',
+            return [
+                {
+                    insertions: {
+                        label: () => '1111',
+                        control: () => '2222',
+                    },
                 },
-            };
+                {
+                    insertions: {
+                        label: () => '333',
+                        control: () => '444',
+                    },
+                },
+            ];
         },
     },
     none: {
-        filter: function (form_item) {
-            return form_item.type !== 'none';
+        // filter: function (form_item) {
+        //     return form_item.type !== 'none';
+        // },
+        transform_self: function ({form_item, parent, query}) {
+            return [];
         },
     },
     unwrap: {
-        transform: function (items, db) {
-            return items.flatMap(function (item) {
-                if (item.form_item.type === 'unwrap') {
-                    return db.filter(v => v.parent === item.form_item);
-                }
-                return [];
-            });
+        transform_self: function ({form_item, parent}, query) {
+            return query({parent: form_item});
+        },
+        _transform: function (out, query) {
+            return out.flatMap(v => (v.form_item.type === 'unwrap') ? query({parent: v.form_item}) : [v]);
+        },
+    },
+    expand: {
+        make_insertions: function ({form_item, query, make_insertions, storage}) {
+            return [
+                {
+                    insertions: {
+                        label: () => 'Expand',
+                        control: () => Vue.h(Vue.resolveComponent('expand'), {modelValue: storage.expand1, 'onUpdate:modelValue': v => storage.expand1 = v}),
+                    },
+                },
+                ...(!storage.expand1 ? [] : query({parent: form_item}).flatMap(make_insertions)),
+            ];
         },
     },
     filter: {
@@ -178,7 +200,7 @@ const form_types = {
             };
         },
     },
-    expand: {
+    expand1: {
         install_plugin: function (form_item) {
             form_item.insertions = {};
             let counter = Vue.ref(0);
@@ -411,6 +433,30 @@ vue_component('layout-columns', {
     },
 });
 
+vue_component('expand', {
+    emits: ['update:modelValue'],
+    props: ['modelValue'],
+    template: `
+        <button v-if="open" v-on:click="click_collapse">collapse</button>
+        <button v-else v-on:click="click_expand">expand</button>
+    `,
+    data: function () {
+        return {
+            open: this.modelValue,
+        };
+    },
+    methods: {
+        click_expand: function () {
+            this.open = true;
+            this.$emit('update:modelValue', this.open);
+        },
+        click_collapse: function () {
+            this.open = false;
+            this.$emit('update:modelValue', this.open);
+        },
+    },
+});
+
 vue_component('expand2', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'form_item', 'incr'],
@@ -465,29 +511,35 @@ vue_component('x-form', {
     data: function () {
         return {
             items: [],
+            storage: {},
         };
     },
     computed: {
         gogogo_v1: function () {
+            const {storage} = this;
             const db = [];
             this.items.forEach(v => walk(null, v));
 
-            const filters = db.map(v => form_types[v.form_item.type]?.filter).filter(v => v);
+            // const filters = db.map(v => form_types[v.form_item.type]?.filter).filter(v => v);
             const transforms = db.map(v => form_types[v.form_item.type]?.transform).filter(v => v);
 
-            return query({parent: null}).map(make_insertions);
+            return query({parent: null}).flatMap(make_insertions);
             function walk(parent, form_item) {
                 db.push({parent, form_item});
                 form_item.child_items.forEach(child => walk(form_item, child));
             }
             function query(expr) {
                 let out = db.filter(v => v.parent === expr.parent);
-                // out = transforms.reduce((a, fn) => fn(a), out);
-                return out.filter(v => filters.every(fn => fn(v.form_item)));
+                out = out.flatMap(v => form_types[v.form_item.type]?.transform_self ? form_types[v.form_item.type].transform_self(v, query) : [v]);
+                // out = transforms.reduce((a, fn) => fn(a, query), out);
+
+                // out = out.flatMap(v => (v.form_item.type === 'unwrap') ? query({parent: v.form_item}) : [v]);
+
+                return out;
             }
             function make_insertions({form_item, parent}) {
                 if (form_types[form_item.type]?.make_insertions) {
-                    return form_types[form_item.type]?.make_insertions({form_item, parent, make_insertions});
+                    return form_types[form_item.type]?.make_insertions({form_item, parent, make_insertions, query, storage});
                 }
                 if (form_item.label) {
                     return {
@@ -774,13 +826,16 @@ vue_component('app', {
                     <x-form-item type="text" label="First" />
                     <x-form-item type="text" label="Last" />
                 </x-form-item>
-                <x-form-item type="none" xlabel="Basic">
-                    <x-form-item type="text" label="First" />
-                    <x-form-item type="text" label="Last" />
+                <x-form-item type="expand" label="Basic">
+                    <x-form-item type="text" label="ex.First" />
+                    <x-form-item type="text" label="ex.Last" />
                 </x-form-item>
                 <x-form-item type="unwrap" label="Unwrap">
-                    <x-form-item type="text" label="First" />
-                    <x-form-item type="text" label="Last" />
+                    <x-form-item type="text" label="w.First" />
+                    <x-form-item type="unwrap" label="Unwrap">
+                        <x-form-item type="text" label="x.First" />
+                    </x-form-item>
+                    <x-form-item type="text" label="w.Last" />
                 </x-form-item>
 
 <!--
