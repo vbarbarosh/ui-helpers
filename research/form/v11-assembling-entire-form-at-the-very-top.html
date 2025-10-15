@@ -85,6 +85,27 @@ const form_types = {
         },
     },
     filter: {
+        make_insertions: function ({form_item, query, make_insertions, storage}) {
+            return [
+                {
+                    insertions: {
+                        container: () => Vue.h('DIV', {class: 'gradient'}, [
+                            form_item.render_label(),
+                            Vue.h('input', {value: storage.filter1, 'onInput': e => storage.filter1 = e.target.value, class: 'ml5'}),
+                        ]),
+                    }
+                }
+            ];
+        },
+        transform: function (out, query, storage) {
+            if (!storage.filter1) {
+                return out;
+            }
+            const s = storage.filter1.toLowerCase();
+            return out.filter(v => v.form_item.type === 'filter' || !v.form_item.label || v.form_item.label.toLowerCase().includes(s));
+        },
+    },
+    filter2: {
         install_plugin: function (form_item) {
             return {
                 items_to_render: function () {
@@ -531,7 +552,7 @@ vue_component('x-form', {
             function query(expr) {
                 let out = db.filter(v => v.parent === expr.parent);
                 out = out.flatMap(v => form_types[v.form_item.type]?.transform_self ? form_types[v.form_item.type].transform_self(v, query) : [v]);
-                // out = transforms.reduce((a, fn) => fn(a, query), out);
+                out = transforms.reduce((a, fn) => fn(a, query, storage), out);
 
                 // out = out.flatMap(v => (v.form_item.type === 'unwrap') ? query({parent: v.form_item}) : [v]);
 
@@ -819,6 +840,7 @@ vue_component('app', {
             <x-form layout="layout-table" class="green">
 
                 <x-form-item type="header" label="HEADER" />
+                <x-form-item type="filter" label="Filter" />
 
                 <x-form-item type="text" label="First" />
                 <x-form-item type="text" label="Last" />
