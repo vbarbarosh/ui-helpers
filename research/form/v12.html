@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
+    <title>horizontal and vertical flows | form | research | ui-helpers</title>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
+<script>
+const form_types = {
+    'layout-bootstrap5': {
+        render_control: function (form_item, query, make_insertions) {
+            return Vue.h(Vue.resolveComponent('layout-bootstrap5'), {items: query({parent: form_item}).map(make_insertions)});
+        },
+    },
+    'layout-basic': {
+        render_control: function (form_item, query, make_insertions) {
+            return Vue.h(Vue.resolveComponent('layout-basic'), {items: query({parent: form_item}).map(make_insertions)});
+        },
+    },
+    'layout-table': {
+        render_control: function (form_item, query, make_insertions) {
+            return Vue.h(Vue.resolveComponent('layout-table'), {items: query({parent: form_item}).map(make_insertions)});
+        },
+    },
+    'layout-group': {
+        render_control: function (form_item) {
+            return Vue.h(Vue.resolveComponent('layout-group'), {form_item}, {
+                legend: form_item.render_label,
+            });
+        },
+    },
+    'layout-inline': {
+        render_control: function (form_item, query, make_insertions) {
+            return Vue.h(Vue.resolveComponent('layout-inline'), {items: query({parent: form_item}).map(make_insertions)});
+        },
+    },
+    'layout-inline-rev': {
+        render_control: function (form_item, query, make_insertions) {
+            return Vue.h(Vue.resolveComponent('layout-inline-rev'), {items: query({parent: form_item}).map(make_insertions)});
+        },
+    },
+    'layout-columns': {
+        render_control: function (form_item, query, make_insertions) {
+            return Vue.h(Vue.resolveComponent('layout-columns'), {items: query({parent: form_item}).map(make_insertions)});
+        },
+    },
+    none: {
+        transform_self: function ({form_item, parent, query}) {
+            return [];
+        },
+    },
+    header: {
+        make_insertions: function ({form_item, query, make_insertions}) {
+            return [
+                {
+                    insertions: {
+                        label: () => '1111',
+                        control: () => '2222',
+                    },
+                },
+                {
+                    insertions: {
+                        label: () => '333',
+                        control: () => '444',
+                    },
+                },
+            ];
+        },
+    },
+    section: {
+        make_insertions: function ({form_item, query, make_insertions}) {
+            return [
+                {
+                    insertions: {
+                        container: () => form_item.render_label(),
+                        // control: () => 'SECTION',
+                    },
+                },
+                ...query({parent: form_item}).flatMap(make_insertions),
+            ];
+        },
+    },
+    unwrap: {
+        transform_self: function ({form_item, parent}, query) {
+            return query({parent: form_item});
+        },
+        _transform: function (out, query) {
+            return out.flatMap(v => (v.form_item.type === 'unwrap') ? query({parent: v.form_item}) : [v]);
+        },
+    },
+    expand: {
+        make_insertions: function ({form_item, query, make_insertions, storage}) {
+            return [
+                {
+                    insertions: {
+                        label: () => 'Expand',
+                        control: () => Vue.h(Vue.resolveComponent('expand'), {modelValue: storage.expand1, 'onUpdate:modelValue': v => storage.expand1 = v}),
+                    },
+                },
+                ...(!storage.expand1 ? [] : query({parent: form_item}).flatMap(make_insertions)),
+            ];
+        },
+    },
+    filter: {
+        make_insertions: function ({form_item, query, make_insertions, storage}) {
+            return [
+                {
+                    insertions: {
+                        container: () => Vue.h('DIV', {class: 'gradient'}, [
+                            form_item.render_label(),
+                            Vue.h('input', {value: storage.filter1, 'onInput': e => storage.filter1 = e.target.value, class: 'ml5'}),
+                        ]),
+                    }
+                }
+            ];
+        },
+        transform: function (out, query, storage) {
+            if (!storage.filter1) {
+                return out;
+            }
+            const s = storage.filter1.toLowerCase();
+            return out.filter(v => v.form_item.type === 'filter' || !v.form_item.label || v.form_item.label.toLowerCase().includes(s));
+        },
+    },
+    checkbox: {
+        name: 'input-checkbox',
+        insertions: function (form_item) {
+            if (form_item.$attrs.noinline !== undefined) {
+                return {};
+            }
+            return {
+                label: function () {
+                    return [];
+                },
+                control: function () {
+                    return Vue.h('DIV', {class: 'flex-row-center-left gap5'}, [
+                        form_item.render_control(),
+                        form_item.render_label(),
+                    ]);
+                },
+            };
+        },
+    },
+    checkboxes: 'input-checkboxes',
+    color: 'input-color',
+    date: 'input-date',
+    email: 'input-email',
+    file: 'input-file',
+    files: 'input-files',
+    int: 'input-int',
+    month: 'input-month',
+    password: 'input-password',
+    radio: 'input-radio',
+    radios: 'input-radios',
+    range: 'input-range',
+    search: 'input-search',
+    select: 'input-select',
+    'select-many': 'input-select-many',
+    string: 'input-text',
+    tel: 'input-tel',
+    text: 'input-text',
+    textarea: 'input-textarea',
+    time: 'input-time',
+    url: 'input-url',
+    week: 'input-week',
+
+    email: {
+        render_control: function (form_item) {
+            return Vue.h('input', {id: form_item.id, type: 'email', class: 'form-control'});
+        },
+    },
+    password: {
+        render_control: function (form_item) {
+            return Vue.h('input', {id: form_item.id, type: 'password', class: 'form-control'});
+        },
+    },
+    checkbox: {
+        make_insertions: function ({form_item, query, make_insertions, storage}) {
+            const out = query({self: form_item}).flatMap(make_insertions);
+            out.forEach(v => v.boostrap5_form_check = true);
+            return out;
+        },
+        render_label: function (form_item) {
+            return Vue.h('label', {for: form_item.id, class: 'form-check-label'}, form_item.label);
+        },
+        render_control: function (form_item) {
+            return Vue.h('input', {id: form_item.id, type: 'checkbox', class: 'form-check-input'});
+        },
+        // 1. label should know!
+        // 2. layout should know!
+    },
+};
+
+vue_component('warn-invalid-layout-item-type', {
+    props: ['item'],
+    template: `
+        <span>⚠️ Unknown item type: [{{ item.type }}]</span>
+    `,
+});
+
+// - label
+// - control
+// - container
+vue_component('layout-bootstrap5', {
+    props: ['items'],
+    template: `
+        <form>
+            <template v-for="item in items" v-bind:key="item.key">
+                <template v-if="item.insertions.boostrap5_row">
+                    <div>BS5 ROW</div>
+                </template>
+                <template v-else-if="item.insertions.container">
+                    <div class="mb-3">
+                        <render-function :fn="item.insertions.container" />
+                    </div>
+                </template>
+                <template v-else-if="(item.insertions.label && item.insertions.control)">
+                    <div v-bind:class="{'form-check': item.boostrap5_form_check}" class="mb-3">
+                        <render-function :fn="item.insertions.label" class="form-label" />
+                        <render-function :fn="item.insertions.control" class="form-label" />
+                        <div v-if="item.insertions.help" class="form-text">
+                            <render-function :fn="item.insertions.help" />
+                        </div>
+                    </div>
+                </template>
+                <template v-else>
+                    <warn-invalid-layout-item-type :item />
+                </template>
+            </template>
+<!--
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+            </div>
+-->
+        </form>
+    `,
+});
+
+// - label
+// - control
+// - container
+vue_component('layout-basic', {
+    props: ['items'],
+    template: `
+        <div class="mg10">
+            <template v-for="(item,i) in items" v-bind:key="item.key">
+                <template v-if="(item.insertions.container)">
+                    <div><render-function :fn="item.insertions.container" /></div>
+                </template>
+                <template v-else-if="(item.insertions.label && item.insertions.control)">
+                    <div class="hsplit gap10">
+                        <div class="w150"><render-function :fn="item.insertions.label" /></div>
+                        <div class="fluid"><render-function :fn="item.insertions.control" /></div>
+                    </div>
+                </template>
+                <template v-else>
+                    <warn-invalid-layout-item-type :item />
+                </template>
+            </template>
+        </div>
+    `,
+});
+
+vue_component('layout-inline', {
+    props: ['items'],
+    template: `
+        <template v-for="item in items" :key="item.key">
+            <template v-if="item.insertions.container">
+                <div><render-function :fn="item.insertions.container" /></div>
+            </template>
+            <template v-else-if="(item.insertions.label && item.insertions.control)">
+                <div class="flex-row-center-left gap5">
+                    <render-function :fn="item.insertions.control" />
+                    <render-function :fn="item.insertions.label" />
+                </div>
+            </template>
+            <template v-else>
+                <warn-invalid-layout-item-type :item />
+            </template>
+        </template>
+    `,
+});
+
+vue_component('layout-inline-rev', {
+    props: ['items'],
+    template: `
+        <template v-for="item in items" :key="item.key">
+            <template v-if="item.insertions.container">
+                <div><render-function :fn="item.insertions.container" /></div>
+            </template>
+            <template v-else-if="(item.insertions.label && item.insertions.control)">
+                <div class="flex-row-center-left gap5">
+                    <render-function :fn="item.insertions.control" />
+                    <render-function :fn="item.insertions.label" />
+                </div>
+            </template>
+            <template v-else>
+                <warn-invalid-layout-item-type :item />
+            </template>
+        </template>
+    `,
+});
+
+// - label
+// - control
+// - container
+// - layout_table_tr
+// - layout_table_tr2
+vue_component('layout-table', {
+    props: ['items'],
+    template: `
+        <table>
+            <thead>
+            </thead>
+            <tbody>
+                <template v-for="item in items" v-bind:key="item.key">
+                    <template v-if="item.insertions.layout_table_tr">
+                        <render-function :fn="item.insertions.layout_table_tr" />
+                    </template>
+                    <template v-else-if="item.insertions.layout_table_tr2">
+                        <tr>
+                            <render-function :fn="item.insertions.layout_table_tr2" />
+                        </tr>
+                    </template>
+                    <template v-else-if="item.insertions.container">
+                        <tr>
+                            <td colspan="2">
+                                <render-function :fn="item.insertions.container" />
+                            </td>
+                        </tr>
+                    </template>
+                    <template v-else-if="(item.insertions.label && item.insertions.control)">
+                        <tr>
+                            <th><render-function :fn="item.insertions.label" /></th>
+                            <td><render-function :fn="item.insertions.control" /></td>
+                        </tr>
+                    </template>
+                    <template v-else>
+                        <tr>
+                            <td colspan="2">
+                                ⚠️ Unrecognized insertions: {{ win.Object.keys(item.insertions) }}
+                            </td>
+                        </tr>
+                    </template>
+                </template>
+            </tbody>
+        </table>
+    `,
+});
+
+vue_component('layout-columns', {
+    props: ['items', 'cols'],
+    template: `
+        <div class="flex-row gap10">
+            <template v-for="ci in computed_items" v-bind:key="ci.orig.key">
+                <template v-if="ci.orig.insertions.container">
+                    <div v-bind:style="ci.style">
+                        <render-function :fn="ci.orig.insertions.container" />
+                    </div>
+                </template>
+                <template v-else-if="(ci.orig.insertions.label && ci.orig.insertions.control)">
+                    <div v-bind:style="ci.style" class="flex-col gap5">
+                        <render-function :fn="ci.orig.insertions.label" />
+                        <render-function :fn="ci.orig.insertions.control" />
+                    </div>
+                </template>
+                <template v-else>
+                    <warn-invalid-layout-item-type :item="ci.orig" />
+                </template>
+            </template>
+        </div>
+    `,
+    computed: {
+        computed_items: function () {
+            const cols = (this.cols||'1').split(',');
+            return this.items.map(function (item, i) {
+                return {orig: item, style: `flex: ${cols[i] ?? 1} 0 0; min-width: 0;`};
+            });
+        },
+    },
+});
+
+vue_component('expand', {
+    emits: ['update:modelValue'],
+    props: ['modelValue'],
+    template: `
+        <button v-if="open" v-on:click="click_collapse">collapse</button>
+        <button v-else v-on:click="click_expand">expand</button>
+    `,
+    data: function () {
+        return {
+            open: this.modelValue,
+        };
+    },
+    methods: {
+        click_expand: function () {
+            this.open = true;
+            this.$emit('update:modelValue', this.open);
+        },
+        click_collapse: function () {
+            this.open = false;
+            this.$emit('update:modelValue', this.open);
+        },
+    },
+});
+
+vue_component('x-form', {
+    props: ['modelValue', 'layout'],
+    inheritAttrs: false,
+    provide: function () {
+        return {
+            form_search: Vue.ref(''),
+            form_value: this.modelValue,
+            form_items: {
+                add: inst => this.items.push(inst),
+                remove: inst => this.items.splice(this.items.indexOf(inst) >>> 1, 1),
+            },
+        };
+    },
+    template: `
+        <div class="red">
+            <slot />
+        </div>
+        <component v-bind:is="(layout ?? 'layout-basic')"
+                   v-bind:items="gogogo_v1"
+                   v-bind="$attrs" />
+    `,
+    data: function () {
+        return {
+            items: [],
+            storage: {},
+        };
+    },
+    computed: {
+        gogogo_v1: function () {
+            const ignore = new Set();
+            const {storage} = this;
+            const db = [];
+            this.items.forEach(v => walk(null, v));
+
+            // const filters = db.map(v => form_types[v.form_item.type]?.filter).filter(v => v);
+            const transforms = db.map(v => form_types[v.form_item.type]?.transform).filter(v => v);
+
+            return query({parent: null}).flatMap(make_insertions);
+            function walk(parent, form_item) {
+                db.push({parent, form_item});
+                form_item.child_items.forEach(child => walk(form_item, child));
+            }
+            function query(expr) {
+                let out = expr.self
+                    ? db.filter(v => v.form_item === expr.self)
+                    : db.filter(v => v.parent === expr.parent);
+                out = out.flatMap(v => form_types[v.form_item.type]?.transform_self ? form_types[v.form_item.type].transform_self(v, query) : [v]);
+                out = transforms.reduce((a, fn) => fn(a, query, storage), out);
+
+                // out = out.flatMap(v => (v.form_item.type === 'unwrap') ? query({parent: v.form_item}) : [v]);
+
+                return out;
+            }
+            function make_insertions({form_item, parent}) {
+                if (form_types[form_item.type]?.make_insertions && !ignore.has(form_types[form_item.type]?.make_insertions)) {
+                    ignore.add(form_types[form_item.type]?.make_insertions);
+                    try {
+                        return form_types[form_item.type]?.make_insertions({form_item, parent, make_insertions, query, storage});
+                    }
+                    finally {
+                        ignore.delete(form_types[form_item.type]?.make_insertions);
+                    }
+                }
+                if (form_item.label) {
+                    const out = {
+                        insertions: {
+                            source: 'P1',
+                            label: attrs => render_label(form_item, attrs),
+                            control: () => render_control(form_item),
+                        },
+                    };
+                    if (form_item.help) {
+                        out.insertions.help = form_item.$slots.help ?? (() => Vue.h('DIV', null, form_item.help));
+                    }
+                    return out;
+                }
+                return {
+                    insertions: {
+                        source: 'P2',
+                        container: () => render_control(form_item),
+                    },
+                };
+            }
+            function render_label(form_item, attrs) {
+                if (form_types[form_item.type]?.render_label) {
+                    return Vue.h(form_types[form_item.type].render_label(form_item, query, make_insertions, attrs));
+                }
+                return Vue.h('label', {for: form_item.id, ...attrs}, form_item.label);
+            }
+            function render_control(form_item) {
+                if (form_types[form_item.type]?.render_control) {
+                    return Vue.h(form_types[form_item.type].render_control(form_item, query, make_insertions));
+                }
+                if (typeof form_types[form_item.type] !== 'string') {
+                    return Vue.h('DIV', {class: 'yellow'}, [`⚠️ no type ⚠️: ${form_item.type}`]);
+                }
+                return Vue.h(Vue.resolveComponent(form_types[form_item.type]));
+            }
+        },
+    },
+});
+
+vue_component('x-form-item', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'type', 'label', 'items', 'help'],
+    inheritAttrs: false,
+    inject: {
+        form_value: 'form_value',
+        form_search: 'form_search',
+        form_items_parent: {from: 'form_items', default: {add: () => 0, remove: () => 0}},
+    },
+    provide: function () {
+        return {
+            form_items: {
+                add: inst => this.child_items.push(inst),
+                remove: inst => this.child_items.splice(this.child_items.indexOf(inst) >>> 1, 1),
+            },
+        };
+    },
+    template: `
+        <slot>
+            <x-form-item v-for="item in computed_items" v-bind="item" />
+        </slot>
+    `,
+    data: function () {
+        let ov = {};
+        if (form_types[this.type]?.insertions) {
+            ov = form_types[this.type]?.insertions(this);
+        }
+
+        return {
+            id: `id-${crypto.randomUUID()}`,
+            key: `key-${crypto.randomUUID()}`,
+            insertions: {
+                label: this.render_label,
+                control: this.render_control,
+                ...((this.label || this.label === '') ? {} : {container: this.render_control}),
+                ...(this.$attrs.hack_ins_containerl ? {container: this.render_control} : {}),
+                ...(this.$attrs.hack_ins_nolab ? {label: () => []} : {}),
+                ...ov,
+                ...this.$slots,
+            },
+            child_items: [],
+        };
+    },
+    computed: {
+        computed_items: function () {
+            const _this = this;
+            return (this.items ?? []).map(function (item) {
+                const out = {
+                    ...item,
+                    get modelValue() {
+                        if (item.path === undefined) {
+                            return null;
+                        }
+                        let out = _this.form_value;
+                        item.path.split('.').forEach(key => out = out?.[key]);
+                        return out;
+                    },
+                    'onUpdate:modelValue': function (value) {
+                        if (item.path === undefined) {
+                            return;
+                        }
+                        let key;
+                        let tmp = _this.form_value;
+                        item.path.split('.').forEach(function (_key) {
+                            if (key) {
+                                tmp = tmp[key];
+                            }
+                            key = _key;
+                        });
+                        tmp[key] = value;
+                    },
+                };
+                delete out.path;
+                return out;
+            });
+        },
+    },
+    methods: {
+        render_label: function (attrs) {
+console.log('x-form-item.render_label');
+            if (this.$slots.label) {
+                return this.$slots.label();
+            }
+            return Vue.h('label', {for: this.id}, this.label);
+        },
+        render_control: function () {
+console.log('x-form-item.render_control');
+            if (!form_types[this.type] || (typeof form_types[this.type] === 'object' && !form_types[this.type].name)) {
+                return [`⚠️ no type ⚠️: ${this.type}`];
+            }
+            let r;
+            try {
+                r = Vue.resolveComponent(form_types[this.type]?.name ?? form_types[this.type]);
+            }
+            catch (error) {
+                console.log(form_types[this.type]?.name ?? form_types[this.type]);
+                console.error(error);
+                r = 'DIV';
+            }
+            return Vue.h(r, {
+                id: this.id,
+                modelValue: this.modelValue,
+                'onUpdate:modelValue': v => this.$emit('update:modelValue', v),
+            });
+        },
+    },
+    created: function () {
+        this.form_items_parent.add(this);
+    },
+    unmounted: function () {
+        this.form_items_parent.remove(this);
+    },
+});
+
+vue_component('render-function', {
+    inheritAttrs: false,
+    props: ['fn'],
+    render: function () {
+        return this.fn(this.$attrs, this.$slots);
+    },
+});
+
+vue_component('app', {
+    template: `
+    <div class="fix-f hsplit gap15 m10">
+        <div class="w500">
+
+<form>
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Email address</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+    </div>
+    <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label">Password</label>
+        <input type="password" class="form-control" id="exampleInputPassword1">
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+        <label class="form-check-label" for="exampleCheck1">Check me out</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+        </div>
+        <div class="w400">
+
+            <x-form layout="layout-bootstrap5">
+                <x-form-item type="email" label="Email address" help="We'll never share your email with anyone else." />
+                <x-form-item type="password" label="Password" />
+                <x-form-item type="checkbox" label="Check me out" />
+            </x-form>
+
+        </div>
+        <div class="fluid mg15 oa">
+
+            <x-form layout="layout-table" class="green">
+
+                <x-form-item type="header" label="HEADER" />
+                <x-form-item type="filter" label="Filter" />
+
+                <x-form-item type="section" label="Personal Info">
+                    <x-form-item type="text" label="First" />
+                    <x-form-item type="text" label="Last" />
+                </x-form-item>
+
+
+                <x-form-item type="text" label="First" />
+                <x-form-item type="text" label="Last" />
+                <x-form-item type="layout-table" xlabel="Basic">
+                    <x-form-item type="text" label="First" />
+                    <x-form-item type="text" label="Last" />
+                </x-form-item>
+                <x-form-item type="expand" label="Basic">
+                    <x-form-item type="text" label="ex.First" />
+                    <x-form-item type="text" label="ex.Last" />
+                </x-form-item>
+                <x-form-item type="unwrap" label="Unwrap">
+                    <x-form-item type="text" label="w.First" />
+                    <x-form-item type="unwrap" label="Unwrap">
+                        <x-form-item type="text" label="x.First" />
+                    </x-form-item>
+                    <x-form-item type="text" label="w.Last" />
+                </x-form-item>
+
+<!--
+
+                <x-form-item type="expand">
+                    <x-form-item type="section" label="Personal information">
+                        <x-form-item type="text" label="First" />
+                        <x-form-item type="text" label="Last" />
+                    </x-form-item>
+                    <x-form-item type="section" label="Account information">
+                        <x-form-item type="text" label="Email" />
+                        <x-form-item type="text" label="Password" />
+                        <x-form-item type="text" label="Confirm" />
+                        <x-form-item type="checkbox" label="Remember me" />
+                    </x-form-item>
+                </x-form-item>
+
+
+
+                <x-form-item layout="layout-table" label="Nested">
+                    <x-form-item type="header" label="Step 1. Your details" />
+                    <x-form-item type="text" label="Name" />
+                    <x-form-item type="text" label="Email" />
+                    <x-form-item type="text" label="Phone" />
+
+                    <x-form-item type="header" label="Step 2. Delivery address" />
+                    <x-form-item type="text" label="Address" />
+                    <x-form-item type="text" label="Post code" />
+                    <x-form-item type="text" label="Country" />
+
+                    <x-form-item type="header" label="Step 3. Card details" />
+                    <x-form-item type="text" label="Card type" />
+                    <x-form-item type="text" label="Card number" />
+                    <x-form-item type="text" label="Security code" />
+                    <x-form-item type="text" label="Name on card" />
+                </x-form-item>
+
+
+
+                <x-form-item type="unwrap">
+                    <x-form-item type="text" label="Unwrap -> Text1" />
+                    <x-form-item type="text" label="Unwrap -> Text2" />
+                    <x-form-item type="expand" xlayout="layout-table">
+                        <x-form-item type="text" label="Text22" />
+                        <x-form-item type="text" label="Text22" />
+                        <x-form-item type="expand" layout="layout-basic">
+                            <x-form-item type="text" label="Text33" />
+                            <x-form-item type="text" label="Text33" />
+                        </x-form-item>
+                    </x-form-item>
+                </x-form-item>
+
+                <x-form-item type="unwrap" label="Unwrap">
+                    <x-form-item v-model="form.name.title" type="text" label="__1__ CC Title ___" />
+                    <x-form-item v-model="form.name.title" type="text" label="__1__ CC Title ___" />
+                    <x-form-item v-model="form.name.title" type="text" label="__1__ CC Title ___" />
+                    <x-form-item layout="expand2">
+                        <x-form-item v-model="form.name.title" type="text" label="__2__ CC Title ___" />
+                        <x-form-item v-model="form.name.title" type="text" label="__2__ CC Title ___" />
+                        <x-form-item v-model="form.name.title" type="text" label="__2__ CC Title ___" />
+                    </x-form-item>
+                </x-form-item>
+
+                <x-form-item v-model="form.name.title" type="text" label="CC Title" />
+                <x-form-item v-model="form.name.first" type="text" label="CC First" />
+                <x-form-item v-model="form.name.last" type="text" label="CC Last" />
+                <x-form-item v-model="form.ex1"" type="expand2" label="Nested">
+                    <x-form-item v-model="form.name.title" type="text" label="Nested Title" />
+                    <x-form-item v-model="form.name.first" type="text" label="Nested First" />
+                    <x-form-item v-model="form.name.last" type="text" label="Nested Last" />
+                    <x-form-item v-model="form.ex2" type="expand2" label="Nested2">
+                        <x-form-item v-model="form.name.title" type="text" label="33 Nested Title" />
+                        <x-form-item v-model="form.name.first" type="text" label="33 Nested First" />
+                        <x-form-item v-model="form.name.last" type="text" label="33 Nested Last" />
+                        <x-form-item v-model="form.ex3" type="expand2" label="Nested3">
+                            <x-form-item v-model="form.name.title" type="text" label="44 Nested Title" />
+                            <x-form-item v-model="form.name.first" type="text" label="44 Nested First" />
+                            <x-form-item v-model="form.name.last" type="text" label="44 Nested Last" />
+                        </x-form-item>
+                    </x-form-item>
+                    <x-form-item layout="layout-columns">
+                        <x-form-item v-model="form.name.title" type="text" label="XX Nested Title" />
+                        <x-form-item v-model="form.name.first" type="text" label="XX Nested First" />
+                        <x-form-item v-model="form.name.last" type="text" label="XX Nested Last" />
+                    </x-form-item>
+                </x-form-item>
+-->
+            </x-form>
+        </div>
+    </div>
+`,
+    data: function () {
+        return {
+            form: {
+                gender: '',
+                name: {
+                    title: 'tt',
+                    first: 'ff',
+                    last: 'll',
+                },
+                first_name: '',
+                last_name: '',
+                address: '',
+                address2: '',
+                city: '',
+                state: '',
+                zip: '',
+            },
+            items: [
+                {layout: 'layout-group', label: 'Personal information', hack_ins_containerl:1, items: [
+                    {type: 'text', path: 'name.title', label: 'Title'},
+                    {type: 'text', path: 'name.first', label: 'First'},
+                    {type: 'text', path: 'name.last', label: 'Last'},
+                ]},
+                {layout: 'layout-group', label: 'Account information', hack_ins_nolab: 1, items: [
+                    {type: 'text', path: 'name.title', label: 'Title'},
+                    {type: 'text', path: 'name.first', label: 'First'},
+                    {type: 'text', path: 'name.last', label: 'Last'},
+                ]},
+                {type: 'text', path: 'gender', label: 'Gender'},
+                {type: 'checkbox', path: 'remember_me', label: 'Remember Me'},
+                {type: 'checkbox', path: 'remember_me', label: 'Remember Me', noinline: true},
+                {layout: 'layout-columns', cols: '2,5,5', items: [
+                    {type: 'text', path: 'name.title', label: 'cols.Title'},
+                    {type: 'text', path: 'name.first', label: 'cols.First'},
+                    {type: 'text', path: 'name.last', label: 'cols.Last'},
+                ]},
+                {layout: 'layout-table', items: [
+                    // <x-form-item>
+                    //     <template #label>GGG</template>
+                    //     <template #control>XXXX</template>
+                    //     <template #container>CONTAINER</template>
+                    //     <template #layout_table_tr>
+                    //         <tr><td>layout_table_tr</td></tr>
+                    //     </template>
+                    // </x-form-item>
+                    {type: 'xxx', items: []},
+                    {layout: 'layout-table', items: [
+                        {type: 'text', path: 'name.title', label: 'CC Title'},
+                        {type: 'text', path: 'name.first', label: 'CC First'},
+                        {type: 'text', path: 'name.last', label: 'CC Last'},
+                    ]},
+                    {type: 'text', path: 'name.title', label: 'Title'},
+                    {type: 'text', path: 'name.first', label: 'First'},
+                    {layout: 'layout-table', label: 'Whatever111', items: [
+                        {type: 'text', path: 'name.title', label: 'CC Title'},
+                        {type: 'text', path: 'name.first', label: 'CC First'},
+                        {type: 'text', path: 'name.last', label: 'CC Last'},
+                    ]},
+                    // <x-form-item #control label="Whatever2">
+                    //     <expand>
+                    //         <x-form layout="layout-table">
+                    //             <x-form-item v-model="form.name.title" type="text" label="Title" />
+                    //             <x-form-item v-model="form.name.first" type="text" label="First" />
+                    //             <x-form-item v-model="form.name.last" type="text" label="Last" />
+                    //         </x-form>
+                    //     </expand>
+                    // </x-form-item>
+                    {type: 'xxx', items: []},
+                    // <x-form-item #container>
+                    //     <tabs>
+                    //         <tabs-item label="First">
+                    //             <x-form layout="layout-table">
+                    //                 <x-form-item v-model="form.name.title" type="text" label="tab-Title" />
+                    //                 <x-form-item v-model="form.name.first" type="text" label="tab-First" />
+                    //                 <x-form-item v-model="form.name.last" type="text" label="tab-Last" />
+                    //             </x-form>
+                    //         </tabs-item>
+                    //         <tabs-item label="Second">
+                    //             <x-form layout="layout-columns" cols="2,5,5">
+                    //                 <x-form-item v-model="form.name.title" type="text" label="tab-Title" />
+                    //                 <x-form-item v-model="form.name.first" type="text" label="tab-First" />
+                    //                 <x-form-item v-model="form.name.last" type="text" label="tab-Last" />
+                    //             </x-form>
+                    //         </tabs-item>
+                    //     </tabs>
+                    // </x-form-item>
+                    {type: 'xxx', items: []},
+                    {layout: 'layout-table', label: '--- I\'m a custom label! ---', items: [
+                        {type: 'text', path: 'name.title', label: 'Title'},
+                        {type: 'text', path: 'name.first', label: 'First'},
+                        {type: 'text', path: 'name.last', label: 'Last'},
+                    ]},
+                    {type: 'text', path: 'name.last', label: 'Last'},
+                    {layout: 'layout-tabs', label: 'Tabs please!', items: [
+                        {type: 'text', path: 'name.title', label: 'Title'},
+                        {type: 'text', path: 'name.first', label: 'First'},
+                        {type: 'text', path: 'name.last', label: 'Last'},
+                        {layout: 'layout-table', label: 'Nested Triple', items: [
+                            {type: 'text', path: 'name.title', label: 'TT.Title'},
+                            {type: 'text', path: 'name.first', label: 'TT.First'},
+                            {type: 'text', path: 'name.last', label: 'TT.Last'},
+                        ]},
+                    ]},
+                    {layout: 'layout-accordion', label: 'Accordion please!', items: [
+                        {layout: 'layout-table', label: 'Expand', items: [
+                            {type: 'text', path: 'name.title', label: 'Title'},
+                            {type: 'text', path: 'name.first', label: 'First'},
+                            {type: 'text', path: 'name.last', label: 'Last'},
+                        ]},
+                    ]},
+                    {layout: 'layout-wrapper', wrapper: 'DIV', style: 'border:10px solid #ff8;', items: [
+                        {layout: 'layout-wrapper', wrapper: 'expand', style: 'border:10px solid #f88;', items: [
+                            {type: 'text', path: 'name.title', label: 'Title'},
+                            {type: 'text', path: 'name.first', label: 'First'},
+                            {type: 'text', path: 'name.last', label: 'Last'},
+                        ]},
+                    ]},
+                ]},
+                {layout: 'layout-columns', cols: '2,5,5', items: [
+                    {type: 'text', path: 'name.title', label: 'Title'},
+                    {type: 'text', path: 'name.first', label: 'First'},
+                    {type: 'text', path: 'name.last', label: 'Last'},
+                ]},
+            ],
+        };
+    },
+    computed: {
+        form_json: function () {
+            return JSON.stringify(this.form, null, 4);
+        },
+    },
+})
+</script>
+
+</body>
+</html>
