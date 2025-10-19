@@ -16,14 +16,16 @@
 const form_types = {
     'layout-bootstrap5': {
         render_control: function (form_item, query, make_insertions) {
-            return Vue.h(Vue.resolveComponent('layout-bootstrap5'), {items: query({parent: form_item}).map(make_insertions)});
+            return Vue.h(Vue.resolveComponent('layout-bootstrap5'), {items: query({parent: form_item}).flatMap(make_insertions)});
         },
     },
     'layout-bootstrap5-cols': {
         render_control: function (form_item, query, make_insertions) {
-            const items = query({parent: form_item}).map(function (item) {
+            const items = query({parent: form_item}).flatMap(function (item) {
                 const out = make_insertions(item);
-                console.log('xx', item, out);
+                if (item.form_item.$attrs['bs5-col']) {
+                    out.bs5_col = item.form_item.$attrs['bs5-col'];
+                }
                 return out;
             });
             const cols = form_item.$attrs.cols;
@@ -32,17 +34,17 @@ const form_types = {
     },
     'layout-bootstrap5-hor': {
         render_control: function (form_item, query, make_insertions) {
-            return Vue.h(Vue.resolveComponent('layout-bootstrap5-hor'), {items: query({parent: form_item}).map(make_insertions), cols: form_item.$attrs.cols});
+            return Vue.h(Vue.resolveComponent('layout-bootstrap5-hor'), {items: query({parent: form_item}).flatMap(make_insertions), cols: form_item.$attrs.cols});
         },
     },
     'layout-basic': {
         render_control: function (form_item, query, make_insertions) {
-            return Vue.h(Vue.resolveComponent('layout-basic'), {items: query({parent: form_item}).map(make_insertions)});
+            return Vue.h(Vue.resolveComponent('layout-basic'), {items: query({parent: form_item}).flatMap(make_insertions)});
         },
     },
     'layout-table': {
         render_control: function (form_item, query, make_insertions) {
-            return Vue.h(Vue.resolveComponent('layout-table'), {items: query({parent: form_item}).map(make_insertions)});
+            return Vue.h(Vue.resolveComponent('layout-table'), {items: query({parent: form_item}).flatMap(make_insertions)});
         },
     },
     'layout-group': {
@@ -54,17 +56,17 @@ const form_types = {
     },
     'layout-inline': {
         render_control: function (form_item, query, make_insertions) {
-            return Vue.h(Vue.resolveComponent('layout-inline'), {items: query({parent: form_item}).map(make_insertions)});
+            return Vue.h(Vue.resolveComponent('layout-inline'), {items: query({parent: form_item}).flatMap(make_insertions)});
         },
     },
     'layout-inline-rev': {
         render_control: function (form_item, query, make_insertions) {
-            return Vue.h(Vue.resolveComponent('layout-inline-rev'), {items: query({parent: form_item}).map(make_insertions)});
+            return Vue.h(Vue.resolveComponent('layout-inline-rev'), {items: query({parent: form_item}).flatMap(make_insertions)});
         },
     },
     'layout-columns': {
         render_control: function (form_item, query, make_insertions) {
-            return Vue.h(Vue.resolveComponent('layout-columns'), {items: query({parent: form_item}).map(make_insertions)});
+            return Vue.h(Vue.resolveComponent('layout-columns'), {items: query({parent: form_item}).flatMap(make_insertions)});
         },
     },
     none: {
@@ -406,7 +408,7 @@ vue_component('layout-bootstrap5-cols', {
         items: {
             immediate: true,
             handler: function () {
-                const cols = (this.cols).split(/[,;|]/g).map(v => +v);
+                const cols = String(this.cols ?? '').split(/[,;|]/g).map(v => +v);
                 const item_to_key = new Map(this.local_items.map(v => [v.orig, v.key]));
                 this.local_items = this.items.map(function (item, i) {
                     return {
@@ -758,6 +760,16 @@ vue_component('expand', {
     },
 });
 
+// 👢🚀
+vue_component('form-motivator', {
+    props: ['items'],
+    template: `
+        <template v-for="item in items">
+            <render-function v-if="item.insertions.container" :fn="item.insertions.container" />
+        </template>
+    `,
+});
+
 vue_component('x-form', {
     props: ['modelValue', 'layout'],
     inheritAttrs: false,
@@ -773,11 +785,9 @@ vue_component('x-form', {
     },
     template: `
         <div class="red">
-            <slot />
+            <x-form-item v-bind:type="(layout ?? 'layout-basic')"><slot /></x-form-item>
         </div>
-        <component v-bind:is="(layout ?? 'layout-basic')"
-                   v-bind:items="gogogo_v1"
-                   v-bind="$attrs" />
+        <form-motivator :items="gogogo_v1" />
     `,
     data: function () {
         return {
@@ -796,6 +806,7 @@ vue_component('x-form', {
             const transforms = db.map(v => form_types[v.form_item.type]?.transform).filter(v => v);
 
             return query({parent: null}).flatMap(make_insertions);
+
             function walk(parent, form_item) {
                 db.push({parent, form_item});
                 form_item.child_items.forEach(child => walk(form_item, child));
@@ -829,7 +840,7 @@ vue_component('x-form', {
                                 return form_types[form_item.type].render_container(form_item, query, make_insertions, attrs);
                             },
                         },
-                        ...(form_item.$attrs['bs5-col'] ? {'bs5_col': form_item.$attrs['bs5-col']} : {}),
+                        // ...(form_item.$attrs['bs5-col'] ? {'bs5_col': form_item.$attrs['bs5-col']} : {}),
                     };
                 }
                 if (form_item.label) {
@@ -839,7 +850,7 @@ vue_component('x-form', {
                             label: attrs => render_label(form_item, attrs),
                             control: attrs => render_control(form_item, attrs),
                         },
-                        ...(form_item.$attrs['bs5-col'] ? {'bs5_col': form_item.$attrs['bs5-col']} : {})
+                        // ...(form_item.$attrs['bs5-col'] ? {'bs5_col': form_item.$attrs['bs5-col']} : {})
                     };
                     if (form_item.help) {
                         out.insertions.help = form_item.$slots.help ?? (() => Vue.h('DIV', null, form_item.help));
@@ -851,7 +862,7 @@ vue_component('x-form', {
                         source: 'P2',
                         container: attrs => render_control(form_item, attrs),
                     },
-                    ...(form_item.$attrs['bs5-col'] ? {'bs5_col': form_item.$attrs['bs5-col']} : {}),
+                    // ...(form_item.$attrs['bs5-col'] ? {'bs5_col': form_item.$attrs['bs5-col']} : {}),
                 };
             }
             function render_label(form_item, attrs) {
