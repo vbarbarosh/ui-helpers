@@ -401,6 +401,30 @@ const form_types = {
             return Vue.h(Vue.resolveComponent('el-input'), {type: 'textarea', ...form_item.$attrs, ...attrs});
         },
     },
+
+    'eleme-date-time': {
+        render_label: function (form_item, query, make_insertions, attrs, slots) {
+            return Vue.h(Vue.resolveComponent('el-form-item'), {label: form_item.label}, slots);
+        },
+        render_control: function () {
+            const comp = {
+                props: ['form'],
+                template: `
+                    <el-col :span="11">
+                        <el-date-picker v-model="form.date1" type="date" placeholder="Pick a date" style="width: 100%" />
+                    </el-col>
+                    <el-col :span="2" class="text-center">
+                        <span class="text-gray-500">-</span>
+                    </el-col>
+                    <el-col :span="11">
+                        <el-time-picker v-model="form.date2" placeholder="Pick a time" style="width: 100%" />
+                    </el-col>
+                `,
+            };
+            return Vue.h(comp, {form: {}});
+        },
+    },
+
 };
 
 vue_component('warn-invalid-layout-item-type', {
@@ -1238,6 +1262,7 @@ vue_component('app', {
                     <x-form-item type="date" placeholder="Pick a date" />
                     <x-form-item type="time" placeholder="Pick a time" />
                 </x-form-item>
+                <x-form-item type="eleme-date-time" label="Activity time" />
                 <x-form-item type="checkbox-switch" label="Instant delivery" />
                 <x-form-item type="checkboxes" label="Activity type">
                     <x-form-item type="option" value="online" label="Online activities" />
