@@ -87,12 +87,6 @@ vue_component('x-input-tel', {
     },
 });
 
-vue_component('jack-hack', {
-    template: `
-        <slot id="a12345" />
-    `,
-});
-
 vue_directive('label-id', {
     mounted: function (el, binding) {
         if (binding.instance.$slots.jack_hack_label_id) {
@@ -121,6 +115,12 @@ vue_component('x-input-email', {
     },
 });
 
+// vue_component('jack-hack', {
+//     template: `
+//         <slot id="a12345" />
+//     `,
+// });
+//
 // vue_component('x-input-email', {
 //     emits: ['update:modelValue'],
 //     props: ['modelValue', 'disabled', 'readonly'],
