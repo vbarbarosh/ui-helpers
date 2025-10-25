@@ -990,7 +990,7 @@ vue_component('x-form', {
             form_value: this.modelValue,
             form_items: {
                 add: inst => this.items.push(inst),
-                remove: inst => this.items.splice(this.items.indexOf(inst) >>> 1, 1),
+                remove: inst => this.items.splice(this.items.indexOf(inst) >>> 0, 1),
             },
         };
     },
@@ -1089,7 +1089,12 @@ vue_component('x-form', {
                 if (typeof form_types[form_item.type] !== 'string') {
                     return Vue.h('DIV', {class: 'yellow'}, [`⚠️ no type ⚠️: ${form_item.type}`]);
                 }
-                return Vue.h(Vue.resolveComponent(form_types[form_item.type]), {form_item_id: form_item.id});
+                return Vue.h(Vue.resolveComponent(form_types[form_item.type]), {}, {
+                    jack_hack_label_id: function (obj) {
+                        obj.id = form_item.id;
+                        return [];
+                    },
+                });
             }
         },
     },

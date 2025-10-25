@@ -95,7 +95,11 @@ vue_component('jack-hack', {
 
 vue_directive('label-id', {
     mounted: function (el, binding) {
-        el.setAttribute('id', binding.instance.$attrs.form_item_id);
+        if (binding.instance.$slots.jack_hack_label_id) {
+            const obj = {id: '................'};
+            binding.instance.$slots.jack_hack_label_id(obj);
+            el.setAttribute('id', obj.id);
+        }
     },
 });
 
