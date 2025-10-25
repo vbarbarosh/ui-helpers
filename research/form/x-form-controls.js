@@ -2,7 +2,7 @@ vue_component('x-input-search', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -20,7 +20,7 @@ vue_component('x-input-number', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -38,7 +38,7 @@ vue_component('x-input-text', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -56,7 +56,7 @@ vue_component('x-input-textarea', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <textarea v-label-id
+        <textarea v-form-label-id
                   v-on:input="input"
                   v-bind:value="modelValue"
                   v-bind:disabled="disabled"
@@ -73,7 +73,7 @@ vue_component('x-input-tel', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -101,7 +101,7 @@ vue_component('x-input-email', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -145,7 +145,7 @@ vue_component('x-input-url', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -163,7 +163,7 @@ vue_component('x-input-password', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -181,7 +181,7 @@ vue_component('x-input-checkbox', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:checked="modelValue"
                v-bind:disabled="disabled"
@@ -199,7 +199,7 @@ vue_component('x-input-radio', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'name', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:checked="Boolean(modelValue)"
                v-bind:disabled="disabled"
@@ -235,7 +235,7 @@ vue_component('x-input-color', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -253,7 +253,7 @@ vue_component('x-input-time', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -271,7 +271,7 @@ vue_component('x-input-date', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -289,7 +289,7 @@ vue_component('x-input-month', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -307,7 +307,7 @@ vue_component('x-input-week', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -325,7 +325,7 @@ vue_component('x-input-file', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
     template: `
-        <input v-label-id
+        <input v-form-label-id
                v-on:input="input"
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
@@ -343,7 +343,7 @@ vue_component('x-input-select', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'options', 'disabled', 'readonly'],
     template: `
-        <select v-label-id v-on:input="input">
+        <select v-form-label-id v-on:input="input">
             <option v-for="item in local_items" v-bind:key="item.key" v-bind:value="item.key" v-bind:selected="(item.value === modelValue)">
                 {{ item.label }}
             </option>
