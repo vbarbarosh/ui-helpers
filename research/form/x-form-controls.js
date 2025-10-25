@@ -87,7 +87,7 @@ vue_component('x-input-tel', {
     },
 });
 
-vue_directive('label-id', {
+vue_directive('form-label-id', {
     mounted: function (el, binding) {
         if (binding.instance.$slots.jack_hack_label_id) {
             const obj = {id: '................'};
