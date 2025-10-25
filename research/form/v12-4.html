@@ -735,7 +735,7 @@ vue_component('x-form', {
             form_value: this.modelValue,
             form_items: {
                 add: inst => this.items.push(inst),
-                remove: inst => this.items.splice(this.items.indexOf(inst) >>> 1, 1),
+                remove: inst => this.items.splice(this.items.indexOf(inst) >>> 0, 1),
             },
         };
     },
@@ -841,7 +841,7 @@ vue_component('x-form-item', {
         return {
             form_items: {
                 add: inst => this.child_items.push(inst),
-                remove: inst => this.child_items.splice(this.child_items.indexOf(inst) >>> 1, 1),
+                remove: inst => this.child_items.splice(this.child_items.indexOf(inst) >>> 0, 1),
             },
         };
     },
