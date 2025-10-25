@@ -135,6 +135,7 @@
 - https://builder.vueform.com/demo?v=dev
 - https://primevue.org/treeselect/
 - https://element-plus.org/en-US/component/overview.html
+- https://wpforms.com/templates/
 
 - https://www.justinmind.com/blog/form-examples-web-mobile/
 - https://getbootstrap.com/docs/5.3/examples/checkout/
