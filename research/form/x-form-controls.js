@@ -1,3 +1,37 @@
+vue_component('x-input-search', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly'],
+    template: `
+        <input v-on:input="input"
+               v-bind:value="modelValue"
+               v-bind:disabled="disabled"
+               v-bind:readonly="readonly"
+               type="search" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
+
+vue_component('x-input-number', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly'],
+    template: `
+        <input v-on:input="input"
+               v-bind:value="modelValue"
+               v-bind:disabled="disabled"
+               v-bind:readonly="readonly"
+               type="number" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
+
 vue_component('x-input-text', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
@@ -31,6 +65,23 @@ vue_component('x-input-textarea', {
     },
 });
 
+vue_component('x-input-tel', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly'],
+    template: `
+        <input v-on:input="input"
+               v-bind:value="modelValue"
+               v-bind:disabled="disabled"
+               v-bind:readonly="readonly"
+               type="tel" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
+
 vue_component('x-input-email', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
@@ -40,6 +91,23 @@ vue_component('x-input-email', {
                v-bind:disabled="disabled"
                v-bind:readonly="readonly"
                type="email" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
+
+vue_component('x-input-url', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly'],
+    template: `
+        <input v-on:input="input"
+               v-bind:value="modelValue"
+               v-bind:disabled="disabled"
+               v-bind:readonly="readonly"
+               type="url" />
     `,
     methods: {
         input: function (event) {
@@ -134,27 +202,125 @@ vue_component('x-input-color', {
     },
 });
 
-// input-color.js
-// input-date.js
-// input-email.js
-// input-file.js
-// input-file-drop-zone.js
-// input-files.js
-// input-files-drop-zone.js
-// input-int.js
-// input-month.js
+vue_component('x-input-time', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly'],
+    template: `
+        <input v-on:input="input"
+               v-bind:value="modelValue"
+               v-bind:disabled="disabled"
+               v-bind:readonly="readonly"
+               type="time" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
 
-// input-radio.js
-// input-radios.js
-// input-range.js
-// input-search.js
-// input-select.js
-// input-select-many.js
-// input-select-v1.js.txt
-// input-string.js
-// input-tel.js
-// input-text.js
-// input-textarea.js
-// input-time.js
-// input-url.js
-// input-week.js
+vue_component('x-input-date', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly'],
+    template: `
+        <input v-on:input="input"
+               v-bind:value="modelValue"
+               v-bind:disabled="disabled"
+               v-bind:readonly="readonly"
+               type="date" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
+
+vue_component('x-input-month', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly'],
+    template: `
+        <input v-on:input="input"
+               v-bind:value="modelValue"
+               v-bind:disabled="disabled"
+               v-bind:readonly="readonly"
+               type="month" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
+
+vue_component('x-input-week', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly'],
+    template: `
+        <input v-on:input="input"
+               v-bind:value="modelValue"
+               v-bind:disabled="disabled"
+               v-bind:readonly="readonly"
+               type="week" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
+
+vue_component('x-input-file', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly'],
+    template: `
+        <input v-on:input="input"
+               v-bind:value="modelValue"
+               v-bind:disabled="disabled"
+               v-bind:readonly="readonly"
+               type="file" />
+    `,
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', event.target.value);
+        },
+    },
+});
+
+vue_component('x-input-select', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'options', 'disabled', 'readonly'],
+    template: `
+        <select v-on:input="input">
+            <option v-for="item in local_items" v-bind:key="item.key" v-bind:value="item.key" v-bind:selected="(item.value === modelValue)">
+                {{ item.label }}
+            </option>
+        </select>
+    `,
+    data: function () {
+        return {
+            local_items: [],
+        };
+    },
+    watch: {
+        options: {
+            immediate: true,
+            handler: function () {
+                const item_to_key = new Map(this.local_items.map(v => [v.orig, v.key]));
+                this.local_items = this.options.map(function (item) {
+                    return {
+                        key: item_to_key.get(item) ?? random_html_id(),
+                        label: item.label,
+                        value: ('value' in item) ? item.value : item,
+                        orig: item,
+                    };
+                });
+            },
+        },
+    },
+    methods: {
+        input: function (event) {
+            this.$emit('update:modelValue', this.local_items.find(v => v.key === event.target.value)?.value);
+        },
+    }
+});

@@ -1246,11 +1246,19 @@ vue_component('app', {
             </div>
         </div>
         <div class="dashed xborder-vr" />
-        <div class="p10">
+        <div class="p10 oa">
             right
             <div class="flex-col-center-left">
                 <table>
                 <tbody>
+                    <tr>
+                        <th>x-input-search</th>
+                        <td><x-input-search v-model="form.search1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-number</th>
+                        <td><x-input-number v-model="form.number1" /></td>
+                    </tr>
                     <tr>
                         <th>x-input-text</th>
                         <td><x-input-text v-model="form.text1" /></td>
@@ -1260,8 +1268,16 @@ vue_component('app', {
                         <td><x-input-textarea v-model="form.textarea1" /></td>
                     </tr>
                     <tr>
+                        <th>x-input-tel</th>
+                        <td><x-input-tel v-model="form.tel1" /></td>
+                    </tr>
+                    <tr>
                         <th>x-input-email</th>
                         <td><x-input-email v-model="form.email1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-url</th>
+                        <td><x-input-url v-model="form.url1" /></td>
                     </tr>
                     <tr>
                         <th>x-input-password</th>
@@ -1299,6 +1315,30 @@ vue_component('app', {
                         <th>x-input-color</th>
                         <td><x-input-color v-model="form.color1" /></td>
                     </tr>
+                    <tr>
+                        <th>x-input-time</th>
+                        <td><x-input-time v-model="form.time1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-date</th>
+                        <td><x-input-date v-model="form.date1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-month</th>
+                        <td><x-input-month v-model="form.month1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-week</th>
+                        <td><x-input-week v-model="form.week1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-file</th>
+                        <td><x-input-file v-model="form.file1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-select</th>
+                        <td><x-input-select v-model="form.select1" :options="options1" /></td>
+                    </tr>
                 </tbody>
                 </table>
             </div>
@@ -1311,6 +1351,7 @@ vue_component('app', {
 `,
     data: function () {
         return {
+            options1: [{label: 'Apple'}, {label: 'Banana'}, {label: 'Grape'}],
             form: {
                 name: '',
                 region: '',
