@@ -996,7 +996,7 @@ vue_component('x-form', {
     },
     template: `
         <div class="red">
-            <x-form-item v-bind:type="(layout ?? 'layout-basic')"><slot /></x-form-item>
+            <x-form-item v-bind:type="(layout ?? 'layout-table')"><slot /></x-form-item>
         </div>
         <form-motivator :items="gogogo_v1" />
     `,
@@ -1089,7 +1089,7 @@ vue_component('x-form', {
                 if (typeof form_types[form_item.type] !== 'string') {
                     return Vue.h('DIV', {class: 'yellow'}, [`⚠️ no type ⚠️: ${form_item.type}`]);
                 }
-                return Vue.h(Vue.resolveComponent(form_types[form_item.type]));
+                return Vue.h(Vue.resolveComponent(form_types[form_item.type]), {form_item_id: form_item.id});
             }
         },
     },
