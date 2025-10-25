@@ -307,7 +307,7 @@ vue_component('x-input-select', {
             immediate: true,
             handler: function () {
                 const item_to_key = new Map(this.local_items.map(v => [v.orig, v.key]));
-                this.local_items = this.options.map(function (item) {
+                this.local_items = this.options?.map(function (item) {
                     return {
                         key: item_to_key.get(item) ?? random_html_id(),
                         label: item.label,

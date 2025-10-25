@@ -15,6 +15,36 @@
 <script src="x-form-controls.js"></script>
 <script>
 const form_types = {
+    'layout-basic': {
+        render_control: function (form_item, query, make_insertions) {
+            return Vue.h(Vue.resolveComponent('layout-basic'), {items: query({parent: form_item}).flatMap(make_insertions)});
+        },
+    },
+    'layout-table': {
+        render_control: function (form_item, query, make_insertions) {
+            return Vue.h(Vue.resolveComponent('layout-table'), {items: query({parent: form_item}).flatMap(make_insertions)});
+        },
+    },
+    search: 'x-input-search',
+    number: 'x-input-number',
+    text: 'x-input-text',
+    textarea: 'x-input-textarea',
+    tel: 'x-input-tel',
+    email: 'x-input-email',
+    url: 'x-input-url',
+    password: 'x-input-password',
+    checkbox: 'x-input-checkbox',
+    radio: 'x-input-radio',
+    color: 'x-input-color',
+    time: 'x-input-time',
+    date: 'x-input-date',
+    month: 'x-input-month',
+    week: 'x-input-week',
+    file: 'x-input-file',
+    select: 'x-input-select',
+};
+
+const form_types_v1 = {
     'layout-elementplus': {
         render_control: function (form_item, query, make_insertions) {
             return Vue.h(Vue.resolveComponent('layout-elementplus'), {items: query({parent: form_item}).flatMap(make_insertions)});
