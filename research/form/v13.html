@@ -1008,6 +1008,7 @@ vue_component('x-form', {
     },
     computed: {
         gogogo_v1: function () {
+            const _this = this;
             const ignore = new Set();
             const {storage} = this;
             const db = [];
@@ -1089,7 +1090,9 @@ vue_component('x-form', {
                 if (typeof form_types[form_item.type] !== 'string') {
                     return Vue.h('DIV', {class: 'yellow'}, [`⚠️ no type ⚠️: ${form_item.type}`]);
                 }
-                return Vue.h(Vue.resolveComponent(form_types[form_item.type]), {}, {
+                const modelValue = _this.modelValue?.[form_item.path];
+                const updateModelValue = !_this.modelValue ? () => 0 : v => _this.modelValue[form_item.path] = v;
+                return Vue.h(Vue.resolveComponent(form_types[form_item.type]), {modelValue, 'onUpdate:modelValue': updateModelValue}, {
                     jack_hack_label_id: function (obj) {
                         obj.id = form_item.id;
                         return [];
@@ -1102,7 +1105,7 @@ vue_component('x-form', {
 
 vue_component('x-form-item', {
     emits: ['update:modelValue'],
-    props: ['modelValue', 'type', 'label', 'items', 'help'],
+    props: ['modelValue', 'path', 'type', 'label', 'items', 'help'],
     inheritAttrs: false,
     inject: {
         form_value: 'form_value',
@@ -1178,33 +1181,33 @@ vue_component('x-form-item', {
         },
     },
     methods: {
-        render_label: function (attrs) {
-console.log('x-form-item.render_label');
-            if (this.$slots.label) {
-                return this.$slots.label();
-            }
-            return Vue.h('label', {for: this.id}, this.label);
-        },
-        render_control: function () {
-console.log('x-form-item.render_control');
-            if (!form_types[this.type] || (typeof form_types[this.type] === 'object' && !form_types[this.type].name)) {
-                return [`⚠️ no type ⚠️: ${this.type}`];
-            }
-            let r;
-            try {
-                r = Vue.resolveComponent(form_types[this.type]?.name ?? form_types[this.type]);
-            }
-            catch (error) {
-                console.log(form_types[this.type]?.name ?? form_types[this.type]);
-                console.error(error);
-                r = 'DIV';
-            }
-            return Vue.h(r, {
-                id: this.id,
-                modelValue: this.modelValue,
-                'onUpdate:modelValue': v => this.$emit('update:modelValue', v),
-            });
-        },
+//         render_label: function (attrs) {
+// console.log('x-form-item.render_label');
+//             if (this.$slots.label) {
+//                 return this.$slots.label();
+//             }
+//             return Vue.h('label', {for: this.id}, this.label);
+//         },
+//         render_control: function () {
+// console.log('x-form-item.render_control');
+//             if (!form_types[this.type] || (typeof form_types[this.type] === 'object' && !form_types[this.type].name)) {
+//                 return [`⚠️ no type ⚠️: ${this.type}`];
+//             }
+//             let r;
+//             try {
+//                 r = Vue.resolveComponent(form_types[this.type]?.name ?? form_types[this.type]);
+//             }
+//             catch (error) {
+//                 console.log(form_types[this.type]?.name ?? form_types[this.type]);
+//                 console.error(error);
+//                 r = 'DIV';
+//             }
+//             return Vue.h(r, {
+//                 id: this.id,
+//                 modelValue: this.modelValue,
+//                 'onUpdate:modelValue': v => this.$emit('update:modelValue', v),
+//             });
+//         },
     },
     created: function () {
         this.form_items_parent.add(this);
@@ -1228,25 +1231,25 @@ vue_component('app', {
         <div class="p10 mg15 oa">
             <div class="p10 bs5">
                 <h4>Login Form</h4>
-                <x-form>
-                    <x-form-item type="email" label="Email" />
-                    <x-form-item type="password" label="Password" />
-                    <x-form-item type="checkbox" label="Check me out" />
+                <x-form v-model="login_form">
+                    <x-form-item path="email" type="email" label="Email" />
+                    <x-form-item path="password" type="password" label="Password" />
+                    <x-form-item path="check_me_out"" type="checkbox" label="Check me out" />
                 </x-form>
             </div>
             <div class="p10 bs5">
-                <h4>Google Drive Form Template <small><a href="https://wpforms.com/templates/google-drive-form-template/" target="_blank">src</a></small></h4>
-                <x-form>
-                    <x-form-item type="text" label="First Name" />
-                    <x-form-item type="text" label="Last Name" />
-                    <x-form-item type="email" label="Email" />
-                    <x-form-item type="file" label="File Upload" />
-                    <x-form-item type="textarea" label="Comment or Message" />
+                <h4>Google Drive Form <small><a href="https://wpforms.com/templates/google-drive-form-template/" target="_blank">src</a></small></h4>
+                <x-form v-model="google_drive_form">
+                    <x-form-item type="text" path="first_name" label="First Name" />
+                    <x-form-item type="text" path="last_name" label="Last Name" />
+                    <x-form-item type="email" path="email"" label="Email" />
+                    <x-form-item type="file" path="file" label="File Upload" />
+                    <x-form-item type="textarea" path="comments" label="Comment or Message" />
                 </x-form>
             </div>
             <div class="p10 bs5">
-                <h4>Bootstrap Form Validation <small><a href="https://getbootstrap.com/docs/5.3/forms/validation/" target="_blank">src</a></small></h4>
-                <x-form>
+                <h4>Bootstrap Form <small><a href="https://getbootstrap.com/docs/5.3/forms/validation/" target="_blank">src</a></small></h4>
+                <x-form v-model="bootstrap_form">
                     <x-form-item type="text" label="First Name" />
                     <x-form-item type="text" label="Last Name" />
                     <x-form-item type="text" label="Username" />
@@ -1257,8 +1260,8 @@ vue_component('app', {
                 </x-form>
             </div>
             <div class="p10 bs5">
-                <h4>Element+ Baisc Form <small><a href="https://element-plus.org/en-US/component/form#basic-form" target="_blank">src</a></small></h4>
-                <x-form>
+                <h4>Element+ Basic Form <small><a href="https://element-plus.org/en-US/component/form#basic-form" target="_blank">src</a></small></h4>
+                <x-form v-model="element_plus_form">
                     <x-form-item type="text" label="Activity name" />
                     <x-form-item type="select" label="Activity zone">
                         <x-form-item type="option" value="1" label="Zone One" />
@@ -1380,13 +1383,40 @@ vue_component('app', {
         </div>
         <div class="dashed xborder-vr" />
         <div>
-            <pre>{{ form }}</pre>
+            <table>
+            <tbody>
+            <tr>
+                <th>login_form</th>
+                <td><pre>{{ login_form }}</pre></td>
+            </tr>
+            <tr>
+                <th>google_drive_form</th>
+                <td><pre>{{ google_drive_form }}</pre></td>
+            </tr>
+            <tr>
+                <th>bootstrap_form</th>
+                <td><pre>{{ bootstrap_form }}</pre></td>
+            </tr>
+            <tr>
+                <th>element_plus_form</th>
+                <td><pre>{{ element_plus_form }}</pre></td>
+            </tr>
+            <tr>
+                <th>form</th>
+                <td><pre>{{ form }}</pre></td>
+            </tr>
+            </tbody>
+            </table>
         </div>
     </div>
 `,
     data: function () {
         return {
             options1: [{label: 'Apple'}, {label: 'Banana'}, {label: 'Grape'}],
+            login_form: {},
+            google_drive_form: {},
+            bootstrap_form: {},
+            element_plus_form: {},
             form: {
                 name: '',
                 region: '',
