@@ -27,7 +27,7 @@ const form_types_global = {
                     return Vue.h('label', {for: db_item.form_item.id, ...props}, db_item.form_item.label);
                 },
                 after: function (db_item, final_cell) {
-                    if (db_item.form_item.type === 'checkbox') {
+                    if (db_item.form_item.type === 'checkbox' && final_cell.insertions.label && final_cell.insertions.control) {
                         return {
                             insertions: {
                                 label: () => [],
@@ -40,7 +40,9 @@ const form_types_global = {
                     return final_cell;
                 },
             };
-            return Vue.h(Vue.resolveComponent('layout-table'), {items: query({parent: form_item}).flatMap(v => make_insertions2(v, overrides))});
+            const virtual_items = query({parent: form_item});
+            const final_cells = virtual_items.flatMap(v => make_insertions2(v, overrides));
+            return Vue.h(Vue.resolveComponent('layout-table'), {items: final_cells});
         },
         types: {
             email: 'x-input-password',
@@ -68,6 +70,21 @@ const form_types_global = {
             radio: 'ggg-input-radio',
             color: 'ggg-input-color',
             time: 'ggg-input-time',
+        },
+    },
+    none: {
+        transform_self: function (db_item, query) {
+            return [];
+        },
+    },
+    unwrap: {
+        transform_self: function (db_item, query) {
+            return query({parent: db_item.form_item});
+        },
+    },
+    virtual: {
+        render: function (db_item, render_props) {
+            return Vue.h('DIV', {}, '🤖 ...Virtual... 🤖');
         },
     },
     search: 'x-input-search',
@@ -1123,12 +1140,12 @@ vue_component('x-form', {
                     if (overrides.render_control) {
                         return overrides.render_control(db_item, props, slots);
                     }
-                    if (db_item.local_types[db_item.form_item.type].render) {
+                    if (db_item.local_types[db_item.form_item.type]?.render) {
                         return db_item.local_types[db_item.form_item.type].render(db_item, v => render_props({...props, ...v}));
                     }
-                    const component = db_item.local_types[db_item.form_item.type].component ?? db_item.local_types[db_item.form_item.type];
+                    const component = db_item.local_types[db_item.form_item.type]?.component ?? db_item.local_types[db_item.form_item.type];
                     if (typeof component !== 'string') {
-                        return Vue.h('DIV', {class: 'yellow'}, [`⚠️ no type: ${db_item.form_item.type}`]);
+                        return Vue.h('DIV', {class: 'yellow'}, [`⚠️ no type: [${db_item.form_item.type}]`]);
                     }
                     return Vue.h(Vue.resolveComponent(component), render_props(props), render_slots(slots));
                 }
@@ -1381,6 +1398,12 @@ vue_component('app', {
                 <x-form v-model="basic_form">
                     <x-form-item path="email" type="email" label="Email" />
                     <x-form-item path="check_me_out"" type="checkbox" label="Check me out" />
+                    <x-form-item path="ggg"" type="none" label="None..." />
+                    <x-form-item type="unwrap" label="None...">
+                        <x-form-item path="text1" type="text" label="Text1" />
+                        <x-form-item path="text2" type="text" label="Text2" />
+                    </x-form-item>
+                    <x-form-item type="virtual" />
                 </x-form>
             </div>
 <template v-if="false">
