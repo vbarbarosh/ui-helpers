@@ -17,26 +17,8 @@
 const form_types_global = {
     'layout-basic': {
         render: function (ctx) {
-            const overrides = {
-                render_label: function (db_item, props, slots) {
-                    return Vue.h('label', {for: db_item.form_item.id, ...props}, db_item.form_item.label);
-                },
-                final: function (db_item, final_cell) {
-                    if (db_item.form_item.type === 'checkbox' && final_cell.insertions.label && final_cell.insertions.control) {
-                        return {
-                            insertions: {
-                                label: () => [],
-                                control: () => Vue.h('DIV', {class: 'flex-row-center-left gap10'}, {
-                                    default: () => [final_cell.insertions.control(), final_cell.insertions.label()],
-                                }),
-                            },
-                        };
-                    }
-                    return final_cell;
-                },
-            };
             const virtual_items = ctx.query({parent: ctx.db_item.form_item});
-            const final_cells = virtual_items.flatMap(v => ctx.make_insertions2(v, overrides));
+            const final_cells = virtual_items.flatMap(v => ctx.make_insertions2(v));
             return Vue.h(Vue.resolveComponent('layout-basic'), {items: final_cells});
         },
     },
@@ -1403,7 +1385,7 @@ vue_component('app', {
         <div class="p10 mg15 oa">
             <div class="p10 bs5">
                 <h4>Basic Form</h4>
-                <x-form v-model="basic_form" layout="layout-basic">
+                <x-form v-model="basic_form">
                     <x-form-item path="email" type="email" label="Email" />
                     <x-form-item path="check_me_out"" type="checkbox" label="Check me out" />
                     <x-form-item path="ggg"" type="none" label="None..." />
