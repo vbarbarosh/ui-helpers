@@ -168,7 +168,7 @@ vue_component('x-input-password', {
                v-bind:value="modelValue"
                v-bind:disabled="disabled"
                v-bind:readonly="readonly"
-               type="email" />
+               type="password" />
     `,
     methods: {
         input: function (event) {
