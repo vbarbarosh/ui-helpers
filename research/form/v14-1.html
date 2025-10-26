@@ -16,12 +16,7 @@
 <script>
 const form_types_global = {
     'layout-basic': {
-        render_control: function (form_item, query, make_insertions) {
-            return Vue.h(Vue.resolveComponent('layout-basic'), {items: query({parent: form_item}).flatMap(make_insertions)});
-        },
-    },
-    'layout-table': {
-        render_control: function (form_item, query, make_insertions, attrs, make_insertions2) {
+        render: function (ctx) {
             const overrides = {
                 render_label: function (db_item, props, slots) {
                     return Vue.h('label', {for: db_item.form_item.id, ...props}, db_item.form_item.label);
@@ -40,15 +35,41 @@ const form_types_global = {
                     return final_cell;
                 },
             };
-            const virtual_items = query({parent: form_item});
-            const final_cells = virtual_items.flatMap(v => make_insertions2(v, overrides));
+            const virtual_items = ctx.query({parent: ctx.db_item.form_item});
+            const final_cells = virtual_items.flatMap(v => ctx.make_insertions2(v, overrides));
+            return Vue.h(Vue.resolveComponent('layout-basic'), {items: final_cells});
+        },
+    },
+    'layout-table': {
+        render: function (ctx) {
+            const overrides = {
+                render_label: function (db_item, props, slots) {
+                    return Vue.h('label', {for: db_item.form_item.id, ...props}, db_item.form_item.label);
+                },
+                final: function (db_item, final_cell) {
+                    if (db_item.form_item.type === 'checkbox' && final_cell.insertions.label && final_cell.insertions.control) {
+                        return {
+                            insertions: {
+                                label: () => [],
+                                control: () => Vue.h('DIV', {class: 'flex-row-center-left gap10'}, {
+                                    default: () => [final_cell.insertions.control(), final_cell.insertions.label()],
+                                }),
+                            },
+                        };
+                    }
+                    return final_cell;
+                },
+            };
+            const virtual_items = ctx.query({parent: ctx.db_item.form_item});
+            const final_cells = virtual_items.flatMap(v => ctx.make_insertions2(v, overrides));
             return Vue.h(Vue.resolveComponent('layout-table'), {items: final_cells});
         },
         types: {
             email: 'x-input-password',
             checkbox: {
-                render: function (db_item, render_props) {
-                    return Vue.h(Vue.resolveComponent('el-checkbox'), render_props({id: db_item.form_item.id}));
+                render: function (ctx) {
+                    const props = {...ctx.render_model_value_props(), id: ctx.db_item.form_item.id};
+                    return Vue.h(Vue.resolveComponent('el-checkbox'), props);
                 },
             },
         },
@@ -83,7 +104,7 @@ const form_types_global = {
         },
     },
     virtual: {
-        render: function (db_item, render_props) {
+        render: function (ctx) {
             return Vue.h('DIV', {}, '🤖 ...Virtual... 🤖');
         },
     },
@@ -1047,16 +1068,6 @@ vue_component('form-motivator', {
     `,
 });
 
-function make_type_definition(expr)
-{
-    const obj = typeof expr === 'string' ? {} : expr;
-    const out = {
-        component: (typeof expr === 'string') ? expr : expr.component,
-        render: obj.render ?? null,
-    };
-    return out;
-}
-
 vue_component('x-form', {
     props: ['modelValue', 'layout'],
     inheritAttrs: false,
@@ -1105,13 +1116,13 @@ vue_component('x-form', {
                     : db.filter(v => v.parent === expr.parent);
                 out = out.flatMap(v => v.local_types[v.form_item.type]?.transform_self ? v.local_types[v.form_item.type].transform_self(v, query) : [v]);
                 out = transforms.reduce((a, fn) => fn(a, query, storage), out);
-
                 // out = out.flatMap(v => (v.form_item.type === 'unwrap') ? query({parent: v.form_item}) : [v]);
-
                 return out;
             }
+
             // produce final_cells from db_item
             function make_insertions2(db_item, overrides) {
+                const ctx = {db_item, query, make_insertions2, render_model_value_props, render_jack_hack_slots};
                 overrides ??= {};
                 overrides.final ??= (x,v) => v;
                 if (db_item.form_item.label) {
@@ -1129,7 +1140,6 @@ vue_component('x-form', {
                         container: (props, slots) => render_control(props, slots),
                     },
                 });
-
                 function render_label(props, slots) {
                     if (overrides.render_label) {
                         return overrides.render_label(db_item, props, slots);
@@ -1141,22 +1151,21 @@ vue_component('x-form', {
                         return overrides.render_control(db_item, props, slots);
                     }
                     if (db_item.local_types[db_item.form_item.type]?.render) {
-                        return db_item.local_types[db_item.form_item.type].render(db_item, v => render_props({...props, ...v}));
+                        return db_item.local_types[db_item.form_item.type].render(ctx);
                     }
                     const component = db_item.local_types[db_item.form_item.type]?.component ?? db_item.local_types[db_item.form_item.type];
                     if (typeof component !== 'string') {
                         return Vue.h('DIV', {class: 'yellow'}, [`⚠️ no type: [${db_item.form_item.type}]`]);
                     }
-                    return Vue.h(Vue.resolveComponent(component), render_props(props), render_slots(slots));
+                    return Vue.h(Vue.resolveComponent(component), render_model_value_props(), render_jack_hack_slots());
                 }
-                function render_props(props) {
+                function render_model_value_props() {
                     const modelValue = _this.modelValue?.[db_item.form_item.path];
                     const updateModelValue = !_this.modelValue ? () => 0 : v => _this.modelValue[db_item.form_item.path] = v;
-                    return {...props, modelValue, 'onUpdate:modelValue': updateModelValue};
+                    return {modelValue, 'onUpdate:modelValue': updateModelValue};
                 }
-                function render_slots(slots) {
+                function render_jack_hack_slots() {
                     return {
-                        ...slots,
                         jack_hack_label_id: function (obj) {
                             obj.id = db_item.form_item.id;
                             return [];
@@ -1164,14 +1173,13 @@ vue_component('x-form', {
                     };
                 }
             }
-            function make_insertions({local_types, form_item, parent}) {
-                const out = make_insertions_int({local_types, form_item, parent});
-                if (local_types[form_item.type].after_make_insertions) {
-                    return local_types[form_item.type].after_make_insertions(out);
+
+            function make_insertions(db_item) {
+                const {local_types, form_item, parent} = db_item;
+                if (local_types[form_item.type].render) {
+                    return make_insertions2(db_item);
                 }
-                return out;
-            }
-            function make_insertions_int({local_types, form_item, parent}) {
+
                 if (local_types[form_item.type]?.make_insertions && !ignore.has(local_types[form_item.type]?.make_insertions)) {
                     ignore.add(local_types[form_item.type]?.make_insertions);
                     try {
@@ -1395,7 +1403,7 @@ vue_component('app', {
         <div class="p10 mg15 oa">
             <div class="p10 bs5">
                 <h4>Basic Form</h4>
-                <x-form v-model="basic_form">
+                <x-form v-model="basic_form" layout="layout-basic">
                     <x-form-item path="email" type="email" label="Email" />
                     <x-form-item path="check_me_out"" type="checkbox" label="Check me out" />
                     <x-form-item path="ggg"" type="none" label="None..." />
