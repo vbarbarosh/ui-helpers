@@ -26,7 +26,7 @@ const form_types_global = {
                 render_label: function (db_item, props, slots) {
                     return Vue.h('label', {for: db_item.form_item.id, ...props}, db_item.form_item.label);
                 },
-                after: function (db_item, final_cell) {
+                final: function (db_item, final_cell) {
                     if (db_item.form_item.type === 'checkbox' && final_cell.insertions.label && final_cell.insertions.control) {
                         return {
                             insertions: {
@@ -1113,9 +1113,9 @@ vue_component('x-form', {
             // produce final_cells from db_item
             function make_insertions2(db_item, overrides) {
                 overrides ??= {};
-                overrides.after ??= (x,v) => v;
+                overrides.final ??= (x,v) => v;
                 if (db_item.form_item.label) {
-                    return overrides.after(db_item, {
+                    return overrides.final(db_item, {
                         insertions: {
                             source: 'P1',
                             label: (props, slots) => render_label(props, slots),
@@ -1123,7 +1123,7 @@ vue_component('x-form', {
                         },
                     });
                 }
-                return overrides.after(db_item, {
+                return overrides.final(db_item, {
                     insertions: {
                         source: 'P2',
                         container: (props, slots) => render_control(props, slots),
