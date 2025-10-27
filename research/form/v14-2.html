@@ -17,8 +17,7 @@
 const form_types_global = {
     'layout-basic': {
         render: function (ctx) {
-            const virtual_items = ctx.query({parent: ctx.db_item.form_item});
-            const final_cells = virtual_items.flatMap(v => ctx.make_insertions2(v));
+            const final_cells = ctx.query_final_cells({parent: ctx.virtual_item.db_item.form_item});
             return Vue.h(Vue.resolveComponent('layout-basic'), {items: final_cells});
         },
     },
@@ -29,7 +28,6 @@ const form_types_global = {
                     return Vue.h('label', {for: db_item.form_item.id, ...props}, db_item.form_item.label);
                 },
                 final: function (db_or_virtual_item, final_cell) {
-console.log('final', db_or_virtual_item);
                     if ((db_or_virtual_item.type ?? db_or_virtual_item.form_item.type) === 'checkbox' && final_cell.insertions.label && final_cell.insertions.control) {
                         return {
                             insertions: {
@@ -43,8 +41,7 @@ console.log('final', db_or_virtual_item);
                     return final_cell;
                 },
             };
-            const virtual_items = ctx.query({parent: ctx.db_item.form_item});
-            const final_cells = virtual_items.flatMap(v => ctx.make_insertions2(v, overrides));
+            const final_cells = ctx.query_final_cells({parent: ctx.virtual_item.db_item.form_item}, overrides);
             return Vue.h(Vue.resolveComponent('layout-table'), {items: final_cells});
         },
         types: {
@@ -77,30 +74,31 @@ console.log('final', db_or_virtual_item);
         },
     },
     none: {
-        transform_self: function (db_item, query) {
+        load_virtual_items: function () {
             return [];
         },
     },
     unwrap: {
-        transform_self: function (db_item, query) {
-            return query({parent: db_item.form_item});
+        load_virtual_items: function (ctx) {
+            return ctx.query_virtual_items({parent: ctx.db_item.form_item});
         },
     },
     virtual: {
-        transform_self: function (db_item) {
+        load_virtual_items: function (ctx) {
             return [
-                {db_item, type: 'text', path: 'virtual1', label: 'Virtual 1', id: random_html_id()},
-                {db_item, type: 'text', path: 'virtual2', label: 'Virtual 2', id: random_html_id()},
-                {db_item, type: 'checkbox', path: 'virtual3', label: 'Virtual 3', id: random_html_id()},
+                ctx.make_virtual_item({type: 'text', path: 'virtual1', label: 'Virtual 1', id: random_html_id()}),
+                ctx.make_virtual_item({type: 'text', path: 'virtual2', label: 'Virtual 2', id: random_html_id()}),
+                ctx.make_virtual_item({type: 'checkbox', path: 'virtual3', label: 'Virtual 3', id: random_html_id()}),
             ];
         },
         render: function (ctx) {
+            throw new Error('not reachable');
             return Vue.h('DIV', {}, ['🤖 ...Virtual... 🤖', Vue.h('br'), ctx.db_item.local_no]);
         },
     },
     virtual_render: {
         render: function (ctx) {
-            return Vue.h('DIV', {}, ['🤖 ...Virtual... 🤖', (ctx.db_item.form_item.$slots.yahoo ? ctx.db_item.form_item.$slots.yahoo() : null)]);
+            return Vue.h('DIV', {}, ['🤖 ...Virtual... 🤖', (ctx.virtual_item.db_item.form_item.$slots.yahoo ? ctx.virtual_item.db_item.form_item.$slots.yahoo() : null)]);
         },
     },
     search: 'x-input-search',
@@ -1085,19 +1083,30 @@ vue_component('x-form', {
     data: function () {
         return {
             items: [],
-            storage: {},
         };
     },
     computed: {
         gogogo_v1: function () {
             const _this = this;
-            const ignore = new Set();
-            const {storage} = this;
-            const db = [];
-            this.items.forEach(v => walk(null, v, form_types_global));
 
-            const transforms = db.map(v => v.local_types[v.form_item.type]?.transform).filter(v => v);
-            return query({parent: null}).flatMap(make_insertions);
+            const db = [];
+            this.items.forEach(form_item => walk(null, form_item, form_types_global));
+
+            // db -> virtual_items -> final_cells
+            return query_db_items({parent: null}).flatMap(load_virtual_items).map(v => make_final_cell(v));
+
+            function load_virtual_items(db_item) {
+                const local_type = db_item.local_types[db_item.form_item.type];
+                if (local_type?.load_virtual_items) {
+                    const ctx = {db_item, query_db_items, query_virtual_items, make_virtual_item};
+                    return local_type.load_virtual_items(ctx);
+                }
+                return make_virtual_item();
+                function make_virtual_item(props) {
+                    const {type, path, label, id} = db_item.form_item;
+                    return {db_item, type, path, label, id, ...props};
+                }
+            }
 
             function walk(parent, form_item, parent_types) {
                 const local_types = {...parent_types, ...parent_types[form_item.type]?.types};
@@ -1105,21 +1114,29 @@ vue_component('x-form', {
                 form_item.child_items.forEach(child => walk(form_item, child, local_types));
             }
 
-            function query(expr) {
-                let out = expr.self
+            function query_db_items(expr) {
+                return expr.self
                     ? db.filter(v => v.form_item === expr.self)
                     : db.filter(v => v.parent === expr.parent);
-                out = out.flatMap(v => v.local_types[v.form_item.type]?.transform_self ? v.local_types[v.form_item.type].transform_self(v, query) : [v]);
-                out = transforms.reduce((a, fn) => fn(a, query, storage), out);
-                // out = out.flatMap(v => (v.form_item.type === 'unwrap') ? query({parent: v.form_item}) : [v]);
-                return out;
+            }
+            function query_virtual_items(expr_db_items) {
+                return query_db_items(expr_db_items).flatMap(load_virtual_items);
+            }
+            function query_final_cells(expr_db_items, overrides) {
+                return query_db_items(expr_db_items).flatMap(load_virtual_items).map(v => make_final_cell(v, overrides));
             }
 
-            function pipeline_v2(virtual_item, overrides) {
+            function make_final_cell(virtual_item, overrides) {
                 overrides ??= {};
                 overrides.final ??= (x,v) => v;
-                console.log('pipeline_v2', virtual_item);
-                const ctx = {db_item: null, virtual_item, query: null, make_insertions2, render_model_value_props, render_jack_hack_slots};
+                const ctx = {
+                    virtual_item,
+                    query_db_items,
+                    query_virtual_items,
+                    query_final_cells,
+                    render_model_value_props,
+                    render_jack_hack_slots,
+                };
                 if (virtual_item.label) {
                     return overrides.final(virtual_item, {
                         insertions: {
@@ -1157,164 +1174,6 @@ vue_component('x-form', {
                     return {
                         jack_hack_label_id: function (obj) {
                             obj.id = virtual_item.id;
-                            return [];
-                        },
-                    };
-                }
-            }
-
-            // produce final_cells from db_item
-            function make_insertions2(db_item, overrides) {
-                if (db_item.db_item) {
-                    return pipeline_v2(db_item, overrides);
-                }
-                const ctx = {db_item, query, make_insertions2, render_model_value_props, render_jack_hack_slots};
-                overrides ??= {};
-                overrides.final ??= (x,v) => v;
-                if (db_item.form_item.label) {
-                    return overrides.final(db_item, {
-                        insertions: {
-                            source: 'P1',
-                            label: (props, slots) => render_label(props, slots),
-                            control: (props, slots) => render_control(props, slots),
-                        },
-                    });
-                }
-                return overrides.final(db_item, {
-                    insertions: {
-                        source: 'P2',
-                        container: (props, slots) => render_control(props, slots),
-                    },
-                });
-                function render_label(props, slots) {
-                    if (overrides.render_label) {
-                        return overrides.render_label(db_item, props, slots);
-                    }
-                    return Vue.h('label', {for: db_item.form_item.id, ...props}, db_item.form_item.label);
-                }
-                function render_control(props, slots) {
-                    if (overrides.render_control) {
-                        return overrides.render_control(db_item, props, slots);
-                    }
-                    if (db_item.local_types[db_item.form_item.type]?.render) {
-                        return db_item.local_types[db_item.form_item.type].render(ctx);
-                    }
-                    const component = db_item.local_types[db_item.form_item.type]?.component ?? db_item.local_types[db_item.form_item.type];
-                    if (typeof component !== 'string') {
-                        return Vue.h('DIV', {class: 'yellow'}, [`⚠️ no type: [${db_item.form_item.type}]`]);
-                    }
-                    return Vue.h(Vue.resolveComponent(component), render_model_value_props(), render_jack_hack_slots());
-                }
-                function render_model_value_props() {
-                    const modelValue = _this.modelValue?.[db_item.form_item.path];
-                    const updateModelValue = !_this.modelValue ? () => 0 : v => _this.modelValue[db_item.form_item.path] = v;
-                    return {modelValue, 'onUpdate:modelValue': updateModelValue};
-                }
-                function render_jack_hack_slots() {
-                    return {
-                        jack_hack_label_id: function (obj) {
-                            obj.id = db_item.form_item.id;
-                            return [];
-                        },
-                    };
-                }
-            }
-
-            function make_insertions(db_item) {
-                if (db_item.v2) {
-                    return pipeline_v2(db_item);
-                }
-                const {local_types, form_item, parent} = db_item;
-                if (local_types[form_item.type].render) {
-                    return make_insertions2(db_item);
-                }
-
-                if (local_types[form_item.type]?.make_insertions && !ignore.has(local_types[form_item.type]?.make_insertions)) {
-                    ignore.add(local_types[form_item.type]?.make_insertions);
-                    try {
-                        return local_types[form_item.type]?.make_insertions({form_item, parent, make_insertions, query, storage});
-                    }
-                    finally {
-                        ignore.delete(local_types[form_item.type]?.make_insertions);
-                    }
-                }
-                if (local_types[form_item.type]?.render_container && !ignore.has(local_types[form_item.type]?.render_container)) {
-                    return {
-                        insertions: {
-                            container: function (attrs) {
-                                return local_types[form_item.type].render_container(form_item, query, make_insertions, attrs);
-                            },
-                        },
-                        // ...(form_item.$attrs['bs5-col'] ? {'bs5_col': form_item.$attrs['bs5-col']} : {}),
-                    };
-                }
-                if (form_item.label) {
-                    const out = {
-                        insertions: {
-                            source: 'P1',
-                            label: (attrs, slots) => render_label(form_item, attrs, slots),
-                            control: (attrs, slots) => render_control(form_item, attrs, slots),
-                        },
-                        // ...(form_item.$attrs['bs5-col'] ? {'bs5_col': form_item.$attrs['bs5-col']} : {})
-                    };
-                    if (form_item.help) {
-                        out.insertions.help = form_item.$slots.help ?? (() => Vue.h('DIV', null, form_item.help));
-                    }
-                    return out;
-                }
-                return {
-                    insertions: {
-                        source: 'P2',
-                        container: attrs => render_control(form_item, attrs),
-                    },
-                    // ...(form_item.$attrs['bs5-col'] ? {'bs5_col': form_item.$attrs['bs5-col']} : {}),
-                };
-
-                // function render_label(form_item, attrs, slots) {
-                //     if (local_types[form_item.type]?.render_label) {
-                //         return Vue.h(local_types[form_item.type].render_label(form_item, query, make_insertions, attrs, slots));
-                //     }
-                //     return Vue.h('label', {for: form_item.id, ...attrs}, form_item.label);
-                // }
-
-                // context:
-                //   - parent
-                //   - form_item
-                //   - local_types
-                //   - query
-                //   - make_insertions
-                // render_control(attrs, slots, context)
-
-                function render_control(form_item, attrs) {
-                    if (local_types[form_item.type]?.render_control) {
-                        return Vue.h(local_types[form_item.type].render_control(form_item, query, make_insertions, attrs, make_insertions2));
-                    }
-
-                    const component = local_types[form_item.type].component ?? local_types[form_item.type];
-                    if (typeof component !== 'string') {
-                        return Vue.h('DIV', {class: 'yellow'}, [`⚠️ no type: ${form_item.type}`]);
-                    }
-
-                    return Vue.h(Vue.resolveComponent(component), render_props(), render_slots());
-                }
-
-                function render_label(form_item, attrs, slots) {
-                    if (local_types[form_item.type]?.render_label) {
-                        return Vue.h(local_types[form_item.type].render_label(form_item, query, make_insertions, attrs, slots));
-                    }
-                    return Vue.h('label', {for: form_item.id, ...attrs}, form_item.label);
-                }
-
-                function render_props() {
-                    const modelValue = _this.modelValue?.[form_item.path];
-                    const updateModelValue = !_this.modelValue ? () => 0 : v => _this.modelValue[form_item.path] = v;
-                    return {modelValue, 'onUpdate:modelValue': updateModelValue};
-                }
-
-                function render_slots() {
-                    return {
-                        jack_hack_label_id: function (obj) {
-                            obj.id = form_item.id;
                             return [];
                         },
                     };
