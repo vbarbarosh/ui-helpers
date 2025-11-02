@@ -195,6 +195,55 @@ vue_component('x-input-checkbox', {
     },
 });
 
+vue_component('x-input-checkboxes', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly', 'options', 'layout'],
+    template: `
+        <x-form v-model="local" v-bind:layout="(layout ?? 'layout-inline')">
+            <x-form-item v-for="option in options"
+                         v-on:update:modelValue="v => input(v, option)"
+                         v-bind:modelValue="local.includes(option.value)"
+                         v-bind:label="option.label"
+                         type="checkbox" />
+        </x-form>
+    `,
+    data: function () {
+        return {
+            local: [],
+        };
+    },
+    watch: {
+        modelValue: {
+            immediate: true,
+            handler: function () {
+                if (this.modelValue === this.local) {
+                    return;
+                }
+                if (Array.isArray(this.modelValue)) {
+                    this.local = this.modelValue;
+                }
+                else {
+                    this.local = [];
+                }
+            },
+        },
+    },
+    methods: {
+        input: function (checked, option) {
+            const i = this.local.indexOf(option.value);
+            if (checked && i === -1) {
+                this.local.push(option.value);
+            }
+            else if (!checked && i !== -1) {
+                this.local.splice(i, 1);
+            }
+            if (this.modelValue !== this.local) {
+                this.$emit('update:modelValue', this.local);
+            }
+        },
+    },
+});
+
 vue_component('x-input-radio', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'name', 'disabled', 'readonly'],
