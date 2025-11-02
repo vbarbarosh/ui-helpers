@@ -7,6 +7,41 @@
     <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
     <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/sm.css" rel="stylesheet">
     <title>horizontal and vertical flows | form | research | ui-helpers</title>
+    <style>
+/*             <div class="vsplit border w400 h400">
+                <div class="h50 silver"></div>
+                <div class="fluid oa">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, quae qui. Accusamus at cum cumque dicta dolor dolores eos et fuga in ipsa laborum maxime, officiis reiciendis repellat repudiandae similique.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, quae qui. Accusamus at cum cumque dicta dolor dolores eos et fuga in ipsa laborum maxime, officiis reiciendis repellat repudiandae similique.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, quae qui. Accusamus at cum cumque dicta dolor dolores eos et fuga in ipsa laborum maxime, officiis reiciendis repellat repudiandae similique.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, quae qui. Accusamus at cum cumque dicta dolor dolores eos et fuga in ipsa laborum maxime, officiis reiciendis repellat repudiandae similique.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, quae qui. Accusamus at cum cumque dicta dolor dolores eos et fuga in ipsa laborum maxime, officiis reiciendis repellat repudiandae similique.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, quae qui. Accusamus at cum cumque dicta dolor dolores eos et fuga in ipsa laborum maxime, officiis reiciendis repellat repudiandae similique.</p>
+                </div>
+            </div>
+
+            First Element - fixed
+            All the rest - fluid
+ */
+        .tabs-fluid {
+            /* vsplit */
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+        }
+        .tabs-fluid > * {
+            flex: none;
+        }
+        .tabs-fluid > *:nth-child(n+2) {
+            /* fluid */
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: auto;
+            min-width: 0;
+            min-height: 0;
+            overflow: auto;
+        }
+    </style>
 </head>
 <body>
 
@@ -19,6 +54,18 @@ const form_types_global = {
         render: function (ctx) {
             const final_cells = ctx.query_final_cells({parent: ctx.virtual_item.db_item.form_item});
             return Vue.h(Vue.resolveComponent('layout-inline'), {items: final_cells});
+        },
+    },
+    'layout-inline-rev': {
+        render: function (ctx) {
+            const final_cells = ctx.query_final_cells({parent: ctx.virtual_item.db_item.form_item});
+            return Vue.h(Vue.resolveComponent('layout-inline-rev'), {items: final_cells});
+        },
+    },
+    'layout-columns': {
+        render: function (ctx) {
+            const final_cells = ctx.query_final_cells({parent: ctx.virtual_item.db_item.form_item});
+            return Vue.h(Vue.resolveComponent('layout-columns'), {items: final_cells, cols: ctx.virtual_item.db_item.form_item.$attrs.cols});
         },
     },
     'layout-basic': {
@@ -56,6 +103,79 @@ const form_types_global = {
                 render: function (ctx) {
                     const props = {...ctx.render_model_value_props(), id: (ctx.virtual_item ? ctx.virtual_item.id : ctx.db_item.form_item.id)};
                     return Vue.h(Vue.resolveComponent('el-checkbox'), props);
+                },
+            },
+        },
+    },
+    'layout-bootstrap5': {
+        render: function (ctx) {
+            const overrides = {
+                final: function (db_or_virtual_item, final_cell) {
+                    if ((db_or_virtual_item.type ?? db_or_virtual_item.form_item.type) === 'checkbox') {
+                        final_cell.boostrap5_form_check = true;
+                    }
+                    return final_cell;
+                },
+            };
+            const final_cells = ctx.query_final_cells({parent: ctx.virtual_item.db_item.form_item}, overrides);
+            return Vue.h(Vue.resolveComponent('layout-bootstrap5'), {items: final_cells});
+        },
+        types: {
+            text: {
+                render: function (ctx) {
+                    return Vue.h('input', {id: ctx.virtual_item.id, type: 'text', class: 'form-control'});
+                },
+            },
+            textarea: {
+                render: function (ctx) {
+                    return Vue.h('textarea', {id: ctx.virtual_item.id, class: 'form-control'});
+                },
+            },
+            number: {
+                render: function (ctx) {
+                    return Vue.h('input', {id: ctx.virtual_item.id, type: 'number', class: 'form-control'});
+                },
+            },
+            email: {
+                render: function (ctx) {
+                    return Vue.h('input', {id: ctx.virtual_item.id, type: 'email', class: 'form-control'});
+                },
+            },
+            password: {
+                render: function (ctx) {
+                    return Vue.h('input', {id: ctx.virtual_item.id, type: 'password', class: 'form-control'});
+                },
+            },
+            checkbox: {
+                load_virtual_items: function (ctx) {
+                    return [
+                        {db_item: ctx.db_item, type: 'checkbox', path: ctx.db_item.form_item.path, label: ctx.db_item.form_item.label, id: ctx.db_item.form_item.id},
+                    ];
+                },
+                render: function (ctx) {
+                    return Vue.h('input', {id: ctx.virtual_item.id, type: 'checkbox', class: 'form-check-input'});
+                    // <div class="form-check">
+                    //     <input class="form-check-input" type="checkbox" id="gridCheck">
+                    //     <label class="form-check-label" for="gridCheck">
+                    //         Check me out
+                    //     </label>
+                    // </div>
+                },
+            },
+            select: {
+                load_virtual_items: function (ctx) {
+                    const db_items = ctx.query_db_items({parent: ctx.db_item.form_item});
+                    const options = ctx.db_item.form_item.$attrs.options ?? db_items.map(function (db_item) {
+                        return {label: db_item.form_item.label, value: db_item.form_item.$attrs.value};
+                    });
+                    return [
+                        {db_item: ctx.db_item, type: 'select', path: ctx.db_item.form_item.path, label: ctx.db_item.form_item.label, id: ctx.db_item.form_item.id, props: {options}},
+                    ];
+                },
+                render: function (ctx) {
+                    return Vue.h('select', {id: ctx.virtual_item.id, class: 'form-select'}, ctx.virtual_item.props.options.map(function (option) {
+                        return Vue.h('option', {value: option.value}, option.label);
+                    }));
                 },
             },
         },
@@ -205,9 +325,6 @@ vue_component('warn-invalid-layout-item-type', {
     `,
 });
 
-// - label
-// - control
-// - container
 vue_component('layout-bootstrap5', {
     props: ['items'],
     template: `
@@ -577,8 +694,8 @@ vue_component('layout-inline', {
             </template>
             <template v-else-if="(item.insertions.label && item.insertions.control)">
                 <div class="flex-row-center-left gap5">
-                    <render-function :fn="item.insertions.control" />
                     <render-function :fn="item.insertions.label" />
+                    <render-function :fn="item.insertions.control" />
                 </div>
             </template>
             <template v-else>
@@ -978,20 +1095,42 @@ vue_component('render-template', {
 
 vue_component('app', {
     template: `
-        <div class="fix-f hsplit gap15 m10">
-            <div class="p10 mg15 oa">
-                <div class="p10 bs5">
-                    <h4>Basic Form</h4>
-
-                    <x-form v-model="conf">
-                        <x-form-item path="form" type="select" label="Form" :options="forms" />
-                        <x-form-item path="layout" type="select" label="Layout" :options="layouts" />
-                    </x-form>
-
-                    <x-form v-model="custom" v-bind:layout="conf.layout">
-                        <render-template :value="conf.form" />
-                    </x-form>
-
+        <tabs class="fix-f tabs-fluid">
+            <tabs-item label="Demos">
+                <div class="hsplit">
+                    <div class="w50p mg20">
+                        <x-form v-model="conf">
+                            <x-form-item path="form" type="select" label="Form" :options="forms" />
+                            <x-form-item path="layout" type="select" label="Layout" :options="layouts" />
+                        </x-form>
+                        <div class="m20 p20 br5 bs5">
+                            <x-form v-model="custom" v-bind:layout="conf.layout">
+                                <render-template :value="conf.form" />
+                            </x-form>
+                        </div>
+                    </div>
+                    <div class="w50p oa">
+                        <table>
+                        <tbody>
+                        <tr>
+                            <th>conf</th>
+                            <td><pre>{{ conf }}</pre></td>
+                        </tr>
+                        <tr>
+                            <th>custom</th>
+                            <td><pre>{{ custom }}</pre></td>
+                        </tr>
+                        <tr>
+                            <th>form</th>
+                            <td><pre>{{ form }}</pre></td>
+                        </tr>
+                        <tr>
+                            <th>basic_form</th>
+                            <td><pre>{{ basic_form }}</pre></td>
+                        </tr>
+                        </tbody>
+                        </table>
+                    </div>
 <!--
                     <x-form v-model="basic_form" layout="layout-table">
                         <x-form-item type="insdemo" label="Insertions" />
@@ -1012,130 +1151,121 @@ vue_component('app', {
                         </x-form-item>
                     </x-form>
 -->
+
                 </div>
-            </div>
-            <div class="dashed xborder-vr" />
-            <div class="p10 oa">
-                right
-                <div class="flex-col-center-left">
-                    <table>
-                    <tbody>
-                        <tr>
-                            <th>x-input-search</th>
-                            <td><x-input-search v-model="form.search1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-number</th>
-                            <td><x-input-number v-model="form.number1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-text</th>
-                            <td><x-input-text v-model="form.text1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-textarea</th>
-                            <td><x-input-textarea v-model="form.textarea1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-tel</th>
-                            <td><x-input-tel v-model="form.tel1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-email</th>
-                            <td><x-input-email v-model="form.email1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-url</th>
-                            <td><x-input-url v-model="form.url1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-password</th>
-                            <td><x-input-password v-model="form.password1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-checkbox</th>
-                            <td><x-input-checkbox v-model="form.checkbox1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-radio</th>
-                            <td><x-input-radio v-model="form.radio11" name="radio1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-radio</th>
-                            <td><x-input-radio v-model="form.radio12" name="radio1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-radio</th>
-                            <td><x-input-radio v-model="form.radio13" name="radio1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-radio</th>
-                            <td><x-input-radio v-model="form.radio21" name="radio2" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-radio</th>
-                            <td><x-input-radio v-model="form.radio22" name="radio2" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-radio</th>
-                            <td><x-input-radio v-model="form.radio23" name="radio2" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-color</th>
-                            <td><x-input-color v-model="form.color1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-time</th>
-                            <td><x-input-time v-model="form.time1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-date</th>
-                            <td><x-input-date v-model="form.date1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-month</th>
-                            <td><x-input-month v-model="form.month1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-week</th>
-                            <td><x-input-week v-model="form.week1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-file</th>
-                            <td><x-input-file v-model="form.file1" /></td>
-                        </tr>
-                        <tr>
-                            <th>x-input-select</th>
-                            <td><x-input-select v-model="form.select1" :options="options1" /></td>
-                        </tr>
-                    </tbody>
-                    </table>
+            </tabs-item>
+            <tabs-item label="Layouts">
+                <div class="w400 mg20">
+                    <template v-for="layout in 'layout-inline,layout-inline-rev,layout-columns,layout-basic,layout-table'.split(',')">
+                        <h4 class="silver">{{ layout }}</h4>
+                        <x-form v-bind:layout="layout">
+                            <x-form-item type="text" label="First Name" />
+                            <x-form-item type="text" label="Last Name" />
+                            <x-form-item type="select" label="Color">
+                                <x-form-item value="red" label="Red" />
+                                <x-form-item value="green" label="Green" />
+                                <x-form-item value="blue" label="Blue" />
+                            </x-form-item>
+                        </x-form>
+                        hr
+                    </template>
                 </div>
-            </div>
-            <div class="dashed xborder-vr" />
-            <div>
-                <table>
+            </tabs-item>
+            <tabs-item label="Standard Controls">
+                <table style="width:auto;">
                 <tbody>
-                <tr>
-                    <th>conf</th>
-                    <td><pre>{{ conf }}</pre></td>
-                </tr>
-                <tr>
-                    <th>custom</th>
-                    <td><pre>{{ custom }}</pre></td>
-                </tr>
-                <tr>
-                    <th>form</th>
-                    <td><pre>{{ form }}</pre></td>
-                </tr>
-                <tr>
-                    <th>basic_form</th>
-                    <td><pre>{{ basic_form }}</pre></td>
-                </tr>
+                    <tr>
+                        <th>x-input-search</th>
+                        <td><x-input-search v-model="form.search1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-number</th>
+                        <td><x-input-number v-model="form.number1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-text</th>
+                        <td><x-input-text v-model="form.text1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-textarea</th>
+                        <td><x-input-textarea v-model="form.textarea1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-tel</th>
+                        <td><x-input-tel v-model="form.tel1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-email</th>
+                        <td><x-input-email v-model="form.email1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-url</th>
+                        <td><x-input-url v-model="form.url1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-password</th>
+                        <td><x-input-password v-model="form.password1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-checkbox</th>
+                        <td><x-input-checkbox v-model="form.checkbox1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-radio</th>
+                        <td><x-input-radio v-model="form.radio11" name="radio1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-radio</th>
+                        <td><x-input-radio v-model="form.radio12" name="radio1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-radio</th>
+                        <td><x-input-radio v-model="form.radio13" name="radio1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-radio</th>
+                        <td><x-input-radio v-model="form.radio21" name="radio2" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-radio</th>
+                        <td><x-input-radio v-model="form.radio22" name="radio2" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-radio</th>
+                        <td><x-input-radio v-model="form.radio23" name="radio2" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-color</th>
+                        <td><x-input-color v-model="form.color1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-time</th>
+                        <td><x-input-time v-model="form.time1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-date</th>
+                        <td><x-input-date v-model="form.date1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-month</th>
+                        <td><x-input-month v-model="form.month1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-week</th>
+                        <td><x-input-week v-model="form.week1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-file</th>
+                        <td><x-input-file v-model="form.file1" /></td>
+                    </tr>
+                    <tr>
+                        <th>x-input-select</th>
+                        <td><x-input-select v-model="form.select1" :options="options1" /></td>
+                    </tr>
                 </tbody>
                 </table>
-            </div>
-        </div>
+            </tabs-item>
+        </tabs>
 `,
     data: function () {
         return {

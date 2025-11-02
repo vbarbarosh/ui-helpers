@@ -199,7 +199,7 @@ vue_component('x-input-checkboxes', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly', 'options', 'layout'],
     template: `
-        <x-form v-model="local" v-bind:layout="(layout ?? 'layout-inline')">
+        <x-form v-model="local" v-bind:layout="(layout ?? 'layout-inline-rev')">
             <x-form-item v-for="option in options"
                          v-on:update:modelValue="v => input(v, option)"
                          v-bind:modelValue="local.includes(option.value)"
@@ -284,7 +284,7 @@ vue_component('x-input-radios', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly', 'options', 'layout'],
     template: `
-        <x-form v-bind:layout="(layout ?? 'layout-inline')">
+        <x-form v-bind:layout="(layout ?? 'layout-inline-rev')">
             <x-form-item v-for="option in options"
                          v-on:update:modelValue="v => input(v, option)"
                          v-bind:modelValue="(modelValue === option.value)"
