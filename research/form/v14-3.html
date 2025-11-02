@@ -54,25 +54,6 @@ const form_types_global = {
             },
         },
     },
-    'layout-ggg': {
-        render_control: function (form_item, query, make_insertions) {
-            return Vue.h(Vue.resolveComponent('layout-ggg'), {items: query({parent: form_item}).flatMap(make_insertions)});
-        },
-        types: {
-            search: 'ggg-input-search',
-            number: 'ggg-input-number',
-            text: 'ggg-input-text',
-            textarea: 'ggg-input-textarea',
-            tel: 'ggg-input-tel',
-            email: 'ggg-input-email',
-            url: 'ggg-input-url',
-            password: 'ggg-input-password',
-            checkbox: 'ggg-input-checkbox',
-            radio: 'ggg-input-radio',
-            color: 'ggg-input-color',
-            time: 'ggg-input-time',
-        },
-    },
     none: {
         load_virtual_items: function () {
             return [];
@@ -110,8 +91,51 @@ const form_types_global = {
         },
     },
     header: {
-        render: function (ctx) {
-            return Vue.h('h4', {class: 'xm xp silver'}, ctx.virtual_item.body);
+        make_final_cell: function (virtual_item) {
+            return {
+                insertions: {
+                    container: function () {
+                        return Vue.h('h4', {class: 'xm xp silver'}, virtual_item.label);
+                    },
+                    layout_table_tr: function () {
+                        return Vue.h('tr', {}, [
+                            Vue.h('th', {colspan: 2, class: 'c xp green'}, virtual_item.label)
+                        ]);
+                    },
+                },
+            };
+        },
+    },
+    insdemo: {
+        make_final_cell: function (virtual_item) {
+            return {
+                insertions: {
+                    container: function () {
+                        return Vue.h('div', {class: 'silver'}, 'INSDEMO');
+                    },
+                    layout_table_tr: function () {
+                        return Vue.h('tr', {}, [
+                            Vue.h('th', {colspan: 2, class: 'c xp green'}, 'INSDEMO')
+                        ]);
+                    },
+                },
+            };
+        },
+    },
+    hr: {
+        make_final_cell: function (ctx) {
+            return {
+                insertions: {
+                    container: function () {
+                        return Vue.h('hr');
+                    },
+                    layout_table_tr: function () {
+                        return Vue.h('tr', {}, [
+                            Vue.h('th', {colspan: 2, class: 'silver'})
+                        ]);
+                    },
+                },
+            };
         },
     },
     search: 'x-input-search',
@@ -124,6 +148,17 @@ const form_types_global = {
     password: 'x-input-password',
     checkbox: 'x-input-checkbox',
     radio: 'x-input-radio',
+    radios: {
+        load_virtual_items: function (ctx) {
+            const db_items = ctx.query_db_items({parent: ctx.db_item.form_item});
+            const options = db_items.map(function (db_item) {
+                return {label: db_item.form_item.label, value: db_item.form_item.$attrs.value};
+            });
+            return [
+                {db_item: ctx.db_item, type: 'select', path: ctx.db_item.form_item.path, label: ctx.db_item.form_item.label, id: ctx.db_item.form_item.id, props: {options}},
+            ];
+        },
+    },
     color: 'x-input-color',
     time: 'x-input-time',
     date: 'x-input-date',
@@ -731,6 +766,10 @@ vue_component('x-form', {
                     render_model_value_props,
                     render_jack_hack_slots,
                 };
+                if (virtual_item.db_item.local_types[virtual_item.type]?.make_final_cell) {
+                    const tmp = virtual_item.db_item.local_types[virtual_item.type].make_final_cell(virtual_item);
+                    return overrides.final(virtual_item, tmp);
+                }
                 if (virtual_item.label) {
                     return overrides.final(virtual_item, {
                         insertions: {
@@ -757,7 +796,8 @@ vue_component('x-form', {
                     if (typeof component !== 'string') {
                         return Vue.h('DIV', {class: 'yellow'}, [`⚠️ no type: [${virtual_item.type}]`]);
                     }
-                    return Vue.h(Vue.resolveComponent(component), {...render_model_value_props(), ...render_attr_props()}, render_jack_hack_slots());
+                    const tmp = {...render_model_value_props(), ...render_attr_props(), ...virtual_item.props};
+                    return Vue.h(Vue.resolveComponent(component), tmp, render_jack_hack_slots());
                 }
                 function render_model_value_props() {
                     const modelValue = _this.modelValue?.[virtual_item.path];
@@ -765,7 +805,13 @@ vue_component('x-form', {
                     return {modelValue, 'onUpdate:modelValue': updateModelValue};
                 }
                 function render_attr_props() {
-                    return virtual_item.db_item.form_item.$attrs;
+                    // Small typo in a template, could lead to a cryptic error message:
+                    //                             🚧____🚧
+                    // <x-form-item path="check_me_out"" type="checkbox" label="Check me out" />
+                    // ⚠️ Failed to execute 'setAttribute' on 'Element': '"' is not a valid attribute name.
+                    const out = {...virtual_item.db_item.form_item.$attrs};
+                    delete out['"'];
+                    return out;
                 }
                 function render_jack_hack_slots() {
                     return {
@@ -879,7 +925,6 @@ vue_component('render-template', {
             immediate: true,
             handler: function () {
                 this.spec = Vue.markRaw({template: this.html ?? '<span>NONE</span>', data: () => this.data ?? {}});
-                console.log(this.html);
                 if (this.$refs.component) {
                     this.$refs.component.$forceUpdate();
                 }
@@ -910,10 +955,11 @@ vue_component('app', {
                     <x-form v-model="custom" v-bind:layout="conf.layout">
                         <render-template :value="conf.form" />
                     </x-form>
-
+<!--
                     <x-form v-model="basic_form" layout="layout-table">
+                        <x-form-item type="insdemo" label="Insertions" />
                         <x-form-item path="email" type="email" label="Email" />
-                        <x-form-item path="check_me_out"" type="checkbox" label="Check me out" />
+                        <x-form-item path="check_me_out" type="checkbox" label="Check me out" />
                         <x-form-item path="ggg"" type="none" label="None..." />
                         <x-form-item type="unwrap" label="None...">
                             <x-form-item path="text1" type="text" label="Text1" />
@@ -928,6 +974,7 @@ vue_component('app', {
                             </template>
                         </x-form-item>
                     </x-form>
+-->
                 </div>
             </div>
             <div class="dashed xborder-vr" />
@@ -1084,7 +1131,9 @@ vue_component('app', {
             this.forms = [
                 {label: 'login.html', value: await http_get_utf8('v14-3/login.html')},
                 {label: 'register.html', value: await http_get_utf8('v14-3/register.html')},
-                {label: 'wpforms/google-drive-form-template.html', value: await http_get_utf8('v14-3/wpforms/google-drive-form-template.html')}
+                {label: 'task.html', value: await http_get_utf8('v14-3/task.html')},
+                {label: 'wpforms/google-drive-form-template.html', value: await http_get_utf8('v14-3/wpforms/google-drive-form-template.html')},
+                {label: 'bootstrap5/checkout.html', value: await http_get_utf8('v14-3/bootstrap5/checkout.html')},
             ];
         },
     },

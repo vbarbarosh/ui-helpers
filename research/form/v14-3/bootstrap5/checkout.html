@@ -1,0 +1,28 @@
+<x-form-item type="header" label="Billing Address"  />
+
+<x-form-item type="text" path="first_name" label="First Name" />
+<x-form-item type="text" path="last_name" label="Last Name" />
+<x-form-item type="text" path="username" label="Username" bs5-pre="@" />
+<x-form-item type="email" path="email" label="Email" />
+<x-form-item type="text" path="address"  label="Address" />
+<x-form-item type="text" path="address2" label="Address 2" />
+
+<x-form-item path="country" type="text" label="Country" />
+<x-form-item path="state" type="text" label="State" />
+<x-form-item path="zip" type="text" label="Zip" />
+
+<x-form-item type="hr" />
+<x-form-item type="checkbox" path="shipping_same_as_billing" label="Shipping address is the same as my billing address" />
+<x-form-item type="checkbox" path="save_shipping_info" label="Save this information for next time" />
+<x-form-item type="hr" />
+
+<x-form-item type="radios" path="payment_method" label="Payment">
+    <x-form-item value="credit_card" label="Credit Card" />
+    <x-form-item value="debit_card" label="Debit Card" />
+    <x-form-item value="paypal" label="PayPal" />
+</x-form-item>
+
+<x-form-item type="text" path="card_name" label="Name on card" hint="Full name as displayed on card" bs5-span="6" />
+<x-form-item type="number" path="card_number" label="Credit card number" bs5-span="6" />
+<x-form-item type="date" path="card_exp" label="Expiration" bs5-span="3" />
+<x-form-item type="number" path="card_cvv" label="CVV" bs5-span="3" />
