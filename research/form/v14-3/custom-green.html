@@ -1,0 +1,19 @@
+<x-form-item type="header" label="Step 1: Your details" />
+<x-form-item type="text" path="name" label="Name" />
+<x-form-item type="email" path="email" label="Email" />
+<x-form-item type="tel" path="phone" label="Phone" />
+
+<x-form-item type="header" label="Step 2: Delivery address" />
+<x-form-item type="text" path="address" label="Address" />
+<x-form-item type="text" path="post_code" label="Post code" />
+<x-form-item type="text" path="country" label="Country" />
+
+<x-form-item type="header" label="Step 3: Card details" />
+<x-form-item type="radios" path="card_type" label="Card type">
+    <x-form-item value="visa" label="Visa" />
+    <x-form-item value="amex" label="AmEx" />
+    <x-form-item value="mastercard" label="Mastercard" />
+</x-form-item>
+<x-form-item type="number" path="card_number" label="Card number" />
+<x-form-item type="number" path="card_cvv" label="Security code" />
+<x-form-item type="text" path="card_name" label="Name on card" placeholder="Exact name as on the card" />
