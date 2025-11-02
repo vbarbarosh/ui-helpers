@@ -280,6 +280,31 @@ vue_component('x-input-radio', {
     },
 });
 
+vue_component('x-input-radios', {
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'disabled', 'readonly', 'options', 'layout'],
+    template: `
+        <x-form v-bind:layout="(layout ?? 'layout-inline')">
+            <x-form-item v-for="option in options"
+                         v-on:update:modelValue="v => input(v, option)"
+                         v-bind:modelValue="(modelValue === option.value)"
+                         v-bind:label="option.label"
+                         v-bind:name="id"
+                         type="radio" />
+        </x-form>
+    `,
+    data: function () {
+        return {
+            id: random_html_id(),
+        };
+    },
+    methods: {
+        input: function (value, option) {
+            this.$emit('update:modelValue', option.value);
+        },
+    },
+});
+
 vue_component('x-input-color', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],

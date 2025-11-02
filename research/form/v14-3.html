@@ -167,13 +167,14 @@ const form_types_global = {
     },
     radio: 'x-input-radio',
     radios: {
+        component: 'x-input-radios',
         load_virtual_items: function (ctx) {
             const db_items = ctx.query_db_items({parent: ctx.db_item.form_item});
-            const options = db_items.map(function (db_item) {
+            const options = ctx.db_item.form_item.$attrs.options ?? db_items.map(function (db_item) {
                 return {label: db_item.form_item.label, value: db_item.form_item.$attrs.value};
             });
             return [
-                {db_item: ctx.db_item, type: 'select', path: ctx.db_item.form_item.path, label: ctx.db_item.form_item.label, id: ctx.db_item.form_item.id, props: {options}},
+                {db_item: ctx.db_item, type: 'radios', path: ctx.db_item.form_item.path, label: ctx.db_item.form_item.label, id: ctx.db_item.form_item.id, props: {options}},
             ];
         },
     },
@@ -975,7 +976,6 @@ vue_component('render-template', {
     },
 });
 
-
 vue_component('app', {
     template: `
         <div class="fix-f hsplit gap15 m10">
@@ -990,20 +990,6 @@ vue_component('app', {
 
                     <x-form v-model="custom" v-bind:layout="conf.layout">
                         <render-template :value="conf.form" />
-                    </x-form>
-
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-
-                    <x-form v-model="basic_form">
-                        <x-form-item type="checkboxes" path="activity_types" label="Activity types">
-                            <x-form-item value="online" label="Online activities" />
-                            <x-form-item value="promo" label="Promotion activities" />
-                            <x-form-item value="offline" label="Offline activities" />
-                            <x-form-item value="brand" label="Simple brand exposure" />
-                        </x-form-item>
                     </x-form>
 
 <!--
