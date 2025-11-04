@@ -45,6 +45,39 @@
 </head>
 <body>
 
+<script type="text/html">
+    <form>
+        <div class="mb-3">
+            <label for="id-8bce68f2-640e-412c-8c0b-8d421a2a4819" class="form-label">Email address</label>
+            <input id="id-8bce68f2-640e-412c-8c0b-8d421a2a4819" type="email" class="form-control">
+            <div class="form-text">We'll never share your email with anyone else.</div>
+        </div>
+        <div class="mb-3">
+            <label for="id-bf1bc8dd-36f4-4db0-90f5-b23014e57531" class="form-label">Password</label>
+            <input id="id-bf1bc8dd-36f4-4db0-90f5-b23014e57531" type="password" class="form-control">
+        </div>
+        <div class="form-check mb-3">
+            <input id="id-f894b94e-2806-446e-93f8-8fb2217ab9ce" type="checkbox" class="form-check-input">
+            <label for="id-f894b94e-2806-446e-93f8-8fb2217ab9ce" class="form-check-label">Check me out</label>
+        </div>
+    </form>
+    <form>
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            <input type="password" class="form-control" id="exampleInputPassword1">
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="exampleCheck1">
+            <label class="form-check-label" for="exampleCheck1">Check me out</label>
+        </div>
+    </form>
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@vbarbarosh/ui-helpers@0.5.1/src/static/js/bundle.js"></script>
 <script src="x-form-controls.js"></script>
@@ -108,11 +141,23 @@ const form_types_global = {
         },
     },
     'layout-bootstrap5': {
+//         load_virtual_items: function (ctx) {
+//             //
+//             const tmp = ctx.load_virtual_items(ctx.db_item);
+// console.log(tmp);
+//             return tmp;
+//         },
         render: function (ctx) {
             const overrides = {
-                final: function (db_or_virtual_item, final_cell) {
-                    if ((db_or_virtual_item.type ?? db_or_virtual_item.form_item.type) === 'checkbox') {
+                final: function (virtual_item, final_cell) {
+                    if ((virtual_item.type ?? virtual_item.db_item.form_item.type) === 'checkbox') {
                         final_cell.boostrap5_form_check = true;
+                    }
+                    if (virtual_item.db_item.form_item.$slots.help) {
+                        final_cell.insertions.help = virtual_item.db_item.form_item.$slots.help;
+                    }
+                    if (virtual_item.db_item.form_item.help) {
+                        final_cell.insertions.help = () => virtual_item.db_item.form_item.help;
                     }
                     return final_cell;
                 },
@@ -121,14 +166,44 @@ const form_types_global = {
             return Vue.h(Vue.resolveComponent('layout-bootstrap5'), {items: final_cells});
         },
         types: {
+            group: {
+                load_virtual_items: function (ctx) {
+                    return [
+                        {db_item: ctx.db_item, type: 'fieldset', legend: ctx.db_item.form_item.label},
+                    ];
+                },
+            },
+            fieldset: {
+                render: function (ctx) {
+                    const overrides = {
+                        final: function (virtual_item, final_cell) {
+                            if ((virtual_item.type ?? virtual_item.db_item.form_item.type) === 'checkbox') {
+                                final_cell.boostrap5_form_check = true;
+                            }
+                            if (virtual_item.db_item.form_item.$slots.help) {
+                                final_cell.insertions.help = virtual_item.db_item.form_item.$slots.help;
+                            }
+                            if (virtual_item.db_item.form_item.help) {
+                                final_cell.insertions.help = () => virtual_item.db_item.form_item.help;
+                            }
+                            return final_cell;
+                        },
+                    };
+                    const final_cells = ctx.query_final_cells({parent: ctx.virtual_item.db_item.form_item}, overrides);
+                    return Vue.h('fieldset', {disabled: true}, [
+                        Vue.h('legend', {}, ctx.virtual_item.legend),
+                        Vue.h(Vue.resolveComponent('layout-bootstrap5'), {items: final_cells}),
+                    ]);
+                },
+            },
             text: {
                 render: function (ctx) {
-                    return Vue.h('input', {id: ctx.virtual_item.id, type: 'text', class: 'form-control'});
+                    return Vue.h('input', {id: ctx.virtual_item.id, type: 'text', class: 'form-control', placeholder: ctx.virtual_item.placeholder});
                 },
             },
             textarea: {
                 render: function (ctx) {
-                    return Vue.h('textarea', {id: ctx.virtual_item.id, class: 'form-control'});
+                    return Vue.h('textarea', {id: ctx.virtual_item.id, class: 'form-control', ...ctx.virtual_item.db_item.form_item.$attrs});
                 },
             },
             number: {
@@ -328,43 +403,35 @@ vue_component('warn-invalid-layout-item-type', {
 vue_component('layout-bootstrap5', {
     props: ['items'],
     template: `
-        <form>
-            <template v-for="item in items" v-bind:key="item.key">
-                <template v-if="item.insertions.boostrap5_row">
-                    <div>BS5 ROW</div>
-                </template>
-                <template v-else-if="item.insertions.container">
-                    <div class="mb-3">
-                        <render-function :fn="item.insertions.container" />
-                    </div>
-                </template>
-                <template v-else-if="(item.insertions.label && item.insertions.control)">
-                    <div v-if="item.boostrap5_form_check" class="form-check mb-3">
-                        <render-function :fn="item.insertions.control" class="form-label" />
-                        <render-function :fn="item.insertions.label" class="form-label" />
-                        <div v-if="item.insertions.help" class="form-text">
-                            <render-function :fn="item.insertions.help" />
-                        </div>
-                    </div>
-                    <div v-else class="mb-3">
-                        <render-function :fn="item.insertions.label" class="form-label" />
-                        <render-function :fn="item.insertions.control" class="form-label" />
-                        <div v-if="item.insertions.help" class="form-text">
-                            <render-function :fn="item.insertions.help" />
-                        </div>
-                    </div>
-                </template>
-                <template v-else>
-                    <warn-invalid-layout-item-type :item />
-                </template>
+        <template v-for="item in items" v-bind:key="item.key">
+            <template v-if="item.insertions.boostrap5_row">
+                <div>BS5 ROW</div>
             </template>
-<!--
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-            </div>
--->
-        </form>
+            <template v-else-if="item.insertions.container">
+                <div class="mb-3">
+                    <render-function :fn="item.insertions.container" />
+                </div>
+            </template>
+            <template v-else-if="(item.insertions.label && item.insertions.control)">
+                <div v-if="item.boostrap5_form_check" class="form-check mb-3">
+                    <render-function :fn="item.insertions.control" class="form-label" />
+                    <render-function :fn="item.insertions.label" class="form-check-label" />
+                    <div v-if="item.insertions.help" class="form-text">
+                        <render-function :fn="item.insertions.help" />
+                    </div>
+                </div>
+                <div v-else class="mb-3">
+                    <render-function :fn="item.insertions.label" class="form-label" />
+                    <render-function :fn="item.insertions.control" class="form-label" />
+                    <div v-if="item.insertions.help" class="form-text">
+                        <render-function :fn="item.insertions.help" />
+                    </div>
+                </div>
+            </template>
+            <template v-else>
+                <warn-invalid-layout-item-type :item />
+            </template>
+        </template>
     `,
 });
 
@@ -879,8 +946,8 @@ vue_component('x-form', {
                 }
                 return make_virtual_item();
                 function make_virtual_item(props) {
-                    const {type, path, label, id} = db_item.form_item;
-                    return {db_item, type, path, label, id, ...props};
+                    const {type, path, label, help, placeholder, id} = db_item.form_item;
+                    return {db_item, type, path, label, help, placeholder, id, ...props};
                 }
             }
 
@@ -981,7 +1048,7 @@ vue_component('x-form', {
 
 vue_component('x-form-item', {
     emits: ['update:modelValue'],
-    props: ['modelValue', 'path', 'type', 'label', 'items', 'help'],
+    props: ['modelValue', 'path', 'type', 'label', 'items', 'help', 'placeholder'],
     inheritAttrs: false,
     inject: {
         form_value: 'form_value',
@@ -1296,21 +1363,26 @@ vue_component('app', {
     methods: {
         refresh: async function () {
             this.forms = [
+                {label: 'bootstrap5/basic.html', value: await http_get_utf8('v14-3/bootstrap5/basic.html')},
+                {label: 'bootstrap5/basic2.html', value: await http_get_utf8('v14-3/bootstrap5/basic2.html')},
+                {label: 'bootstrap5/basic3.html', value: await http_get_utf8('v14-3/bootstrap5/basic3.html')},
+                {label: 'bootstrap5/basic4.html', value: await http_get_utf8('v14-3/bootstrap5/basic4.html')},
+                {label: 'bootstrap5/checkout.html', value: await http_get_utf8('v14-3/bootstrap5/checkout.html')},
+                {label: 'bootstrap5/demo.html', value: await http_get_utf8('v14-3/bootstrap5/demo.html')},
+                {label: 'bootstrap5/select.html', value: await http_get_utf8('v14-3/bootstrap5/select.html')},
+                {label: 'custom-green.html', value: await http_get_utf8('v14-3/custom-green.html')},
+                {label: 'elementplus/basic.html', value: await http_get_utf8('v14-3/elementplus/basic.html')},
                 {label: 'login.html', value: await http_get_utf8('v14-3/login.html')},
                 {label: 'register.html', value: await http_get_utf8('v14-3/register.html')},
                 {label: 'task.html', value: await http_get_utf8('v14-3/task.html')},
-                {label: 'custom-green.html', value: await http_get_utf8('v14-3/custom-green.html')},
                 {label: 'wpforms/google-drive-form-template.html', value: await http_get_utf8('v14-3/wpforms/google-drive-form-template.html')},
-                {label: 'bootstrap5/demo.html', value: await http_get_utf8('v14-3/bootstrap5/demo.html')},
-                {label: 'bootstrap5/checkout.html', value: await http_get_utf8('v14-3/bootstrap5/checkout.html')},
-                {label: 'elementplus/basic.html', value: await http_get_utf8('v14-3/elementplus/basic.html')},
             ];
         },
     },
     created: async function () {
         await blocking(this.refresh());
-        this.conf.form ??= this.forms[0].value;
-        this.conf.layout ??= this.layouts[0].value;
+        this.conf.form ??= this.forms[3].value;
+        this.conf.layout ??= 'layout-bootstrap5';
     },
 })
 </script>
