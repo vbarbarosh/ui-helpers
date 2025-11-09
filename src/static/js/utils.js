@@ -39,20 +39,6 @@ function thumbnailer(url, params)
     return url;
 }
 
-function css([val])
-{
-    const elem = document.createElement('STYLE');
-    elem.innerHTML = val;
-    const sm = document.querySelector('#smcss') ?? document.querySelector('link[href*="sm.css"]');
-    if (sm) {
-        sm.parentElement.insertBefore(elem, sm);
-    }
-    else {
-        document.querySelector('head').appendChild(elem);
-        document.head.appendChild(elem);
-    }
-}
-
 function parse_links_and_scripts(html)
 {
     const links = [];

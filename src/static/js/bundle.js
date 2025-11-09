@@ -17,6 +17,20 @@ function vue_directive(name, params)
     vue_directives.push({name, params});
 }
 
+function css([val])
+{
+    const elem = document.createElement('STYLE');
+    elem.innerHTML = val;
+    const sm = document.querySelector('#smcss') ?? document.querySelector('link[href*="sm.css"]');
+    if (sm) {
+        sm.parentElement.insertBefore(elem, sm);
+    }
+    else {
+        document.querySelector('head').appendChild(elem);
+        document.head.appendChild(elem);
+    }
+}
+
 (function () {
 
     window.bundle_pending = ['utils'];
