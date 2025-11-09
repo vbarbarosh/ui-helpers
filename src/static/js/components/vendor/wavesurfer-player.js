@@ -25,10 +25,10 @@ vue_component('wavesurfer-player', {
         },
     },
     created: function () {
-        console.log('[wavesurfer_player.created]');
+        // console.log('[wavesurfer_player.created]');
     },
     mounted: function () {
-        console.log('[wavesurfer_player.mounted]');
+        // console.log('[wavesurfer_player.mounted]');
 
         this.resize_observer = new ResizeObserver(() => this.wavesurfer.setOptions({height: this.$refs.waveform.clientHeight}));
         this.resize_observer.observe(this.$el);
