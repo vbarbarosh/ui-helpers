@@ -98,6 +98,7 @@ vue_component('app', {
             'snippets/vendor-element-plus.md',
             'snippets/vendor-observable-plot.md',
             'snippets/virtual-grid.md',
+            'snippets/wavesurfer-player.md',
         ];
         this.snippets = await blocking(Promise.all(ss.map(async function (url) {
             const markdown = await http_get_utf8(url);

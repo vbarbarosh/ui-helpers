@@ -167,6 +167,7 @@ function vue_directive(name, params)
         inject('components/vendor/prism-html.js');
         inject('components/vendor/prism-js.js');
         inject('components/vendor/prism-php.js');
+        inject('components/vendor/wavesurfer-player.js');
         inject('components/virtual/virtual-grid.js');
         inject('directives/autofocus.js');
         inject('directives/autosize.js');
