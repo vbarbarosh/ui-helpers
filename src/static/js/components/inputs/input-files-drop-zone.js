@@ -6,7 +6,7 @@ vue_component('input-files-drop-zone', {
                v-on:dragleave="dragleave"
                v-on:drop="drop"
                v-bind:class="{active: is_active}"
-               class="form-input-drop-zone">
+               class="input-files-drop-zone__root">
             <span v-if="label" class="form-label">{{ label }}</span>
             <input ref="input" v-on:change="change" type="file" webkitdirectory multiple style="display:none;" />
             <div>
@@ -43,7 +43,7 @@ vue_component('input-files-drop-zone', {
 });
 
 css`
-    .form-inputs-drop-zone {
+    .input-files-drop-zone__root {
         display: flex;
         flex-direction: column;
         gap: 0.5em;
@@ -54,11 +54,11 @@ css`
         background: #fafafa;
         transition: border-color 0.2s;
     }
-    .form-inputs-drop-zone.active {
+    .input-files-drop-zone__root.active {
         border-color: #1976d2;
         background: #e3f2fd;
     }
-    .form-inputs-drop-zone > div {
+    .input-files-drop-zone__root > div {
         padding: 2em;
         text-align: center;
         color: #666;

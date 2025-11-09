@@ -8,7 +8,7 @@ vue_component('files-browser', {
                         v-on:click="click_file_name(file)"
                         v-bind:key="file.name"
                         v-bind:class="{active: (file.name === active?.name)}"
-                        class="xls files-browser-row">
+                        class="xls files-browser__row">
                         📄 {{ file.name }}
                     </li>
                 </ul>
@@ -53,7 +53,7 @@ vue_component('files-browser', {
 });
 
 css`
-    .files-browser-row { padding: 2px 4px; border-radius: 6px; cursor: pointer; }
-    .files-browser-row:hover { background: #eef6ff; }
-    .files-browser-row.active { background: #dbeafe; outline: 1px solid #bfdbfe; }
+    .files-browser__row { padding: 2px 4px; border-radius: 6px; cursor: pointer; }
+    .files-browser__row:hover { background: #eef6ff; }
+    .files-browser__row.active { background: #dbeafe; outline: 1px solid #bfdbfe; }
 `;

@@ -2,7 +2,7 @@ vue_component('input-radios', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'id', 'options', 'label', 'disabled', 'readonly'],
     template: `
-        <div class="input-radios">
+        <div class="input-radios__root">
             <label v-for="item in local_items" v-bind:key="item.key" class="flex-row-center-left gap5 cur-pointer">
                 <input v-on:input="input(item)" v-bind:id="id" v-bind:checked="(modelValue === item.value)" type="radio">
                 <span>{{ item.label }}</span>
@@ -40,7 +40,7 @@ vue_component('input-radios', {
 });
 
 css`
-    .input-radios {
+    .input-radios__root {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         gap: 10px;

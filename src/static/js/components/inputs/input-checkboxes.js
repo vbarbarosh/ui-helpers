@@ -2,7 +2,7 @@ vue_component('input-checkboxes', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'options', 'label', 'disabled', 'readonly'],
     template: `
-        <div class="input-select-checkboxes">
+        <div class="input-checkboxes__root">
             <label v-for="item in local_items" v-bind:key="item.key" class="flex-row-center-left gap5 cur-pointer">
                 <input v-on:input="input($event, item)" v-bind:checked="item.checked" type="checkbox">
                 <span>{{ item.label }}</span>
@@ -61,7 +61,7 @@ vue_component('input-checkboxes', {
 });
 
 css`
-    .input-select-checkboxes {
+    .input-checkboxes__root {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         gap: 10px;

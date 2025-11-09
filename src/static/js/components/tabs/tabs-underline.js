@@ -1,15 +1,15 @@
 vue_component('tabs-underline', {
     props: ['items'],
-    template: `<tabs v-bind:items="items" class2="tabs-underline"><slot /></tabs>`,
+    template: `<tabs v-bind:items="items" class2="tabs-underline__root"><slot /></tabs>`,
 });
 
 css`
-    .tabs-underline > .tab-header {
+    .tabs-underline__root > .tab-header {
         display: flex;
         border-bottom: 1px solid #ddd;
         margin-bottom: 15px;
     }
-    .tabs-underline > .tab-header > .tab-button {
+    .tabs-underline__root > .tab-header > .tab-button {
         padding: 10px 20px;
         background: none;
         border: none;
@@ -19,13 +19,13 @@ css`
         color: #6c757d;
         transition: all 0.3s;
     }
-    .tabs-underline > .tab-header > .tab-button:hover {
+    .tabs-underline__root > .tab-header > .tab-button:hover {
         color: #495057;
     }
-    .tabs-underline > .tab-header > .tab-button.active {
+    .tabs-underline__root > .tab-header > .tab-button.active {
         color: #212529;
     }
-    .tabs-underline > .tab-header > .tab-button.active::after {
+    .tabs-underline__root > .tab-header > .tab-button.active::after {
         content: '';
         position: absolute;
         bottom: -1px;
@@ -34,7 +34,7 @@ css`
         height: 2px;
         background: #212529;
     }
-    .tabs-underline > .tab-content {
+    .tabs-underline__root > .tab-content {
         padding: 15px;
         line-height: 1.6;
     }
