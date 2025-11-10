@@ -20,6 +20,9 @@ vue_component('wavesurfer-player', {
     },
     watch: {
         src: function () {
+            if (!this.wavesurfer) {
+                return;
+            }
             this.wavesurfer.setTime(0);
             this.wavesurfer.load(this.src);
         },
@@ -51,8 +54,12 @@ vue_component('wavesurfer-player', {
     },
     unmounted: function () {
         // console.log('[wavesurfer_player.unmounted]');
-        this.wavesurfer?.destroy();
-        this.resize_observer?.disconnect();
+        if (this.wavesurfer) {
+            this.wavesurfer.destroy();
+        }
+        if (this.resize_observer) {
+            this.resize_observer.disconnect();
+        }
     },
 });
 
