@@ -87,6 +87,11 @@ function css([val])
         inject('components/etc/slot-hack.js');
         inject('components/etc/spinner.js');
         inject('components/etc/warn-invalid-layout-item-type.js');
+        inject('components/forms/form-box.js');
+        inject('components/forms/form-item.js');
+        inject('components/forms/form-launcher.js');
+        inject('components/forms/form-layout-table.js');
+        inject('components/forms/form-types.js');
         // inject('components/forms/form-box.js');
         // inject('components/forms/form-invalid-layout-item-type.js');
         // inject('components/forms/form-item.js');
