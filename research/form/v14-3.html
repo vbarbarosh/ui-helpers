@@ -896,7 +896,7 @@ vue_component('expand', {
 });
 
 // 👢🚀
-vue_component('form-motivator', {
+vue_component('form-launcher', {
     props: ['items'],
     template: `
         <template v-for="item in items">
@@ -921,7 +921,7 @@ vue_component('x-form', {
         <div class="red">
             <x-form-item v-bind:type="(layout ?? 'layout-table')"><slot /></x-form-item>
         </div>
-        <form-motivator :items="gogogo_v1" />
+        <form-launcher :items="gogogo_v1" />
     `,
     data: function () {
         return {
