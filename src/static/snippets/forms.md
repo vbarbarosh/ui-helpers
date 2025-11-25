@@ -1,7 +1,7 @@
 # Forms
 
 ```vue
-<data-vars v-slot="vars">
+<data-vars v-slot="vars" v-bind:vars="{form: {}}">
     <div class="hsplit">
         <div class="flex-col gap10">
             <form-box v-model="vars.form">
