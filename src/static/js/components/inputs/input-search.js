@@ -1,9 +1,8 @@
 vue_component('input-search', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
-    inject: {form_item_id: {default: null}},
     template: `
-        <input v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item_id" type="search" />
+        <input v-form-control-id v-on:input="input" v-bind:value="modelValue" type="search" />
     `,
     methods: {
         input: function (event) {

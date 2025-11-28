@@ -1,9 +1,8 @@
 vue_component('input-url', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
-    inject: {form_item_id: {default: null}},
     template: `
-        <input v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item_id" type="url" />
+        <input v-form-control-id v-on:input="input" v-bind:value="modelValue" type="url" />
     `,
     methods: {
         input: function (event) {

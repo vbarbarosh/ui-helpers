@@ -1,9 +1,8 @@
 vue_component('input-textarea', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
-    inject: {form_item_id: {default: null}},
     template: `
-        <textarea v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item_id" />
+        <textarea v-form-control-id v-on:input="input" v-bind:value="modelValue" />
     `,
     methods: {
         input: function (event) {

@@ -14,7 +14,7 @@ vue_component('form-types', {
                                     return {
                                         insertions: {
                                             label: () => [],
-                                            control: () => Vue.h('DIV', {class: 'flex-row-center-left gap10'}, {
+                                            control: () => Vue.h('DIV', {class: 'flex-row-center-left gap5'}, {
                                                 default: () => [final_cell.insertions.control(), final_cell.insertions.label()],
                                             }),
                                         },

@@ -8,7 +8,7 @@ vue_component('input-file-drop-zone', {
                v-bind:class="{active: is_active}"
                class="input-file-drop-zone__root">
             <span v-if="label" class="form-label">{{ label }}</span>
-            <input ref="input" v-on:change="change_input" type="file" style="display:none;" />
+            <input ref="input" v-form-control-id v-on:change="change_input" type="file" style="display:none;" />
             <div>
                 <span v-if="!modelValue">Drop file here or click to select</span>
                 <span v-else>{{ modelValue.name }}</span>

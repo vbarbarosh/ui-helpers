@@ -1,9 +1,8 @@
 vue_component('input-range', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
-    inject: {form_item_id: {default: null}},
     template: `
-        <input v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item_id" type="range" />
+        <input v-form-control-id v-on:input="input" v-bind:value="modelValue" type="range" />
     `,
     methods: {
         input: function (event) {

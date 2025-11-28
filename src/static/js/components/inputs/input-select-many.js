@@ -2,7 +2,7 @@ vue_component('input-select-many', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'options', 'label', 'disabled', 'readonly'],
     template: `
-        <select v-on:input="input" multiple>
+        <select v-form-control-id v-on:input="input" multiple>
             <option v-for="item in local_items" v-bind:key="item.key" v-bind:value="item.key" v-bind:selected="item.selected">
                 {{ item.label }}
             </option>

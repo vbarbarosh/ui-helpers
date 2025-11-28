@@ -2,7 +2,7 @@ vue_component('input-select', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'options', 'label', 'disabled', 'readonly'],
     template: `
-        <select v-on:input="input">
+        <select v-form-control-id v-on:input="input">
             <option v-for="item in local_items" v-bind:key="item.key" v-bind:value="item.key" v-bind:selected="(item.value === modelValue)">
                 {{ item.label }}
             </option>

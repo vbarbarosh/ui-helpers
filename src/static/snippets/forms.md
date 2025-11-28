@@ -16,3 +16,20 @@
     </div>
 </data-vars>
 ```
+
+---
+
+```vue
+<data-vars v-slot="vars" v-bind:vars="{form: {}}">
+    <div class="hsplit">
+        <div class="flex-col gap10">
+            <form-box v-model="vars.form">
+                <form-item path="audio_file" type="file" label="Audio File" />
+            </form-box>
+        </div>
+        <div class="fluid">
+            {{ vars }}
+        </div>
+    </div>
+</data-vars>
+```

@@ -1,3 +1,13 @@
+vue_directive('form-control-id', {
+    mounted: function (el, binding) {
+        if (binding.instance.$slots.jack_hack_label_id) {
+            const obj = {id: '................'};
+            binding.instance.$slots.jack_hack_label_id(obj);
+            el.setAttribute('id', obj.id);
+        }
+    },
+});
+
 // [form] is already taken by html. [form-box] is alternative.
 vue_component('form-box', {
     props: ['modelValue', 'layout'],
@@ -16,7 +26,7 @@ vue_component('form-box', {
         <div class="red">
             <form-item v-bind:type="(layout ?? 'layout-table')"><slot /></form-item>
         </div>
-        <form-launcher :items="gogogo_v1" />
+        <form-launcher :items="layout_items" />
     `,
     data: function () {
         return {
@@ -24,12 +34,13 @@ vue_component('form-box', {
         };
     },
     computed: {
-        gogogo_v1: function () {
+        layout_items: function () {
             const _this = this;
 
             const db = [];
             this.items.forEach(form_item => walk(null, form_item, this.form_types));
 
+            // rename final_cell to layout_item | make_final_cell -> make_layout_item
             // db -> virtual_items -> final_cells
             return query_db_items({parent: null}).flatMap(load_virtual_items).map(v => make_final_cell(v));
 

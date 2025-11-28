@@ -1,9 +1,8 @@
 vue_component('input-month', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
-    inject: {form_item_id: {default: null}},
     template: `
-        <input v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item_id" type="month" />
+        <input v-form-control-id v-on:input="input" v-bind:value="modelValue" type="month" />
     `,
     methods: {
         input: function (event) {

@@ -1,9 +1,8 @@
 vue_component('input-color', {
     emits: ['update:modelValue'],
     props: ['modelValue', 'disabled', 'readonly'],
-    inject: {form_item_id: {default: null}},
     template: `
-        <input v-on:input="input" v-bind:value="modelValue" v-bind:id="form_item_id" type="color" />
+        <input v-form-control-id v-on:input="input" v-bind:value="modelValue" type="color" />
     `,
     methods: {
         input: function (event) {
