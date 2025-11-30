@@ -28,6 +28,9 @@
         </breadcrumbs-item>
         <breadcrumbs-item :value="vars.row" label="Row">
             <pre>{{ vars.row }}</pre>
+            <form-box v-model="vars.row">
+                <form-item v-for="prop in win.Object.keys(vars.row)" v-bind:path="prop" v-bind:label="prop" type="text" />
+            </form-box>
             <p>dynamic-form v-model="vars.row"</p>
             <p><button>Save</button> <button>Cancel</button></p>
         </breadcrumbs-item>
