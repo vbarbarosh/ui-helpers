@@ -1,7 +1,7 @@
 vue_component('breadcrumbs', {
     props: ['items', 'vars'],
     template: `
-        <div class="tabs">
+        <div class="tabs__root">
             <div class="tab-header">
                 <div v-for="item in local_items"
                         v-on:click="click_tab(item)"
