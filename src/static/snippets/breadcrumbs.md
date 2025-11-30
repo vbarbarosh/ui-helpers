@@ -29,6 +29,6 @@
             </select>
         </breadcrumbs-item>
     </breadcrumbs>
-    <prism-js :value="vars" />
+<!--    <prism-js :value="vars" />-->
 </data-vars>
 ```
