@@ -72,6 +72,7 @@ vue_component('app', {
     },
     created: async function () {
         const ss = [
+            'snippets/sandbox/mysql.md',
             'snippets/breadcrumbs.md',
             'snippets/buttons.md',
             'snippets/download-zip.md',
@@ -98,7 +99,7 @@ vue_component('app', {
         ];
         this.snippets = await blocking(Promise.all(ss.map(async function (url) {
             const markdown = await http_get_utf8(url);
-            return {name: url.split('/').pop(), markdown: markdown};
+            return {name: url.split('/').slice(1).join('/'), markdown: markdown};
         })));
         this.ready = true;
     },
