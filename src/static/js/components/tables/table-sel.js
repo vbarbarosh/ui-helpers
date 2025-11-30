@@ -1,5 +1,6 @@
 vue_component('table-sel', {
-    props: ['items', 'columns', 'selection', 'class'],
+    emits: ['update:modelValue'],
+    props: ['modelValue', 'items', 'columns', 'selection', 'class'],
     template: `
         <table v-bind:class="$props.class">
         <thead>
@@ -173,6 +174,9 @@ vue_component('table-sel', {
                     _this.selrect = null;
                     _this.moving_target = null;
                     _this.feedback = null;
+                    if (_this.selection.length) {
+                        _this.$emit('update:modelValue', _this.selection[0]);
+                    }
                 },
             });
         },
@@ -187,6 +191,9 @@ vue_component('table-sel', {
                 if (i !== -1) {
                     this.selection.splice(i, 1);
                 }
+            }
+            if (this.selection.length) {
+                this.$emit('update:modelValue', this.selection[0]);
             }
         },
     },
