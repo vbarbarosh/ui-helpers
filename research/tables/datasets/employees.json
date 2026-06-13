@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Alice Johnson",
+    "age": 29,
+    "city": "New York",
+    "occupation": "Software Engineer"
+  },
+  {
+    "id": 2,
+    "name": "Bob Smith",
+    "age": 35,
+    "city": "Chicago",
+    "occupation": "Marketing Manager"
+  },
+  {
+    "id": 3,
+    "name": "Carla Reyes",
+    "age": 42,
+    "city": "Houston",
+    "occupation": "Data Analyst"
+  },
+  {
+    "id": 4,
+    "name": "David Kim",
+    "age": 27,
+    "city": "Seattle",
+    "occupation": "Graphic Designer"
+  },
+  {
+    "id": 5,
+    "name": "Emma Wilson",
+    "age": 31,
+    "city": "Boston",
+    "occupation": "Product Manager"
+  }
+]

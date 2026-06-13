@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue 3 TableSel Encapsulated Example</title>
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.4.0/dist/sm.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.4.0/dist/sm.css" rel="stylesheet">
+    <style>
+        table { width: auto; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <table-sel :items :columns>
+        <template v-slot:tr="{item, props}">
+            <tr v-on:mouseover="mouseover(item)" v-bind="props" />
+        </template>
+    </table-sel>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script>
+    const TableSel = {
+        name: 'TableSel',
+        props: ['items', 'columns'],
+        render: function () {
+            const slot = this.$slots.tr;
+            const columns = this.columns;
+            return Vue.h('table', {}, [
+                Vue.h('thead', [
+                    Vue.h('tr', columns.map(col => Vue.h('th', col.label))),
+                ]),
+                Vue.h('tbody', this.items.map(function (item, idx) {
+                    const props = {'data-idx': idx};
+                    const default_tds = columns.map(col => Vue.h('td', item[col.key]));
+                    if (!slot) {
+                        return Vue.h('tr', props, default_tds);
+                    }
+                    // Slot returns [VNode], expect single <tr>
+                    const slot_nodes = slot({item, props});
+                    // Use first returned VNode, and clone with <td>s as children
+                    const tr_node = Array.isArray(slot_nodes) ? slot_nodes[0] : slot_nodes;
+                    if (tr_node && tr_node.type === 'tr') {
+                        // Clone <tr>, replace children with our <td>s
+                        return Vue.h('tr', tr_node.props, default_tds);
+                    }
+                    else {
+                        // fallback if slot doesn't return <tr>
+                        return Vue.h('tr', props, default_tds);
+                    }
+                })),
+            ]);
+        }
+    };
+
+    const app = Vue.createApp({
+        components: {TableSel},
+        data: function () {
+            return {
+                columns: [
+                    {key: 'id', label: 'ID'},
+                    {key: 'name', label: 'Name'},
+                    {key: 'value', label: 'Value'},
+                ],
+                items: [
+                    {id: 1, name: 'Item 1', value: 10},
+                    {id: 2, name: 'Item 2', value: 20},
+                    {id: 3, name: 'Item 3', value: 30},
+                ],
+            };
+        },
+        methods: {
+            mouseover: function (item) {
+                console.log('Hovered: ' + item.name);
+            },
+        },
+    });
+
+    app.mount('#app');
+</script>
+</body>
+</html>
