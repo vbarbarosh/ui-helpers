@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue 3 TableSel Encapsulated Example</title>
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.2.0/dist/reset.css" rel="stylesheet">
+    <link href="https://unpkg.com/@vbarbarosh/smcss@1.4.0/dist/sm.css" rel="stylesheet">
+    <style>
+        table { width: auto; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <table-tree :items :columns />
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script>
+    const TableTree = {
+        name: 'TableTree',
+        props: ['items', 'columns'],
+        render: function () {
+            const slot = this.$slots.tr;
+            const columns = this.columns;
+            return Vue.h('table', {}, [
+                Vue.h('thead', [
+                    Vue.h('tr', columns.map(col => Vue.h('th', {class: col.class}, col.label))),
+                ]),
+                Vue.h('tbody', this.items.map(function (item, idx) {
+                    const props = {'data-idx': idx};
+                    const default_tds = columns.map(col => Vue.h('td', {class: col.class}, item[col.key]));
+                    if (!slot) {
+                        return Vue.h('tr', props, default_tds);
+                    }
+                    // Slot returns [VNode], expect single <tr>
+                    const slot_nodes = slot({item, props});
+                    // Use first returned VNode, and clone with <td>s as children
+                    const tr_node = Array.isArray(slot_nodes) ? slot_nodes[0] : slot_nodes;
+                    if (tr_node && tr_node.type === 'tr') {
+                        // Clone <tr>, replace children with our <td>s
+                        return Vue.h('tr', tr_node.props, default_tds);
+                    }
+                    else {
+                        // fallback if slot doesn't return <tr>
+                        return Vue.h('tr', props, default_tds);
+                    }
+                })),
+            ]);
+        }
+    };
+
+    const app = Vue.createApp({
+        components: {TableTree},
+        data: function () {
+            return {
+                columns: [
+                    {type: 'department', key: 'id', label: 'ID'},
+                    {type: 'department', key: 'name', label: 'Name'},
+                    {type: 'department', key: 'location', label: 'Location'},
+                    {type: 'employee', key: 'name', label: 'Name'},
+                    {type: 'employee', key: 'role', label: 'Role'},
+                    {type: 'employee', key: 'years_experience', label: 'Exp.'},
+                ],
+                items: [
+                    {id: 1, parent_id: null, name: 'Engineering', location: 'Seattle', role: null, years_experience: null},
+                    {id: 2, parent_id: null, name: 'Marketing', location: 'Chicago', role: null, years_experience: null},
+                    {id: 3, parent_id: null, name: 'Data & Analytics', location: 'Houston', role: null, years_experience: null},
+                    {id: 101, parent_id: 1, name: 'Alice Johnson', location: null, role: 'Software Engineer', years_experience: 5},
+                    {id: 102, parent_id: 1, name: 'David Kim', location: null, role: 'Frontend Developer', years_experience: 3},
+                    {id: 103, parent_id: 1, name: 'Priya Nair', location: null, role: 'DevOps Engineer', years_experience: 7},
+                    {id: 201, parent_id: 2, name: 'Bob Smith', location: null, role: 'Marketing Manager', years_experience: 9},
+                    {id: 202, parent_id: 2, name: 'Emma Wilson', location: null, role: 'Content Strategist', years_experience: 4},
+                    {id: 301, parent_id: 3, name: 'Carla Reyes', location: null, role: 'Data Analyst', years_experience: 6},
+                    {id: 302, parent_id: 3, name: 'Marcus Lee', location: null, role: 'Data Scientist', years_experience: 8},
+                ],
+            };
+        },
+    });
+
+    app.mount('#app');
+</script>
+</body>
+</html>

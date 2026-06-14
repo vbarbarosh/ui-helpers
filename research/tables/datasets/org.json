@@ -1,0 +1,12 @@
+[
+  {"id": 1, "parent_id": null, "name": "Engineering", "location": "Seattle", "role": null, "years_experience": null},
+  {"id": 2, "parent_id": null, "name": "Marketing", "location": "Chicago", "role": null, "years_experience": null},
+  {"id": 3, "parent_id": null, "name": "Data & Analytics", "location": "Houston", "role": null, "years_experience": null},
+  {"id": 101, "parent_id": 1, "name": "Alice Johnson", "location": null, "role": "Software Engineer", "years_experience": 5},
+  {"id": 102, "parent_id": 1, "name": "David Kim", "location": null, "role": "Frontend Developer", "years_experience": 3},
+  {"id": 103, "parent_id": 1, "name": "Priya Nair", "location": null, "role": "DevOps Engineer", "years_experience": 7},
+  {"id": 201, "parent_id": 2, "name": "Bob Smith", "location": null, "role": "Marketing Manager", "years_experience": 9},
+  {"id": 202, "parent_id": 2, "name": "Emma Wilson", "location": null, "role": "Content Strategist", "years_experience": 4},
+  {"id": 301, "parent_id": 3, "name": "Carla Reyes", "location": null, "role": "Data Analyst", "years_experience": 6},
+  {"id": 302, "parent_id": 3, "name": "Marcus Lee", "location": null, "role": "Data Scientist", "years_experience": 8}
+]
